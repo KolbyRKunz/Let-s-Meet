@@ -1,3 +1,87 @@
+//@ts-check
+
+import 'react-native-gesture-handler';
+import React from "react";
+import { Text, StatusBar } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from '@react-navigation/stack';
+import MainView from './MainView';
+
+
+const App = () => {
+  return(
+    <>
+      <Text>
+        Hello World;
+      </Text>
+    </>
+  );
+};
+
+export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+/* const Stack = createStackNavigator();
+
+const App = () => {
+  return(
+    <>
+      <StatusBar barStyle='dark-content' hidden/>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="MainView"
+          screenOptions={{headerMode:'screen'}}
+        >
+          <Stack.Screen
+            name='MainView'
+            component={MainView}
+            options={{
+              title: 'Hi!'
+            }}
+          />  
+        </Stack.Navigator>
+      </NavigationContainer>
+      <Text>
+        Hello World!
+      </Text>
+    </>
+  );
+}
+
+export default App;
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -5,7 +89,7 @@
  * @format
  * @flow strict-local
  */
-
+/* 
 import React from 'react';
 import type {Node} from 'react';
 import {
@@ -110,3 +194,4 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+ */
