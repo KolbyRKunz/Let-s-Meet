@@ -4,7 +4,7 @@ namespace Let_s_Meet.Models
 {
     public class UserModel
     {
-        public int UserId { get; set; }
+        public int ID { get; set; }
 
         public string FirstName { get; set; }
 

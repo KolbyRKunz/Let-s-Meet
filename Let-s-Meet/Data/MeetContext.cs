@@ -9,9 +9,9 @@ namespace Let_s_Meet.Data
         {
         }
 
-        public DbSet<EventModel> Courses { get; set; }
-        public DbSet<GroupModel> Enrollments { get; set; }
-        public DbSet<UserModel> Students { get; set; }
+        public DbSet<EventModel> Events { get; set; }
+        public DbSet<GroupModel> Groups { get; set; }
+        public DbSet<UserModel> Users { get; set; }  //Tempory value. Identity will take care of this later
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
