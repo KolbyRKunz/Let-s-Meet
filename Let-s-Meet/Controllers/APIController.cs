@@ -28,6 +28,12 @@ namespace Let_s_Meet.Controllers
             return View();
         }
 
+        [HttpPost]
+        public String post(string something)
+        {
+            return "Hello from web server!!";
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

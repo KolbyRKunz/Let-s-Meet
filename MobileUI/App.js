@@ -6,6 +6,7 @@ import { Text, StatusBar } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
 import MainView from './MainView';
+import HttpExample from './http_example.js'
 
 
 const App = () => {
@@ -14,17 +15,12 @@ const App = () => {
       <Text>
         Hello World;
       </Text>
+      <HttpExample />
     </>
   );
 };
 
 export default App;
-
-
-
-
-
-
 
 
 
