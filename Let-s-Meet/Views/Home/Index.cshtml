@@ -4,22 +4,68 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome To Let's Meet!</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <button id="button" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
 
+    <button style="background-color:lightblue; border:none" id="button0" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
+    <hr />
 </div>
 
 
+
+
+<!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->
+<div style="position:absolute;align-content:center">
+    <div style="float:left; padding:10px">
+        <button style="background-color:lightblue; border:none" id="button1" class="btn btn-danger" onclick="doFunction1(1)"> Request User Data </button>
+    </div>
+
+    <div style="float:left;padding:10px">
+        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="doFunction1(2)"> Request Group Data </button>
+    </div>
+
+    <div style="float:left;padding:10px">
+
+        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="doFunction1(3)"> Request Event Data </button>
+    </div>
+</div>
+
+<br/>
+
+<br />
+
+<br/>
+
+<div class="output_box" style="position:relative;border: 1px solid black;">
+    
+</div>
+
+
+
+
+
+
 <script>
-    function doFunction(){
+    function doFunction() {
 
         let url = "Api/post"
         let data = "string"
 
         $.post(url, data).done(function (result) {
 
-            $("#button").html(result.message);
+            $("#button0").html(result.message);
+            $(".output_box").html("");
+        })
+    }
 
+    function doFunction1(thing) {
+
+        let url = "Api/post"
+        let data = "string"
+
+        $.post(url, data).done(function (result) {
+
+            $(".output_box").html(result.message + " From " + thing);
+            //var element = document.getElementByClassName("output_box");
+            //element.appendChild(result.message);
         })
     }
 
