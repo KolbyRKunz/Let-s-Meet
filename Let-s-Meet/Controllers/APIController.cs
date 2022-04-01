@@ -29,9 +29,9 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public String post(string something)
+        public async Task<IActionResult> Post(string data)
         {
-            return "Hello from web server!!";
+            return Ok(new { message = ("Hello from web server!!" + data) });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
