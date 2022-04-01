@@ -52,13 +52,23 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> get(string data)
+        public async Task<IActionResult> getUsers(string data)
         {
-            //await _context.Opportunities.ToListAsync()
-            //return Ok(new { message = ("Get???" + data) });
             var element = await _context.Users.ToListAsync();
+            return Ok(JsonConvert.SerializeObject(element));
+        }
 
-            //return Ok(element);
+        [HttpGet]
+        public async Task<IActionResult> getEvents(string data)
+        {
+            var element = await _context.Events.ToListAsync();
+            return Ok(JsonConvert.SerializeObject(element));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> getGroups(string data)
+        {
+            var element = await _context.Groups.ToListAsync();
             return Ok(JsonConvert.SerializeObject(element));
         }
 
