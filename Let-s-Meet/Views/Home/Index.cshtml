@@ -5,5 +5,22 @@
 <div class="text-center">
     <h1 class="display-4">Welcome To Let's Meet!</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <button class="btn btn-danger"> This is a button </button>
+    <button id="button" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
+
 </div>
+
+
+<script>
+    function doFunction(){
+
+        let url = "Api/post"
+        let data = "string"
+
+        $.post(url, data).done(function (result) {
+
+            $("#button").html(result);
+
+        })
+    }
+
+</script>
