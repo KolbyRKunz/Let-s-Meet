@@ -28,14 +28,14 @@
     </div>
 </div>
 
-<br/>
+<br />
 
 <br />
 
-<br/>
+<br />
 
 <div class="output_box" style="position:relative;border: 1px solid black;">
-    
+
 </div>
 
 
@@ -56,17 +56,24 @@
         })
     }
 
-    function doFunction1(thing) {
+    function doFunction1(buttonNumber) {
 
-        let url = "Api/post"
+        let url = "Api/get"
         let data = "string"
 
-        $.post(url, data).done(function (result) {
+        $.get(url, data)
+            .fail(function (result) {
+                console.log("Something went wrong");
+            })
+            .done(function (result) {
+                var users = JSON.parse(result);
+                var output = "";
+                for (var k in users) {
+                    output = output + users[k].FirstName + " " + users[k].LastName + ", ";
+                }
 
-            $(".output_box").html(result.message + " From " + thing);
-            //var element = document.getElementByClassName("output_box");
-            //element.appendChild(result.message);
-        })
+                $(".output_box").html("From " + buttonNumber + "\n" + output);
+            })
     }
 
 </script>
