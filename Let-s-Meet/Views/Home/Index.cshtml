@@ -15,27 +15,27 @@
 <!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->
 <div style="position:absolute;align-content:center">
     <div style="float:left; padding:10px">
-        <button style="background-color:lightblue; border:none" id="button1" class="btn btn-danger" onclick="doFunction1(1)"> Request User Data </button>
+        <button style="background-color:lightblue; border:none" id="button1" class="btn btn-danger" onclick="getData(1)"> Request User Data </button>
     </div>
 
     <div style="float:left;padding:10px">
-        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="doFunction1(2)"> Request Group Data </button>
+        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="getData(2)"> Request Group Data </button>
     </div>
 
     <div style="float:left;padding:10px">
 
-        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="doFunction1(3)"> Request Event Data </button>
+        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="getData(3)"> Request Event Data </button>
     </div>
 </div>
 
-<br/>
+<br />
 
 <br />
 
-<br/>
+<br />
 
 <div class="output_box" style="position:relative;border: 1px solid black;">
-    
+
 </div>
 
 
@@ -56,17 +56,48 @@
         })
     }
 
-    function doFunction1(thing) {
+    function getData(buttonNumber) {
 
-        let url = "Api/post"
+        let url = "Api/get"
+
+        if (buttonNumber == 1)
+            url = url + "Users"
+        else if (buttonNumber == 2)
+            url = url + "Groups"
+        else if (buttonNumber == 3)
+            url = url + "Events"
+
         let data = "string"
 
-        $.post(url, data).done(function (result) {
-
-            $(".output_box").html(result.message + " From " + thing);
-            //var element = document.getElementByClassName("output_box");
-            //element.appendChild(result.message);
-        })
+        $.get(url, data)
+            .fail(function (result) {
+                console.log("Something went wrong");
+            })
+            .done(function (result) {
+                var list = JSON.parse(result);
+                var output = "";
+                if (buttonNumber == 1) {
+                    for (var k in list) {
+                        output = output + list[k].FirstName + " " + list[k].LastName + "<br/>";
+                    }
+                }
+                else if (buttonNumber == 2) {
+                    for (var k in list) {
+                        output = output + "Group: " + list[k].ID + " GroupSize: " + list[k].GroupSize + "</br>";
+                        //^^for now until user column gets populated
+                    }
+                }
+                else if (buttonNumber == 3) {
+                    for (var k in list) {
+                        console.log(list[k]);
+                        output = output +
+                            "Start: " + list[k].startTime +
+                            " End: " + list[k].endTime + "<br/>";
+                        //^^for now until group id is resolved?
+                    }
+                }
+                $(".output_box").html(output);
+            })
     }
 
 </script>
