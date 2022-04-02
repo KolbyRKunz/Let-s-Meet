@@ -6,10 +6,16 @@ class HttpExample extends Component {
       data: ''
    }
    componentDidMount = () => {
-      fetch('https://jsonplaceholder.typicode.com/posts/1', {
-         method: 'GET'
+      fetch('http://10.0.2.2:37864/Api/Echo', {
+         method: 'GET',
+         headers:{
+            'Content-Type': 'application/json'
+         }
       })
-      .then((response) => response.json())
+      .then((response) => {   
+         response.json()
+         console.log(response)
+      })
       .then((responseJson) => {
          console.log(responseJson);
          this.setState({

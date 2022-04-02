@@ -34,6 +34,16 @@ namespace Let_s_Meet.Controllers
             return Ok(new { message = ("Hello from web server!!" + data) });
         }
 
+        [HttpGet]
+        [Produces("application/json")]
+        public async Task<IActionResult> Echo(string data)
+        {
+            return new JsonResult(
+                new { body = "Hello from the web" + data});
+
+            //return Ok(new { message = ("Hello from web server!!" + data) });
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
