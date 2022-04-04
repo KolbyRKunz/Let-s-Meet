@@ -76,11 +76,13 @@ namespace Let_s_Meet.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Echo(string data)
         {
-            return new JsonResult(
-                new { body = "Hello from the web" + data});
+            /*var element = "Hello from the web server";
+            return Ok(JsonConvert.SerializeObject(element));*/
 
-            //return Ok(new { message = ("Hello from web server!!" + data) });
-        }
+			return Ok(new { body = "Hello from the web" + data });
+
+			//return Ok(new { message = ("Hello from web server!!" + data) });
+		}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
