@@ -5,10 +5,11 @@ import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 export default HttpExample = () => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const getMovies = async () => {
+  const getResponse = async () => {
      try {
       console.log("try");
-      const response = await fetch('http://192.168.56.1:3000/Api/Echo');
+      const response = await fetch('http://192.168.56.1:3000/Api/Echo?data=Hello from the mobile');
+      
       console.log("response");
       const json = await response.json();
       console.log("this is the body " + json.body);
@@ -23,11 +24,11 @@ export default HttpExample = () => {
   }
 
   useEffect(() => {
-    getMovies();
+    getResponse();
   }, []);
 
   return (
-    <View style={{ flex: 1, padding: 24 }}>
+    <View style={{ flex: 0, padding: 24 }}>
       {isLoading ? <ActivityIndicator/> : (
         <Text>
             {data}

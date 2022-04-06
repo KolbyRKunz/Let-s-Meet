@@ -79,7 +79,7 @@ namespace Let_s_Meet.Controllers
             /*var element = "Hello from the web server";
             return Ok(JsonConvert.SerializeObject(element));*/
 
-			return Ok(new { body = "Hello from the web" + data });
+			return Ok(new { body = "Hello from the web " + data });
 
 			//return Ok(new { message = ("Hello from web server!!" + data) });
 		}
