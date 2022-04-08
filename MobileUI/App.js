@@ -7,6 +7,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
 import MainView from './MainView';
 import HttpExample from './http_example.js'
+import Demo from './demo.js'
 
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
         Hello World;
       </Text>
       <HttpExample />
+      <Demo />
     </>
   );
 };
