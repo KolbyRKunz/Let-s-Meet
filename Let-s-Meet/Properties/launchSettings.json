@@ -3,8 +3,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://192.168.56.1:3000",
-      "sslPort": 0
+      "applicationUrl": "http://localhost:37864",
+      "sslPort": 44356
     }
   },
   "profiles": {
@@ -18,13 +18,13 @@
     },
     "Let_s_Meet": {
       "commandName": "Project",
+      "dotnetRunMessages": "true",
       "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
-      },
-      "dotnetRunMessages": "true",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      }
     }
   }
 }
