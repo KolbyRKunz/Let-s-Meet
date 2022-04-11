@@ -68,7 +68,7 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public async Task<IActionResult> getGroups(string data)
         {
-            var element = await _context.Groups.ToListAsync();
+            var element = await _context.Groups.Include("Users").ToListAsync();
             return Ok(JsonConvert.SerializeObject(element));
         }
 

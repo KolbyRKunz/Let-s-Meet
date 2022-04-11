@@ -41,7 +41,7 @@ export default Demo = () => {
 
       <Text>Groups</Text>
       { isLoading ? <ActivityIndicator/> : 
-        (dataG.map(item => <Text key={item.ID}>Group: {item.ID} GroupSize: {item.GroupSize} {item.Users}</Text>))
+        (dataG.map(item => <Text key={item.ID}>Group: {item.ID}</Text>))
       }
       <Text>{'\n'}</Text>
 
