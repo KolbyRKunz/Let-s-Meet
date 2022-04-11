@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Let_s_Meet.Controllers
 {
@@ -51,6 +52,7 @@ namespace Let_s_Meet.Controllers
             return Ok(new { message = ("Hello from web server!!" + data) });
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> getUsers(string data)
         {
@@ -58,6 +60,7 @@ namespace Let_s_Meet.Controllers
             return Ok(JsonConvert.SerializeObject(element));
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> getEvents(string data)
         {
@@ -65,6 +68,7 @@ namespace Let_s_Meet.Controllers
             return Ok(JsonConvert.SerializeObject(element));
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> getGroups(string data)
         {

@@ -82,15 +82,16 @@
                     }
                 }
                 else if (buttonNumber == 2) {
-					// Set output to list of groups showing the users in each group
-					for (var k in list) {
-						output = output + "Group: " + list[k].ID + " Users: ";
-						for (var i in list[k].Users) {
-							output = output + list[k].Users[i].FirstName + " " + list[k].Users[i].LastName + ", ";
-						}
 
-						output += "<br/>";
-					}
+                    // Set output to list of groups showing the users in each group
+                    for (var k in list) {
+                        output = output + "Group: " + list[k].ID + " Users: ";
+                        for (var i in list[k].Users) {
+                            output = output + list[k].Users[i].FirstName + " " + list[k].Users[i].LastName + ", ";
+                        }
+                        
+                        output += "<br/>";
+                    }
                 }
                 else if (buttonNumber == 3) {
                     for (var k in list) {
