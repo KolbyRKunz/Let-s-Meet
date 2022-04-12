@@ -24,13 +24,13 @@ namespace Let_s_Meet.Models
 
 
         [JsonProperty(PropertyName = "groups")]
-        public ICollection<GroupModel> GroupModels { get; set; }
+        public ICollection<GroupModel> Groups { get; set; }
 
         [JsonProperty(PropertyName = "friends")]
         public ICollection<UserModel> Friends { get; set; }
 
         [JsonProperty(PropertyName = "events")]
-        public ICollection<EventModel> EventModels { get; set; }
+        public ICollection<EventModel> Events { get; set; }
 
 
     }

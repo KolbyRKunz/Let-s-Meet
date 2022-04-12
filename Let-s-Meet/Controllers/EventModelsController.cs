@@ -34,7 +34,7 @@ namespace Let_s_Meet.Controllers
             }
 
             var eventModel = await _context.Events
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.EventID == id);
             if (eventModel == null)
             {
                 return NotFound();
@@ -88,7 +88,7 @@ namespace Let_s_Meet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,startTime,endTime")] EventModel eventModel)
         {
-            if (id != eventModel.ID)
+            if (id != eventModel.EventID)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace Let_s_Meet.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EventModelExists(eventModel.ID))
+                    if (!EventModelExists(eventModel.EventID))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace Let_s_Meet.Controllers
             }
 
             var eventModel = await _context.Events
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.EventID == id);
             if (eventModel == null)
             {
                 return NotFound();
@@ -147,7 +147,7 @@ namespace Let_s_Meet.Controllers
 
         private bool EventModelExists(int id)
         {
-            return _context.Events.Any(e => e.ID == id);
+            return _context.Events.Any(e => e.EventID == id);
         }
     }
 }
