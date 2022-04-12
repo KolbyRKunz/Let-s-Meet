@@ -57,11 +57,11 @@ namespace Let_s_Meet.Data
                 // Create event
                 EventModel eventModel = new EventModel
                 {
-                    Group = groups[i],
+                    //Group = groups[i],
                     //Title = "Event " + i,
                     //Description = "Description " + i,
-                    startTime = DateTime.Now.AddDays(i),
-                    endTime = DateTime.Now.AddDays(i).AddHours(2),
+                    StartTime = DateTime.Now.AddDays(i),
+                    EndTime = DateTime.Now.AddDays(i).AddHours(2),
                     //Location = "Location " + i
                 };
 

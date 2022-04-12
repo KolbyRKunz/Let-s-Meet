@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Let_s_Meet.Models
@@ -7,16 +8,20 @@ namespace Let_s_Meet.Models
     [JsonObject(MemberSerialization.OptIn)]
     public class GroupModel
     {
-        [JsonProperty(PropertyName = "ID")]
-        public int ID { get; set; }
+        [Key]
+        [JsonProperty(PropertyName = "groupID")]
+        public int GroupID { get; set; }  //Primary Key
 
-        [JsonProperty(PropertyName = "GroupSize")]
-        public int GroupSize { get; set; } // TODO this likely isn't necessary since we can just get the length of the list of users
+        [JsonProperty(PropertyName = "groupName")]
+        public string GroupName { get; set; }
 
-        [JsonProperty(PropertyName = "Users")]
+        [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
 
-        // TODO have fields like name, description, owner, and members?
+        [JsonProperty(PropertyName = "events")]
+        public ICollection<EventModel> Events { get; set; }
+
+        //TODO: any other columns we would want an event to have
 
     }
 }

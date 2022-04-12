@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Let_s_Meet.Models
@@ -6,17 +8,29 @@ namespace Let_s_Meet.Models
     [JsonObject(MemberSerialization.OptIn)]
     public class EventModel
     {
-        [JsonProperty(PropertyName = "ID")]
-        public int ID { get; set; }
+        [Key]
+        [JsonProperty(PropertyName = "eventID")]
+        public int ID { get; set; }     //Primary key
 
         [JsonProperty(PropertyName = "startTime")]
-        public DateTime startTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [JsonProperty(PropertyName = "endTime")]
-        public DateTime endTime { get; set; }
+        public DateTime EndTime { get; set; }
 
-        [JsonProperty(PropertyName = "Group")]
-        public GroupModel Group { get; set; }
+        [JsonProperty(PropertyName = "location")]
+        public string Location { get; set; }
+
+        [JsonProperty(PropertyName = "privacy")]
+        public string Privacy { get; set; }
+
+        [JsonProperty(PropertyName = "users")]
+        public ICollection<UserModel> UserModels { get; set; }
+
+        [JsonProperty(PropertyName = "groups")]
+        public ICollection<GroupModel> GroupModels { get; set; }
+
+        //TODO: any other columns we would want an event to have
 
     }
 }
