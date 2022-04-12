@@ -71,16 +71,18 @@
 
         $.get(url, data)
             .fail(function (result) {
-                console.log("Something went wrong");
+                console.log("Something went wrong: " + result);
             })
             .done(function (result) {
                 var list = JSON.parse(result);
                 var output = "";
+                //Display User information
                 if (buttonNumber == 1) {
                     for (var k in list) {
                         output = output + list[k].FirstName + " " + list[k].LastName + "<br/>";
                     }
                 }
+                //Display Group information
                 else if (buttonNumber == 2) {
 
                     // Set output to list of groups showing the users in each group
@@ -93,6 +95,7 @@
                         output += "<br/>";
                     }
                 }
+                //Display Event information
                 else if (buttonNumber == 3) {
                     for (var k in list) {
                         console.log(list[k]);
