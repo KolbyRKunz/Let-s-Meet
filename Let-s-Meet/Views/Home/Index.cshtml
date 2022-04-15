@@ -71,15 +71,18 @@
 
         $.get(url, data)
             .fail(function (result) {
-                console.log("Something went wrong: " + result);
+                console.log("Something went wrong: " + JSON.stringify(result));
             })
             .done(function (result) {
                 var list = JSON.parse(result);
                 var output = "";
+                
+                console.log(list);
+
                 //Display User information
                 if (buttonNumber == 1) {
                     for (var k in list) {
-                        output = output + list[k].FirstName + " " + list[k].LastName + "<br/>";
+                        output = output + list[k].firstName + " " + list[k].lastName + "<br/>";
                     }
                 }
                 //Display Group information
@@ -87,9 +90,9 @@
 
                     // Set output to list of groups showing the users in each group
                     for (var k in list) {
-                        output = output + "Group: " + list[k].ID + " Users: ";
+                        output = output + "Group: " + list[k].groupID + " Users: ";
                         for (var i in list[k].Users) {
-                            output = output + list[k].Users[i].FirstName + " " + list[k].Users[i].LastName + ", ";
+                            output = output + list[k].Users[i].firstName + " " + list[k].Users[i].lastName + ", ";
                         }
                         
                         output += "<br/>";
@@ -100,8 +103,8 @@
                     for (var k in list) {
                         console.log(list[k]);
                         output = output +
-                            "Start: " + list[k].StartTime +
-                            " End: " + list[k].EndTime + "<br/>";
+                            "Start: " + list[k].startTime +
+                            " End: " + list[k].endTime + "<br/>";
                         //^^for now until group id is resolved?
                     }
                 }
