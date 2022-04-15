@@ -23,6 +23,11 @@ namespace Let_s_Meet.Controllers
             return View();
         }
 
+        public IActionResult NewPage()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
