@@ -56,7 +56,30 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public async Task<IActionResult> getUsers(string data)
         {
-            var element = await _context.Users.ToListAsync();
+            var element = _context.Users.Select(u => new
+            {
+                firstName = u.FirstName,
+                lastName = u.LastName,
+                groups = u.Groups.Select(g => new 
+                { 
+                    groupName = g.GroupName,
+                    /*members = g.Users.Select(m => new 
+                    { 
+                        firstName = m.FirstName,
+                        lastName = m.LastName
+                    })*/
+                }),
+                /*friends = u.Friends.Select(f => new 
+                { 
+                    firstName = f.FirstName,
+                    lastName = f.LastName
+                }),*/
+                events = u.Events.Select(e => new 
+                { 
+                    startTime = e.StartTime,
+                    endTime = e.EndTime
+                })
+            });
             return Ok(JsonConvert.SerializeObject(element));
         }
 
@@ -64,7 +87,20 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public async Task<IActionResult> getEvents(string data)
         {
-            var element = await _context.Events.ToListAsync();
+            var element = _context.Events.Select(e => new
+            {
+                startTime = e.StartTime,
+                endTime = e.EndTime,
+                groups = e.Groups.Select(g => new 
+                { 
+                    groupName = g.GroupName
+                }),
+                users = e.Users.Select(u => new 
+                { 
+                    firstName = u.FirstName,
+                    lastName = u.LastName
+                })
+            }) ;
             return Ok(JsonConvert.SerializeObject(element));
         }
 
@@ -72,7 +108,20 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public async Task<IActionResult> getGroups(string data)
         {
-            var element = await _context.Groups.Include("Users").ToListAsync();
+            var element = _context.Groups.Select(g => new 
+            { 
+                groupName = g.GroupName,
+                members = g.Users.Select(m => new 
+                { 
+                    firstName = m.FirstName,
+                    lastName = m.LastName
+                }),
+                events = g.Events.Select(e => new 
+                { 
+                    startTime = e.StartTime,
+                    endTime = e.EndTime
+                })
+            });
             return Ok(JsonConvert.SerializeObject(element));
         }
 
