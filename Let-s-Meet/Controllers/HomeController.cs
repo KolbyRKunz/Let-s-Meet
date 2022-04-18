@@ -23,7 +23,12 @@ namespace Let_s_Meet.Controllers
             return View();
         }
 
-        public IActionResult NewPage()
+        public IActionResult Groups()
+        {
+            return View();
+        }
+
+        public IActionResult Friends()
         {
             return View();
         }
