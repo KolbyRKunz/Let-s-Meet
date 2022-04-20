@@ -24,6 +24,8 @@ namespace Let_s_Meet
                 {
                     //if we have more contexts for some reason this is where we should run their initializers
                     var context = services.GetRequiredService<MeetContext>();
+                    var Identity = services.GetRequiredService<IdentityContext>();
+                    IdentityInit.Initialize(Identity);
                     DbInitializer.Initialize(context);
                 }
                 catch (Exception ex)
