@@ -1,6 +1,7 @@
 package com.mobileui;
 
 import com.facebook.react.ReactActivity;
+import android.os.Bundle;
 
 public class MainActivity extends ReactActivity {
 
@@ -11,5 +12,14 @@ public class MainActivity extends ReactActivity {
   @Override
   protected String getMainComponentName() {
     return "MobileUI";
+  }
+
+  /**
+  * From this tutorial: https://reactnavigation.org/docs/getting-started
+  * Followed when figuring out issues with draw navigation
+  */
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
   }
 }
