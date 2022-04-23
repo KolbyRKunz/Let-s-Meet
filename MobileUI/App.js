@@ -76,11 +76,17 @@ const TempOutputBox = (props) => {
   );
 }
 
+const CalendarTitle = (props) => {
+  return (
+    <Text style={styles.text}>{props.groupName} Schedule</Text>
+  );
+}
+
 export default function App() {
   const [selectedDay, setSelectedDay] = useState('');
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>My Schedule</Text>
+      <CalendarTitle groupName='My'/>
       <Calendar
         onDayPress={day => {
           console.log('selected day', day);
@@ -181,6 +187,10 @@ export default function App() {
 
 
 
+//Sources for trying to get drawer navigator to work
+//https://www.youtube.com/watch?v=EaNCi8o8H0A&ab_channel=TheNetNinja
+//https://github.com/iamshaunjp/react-native-tutorial/tree/lesson-24
+//https://reactnavigation.org/docs/drawer-navigator
 
 
 
@@ -404,10 +414,6 @@ export default function App() {
 
 
 
-//Sources for trying to get drawer navigator to work
-//https://www.youtube.com/watch?v=EaNCi8o8H0A&ab_channel=TheNetNinja
-//https://github.com/iamshaunjp/react-native-tutorial/tree/lesson-24
-//https://reactnavigation.org/docs/drawer-navigator
 
 
 
