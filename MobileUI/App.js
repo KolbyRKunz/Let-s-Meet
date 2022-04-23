@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly'
   },
   outputContainer: {
-    color: Colors.DD_RED_3,
+    color: Colors.DD_RED_2,
     left: 50,
     maxWidth: 300,
     padding: 15,
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 25,
     fontWeight: '500',
-    color: Colors.DD_RED_3,
+    color: Colors.DD_RED_2,
     textAlign: 'center',
     marginTop: 40,
     //marginBottom: 50,
