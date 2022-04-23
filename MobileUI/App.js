@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from "react";
+import React, {useState} from "react";
 import { Text, StatusBar, SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
@@ -11,10 +11,9 @@ import { LocaleConfig } from 'react-native-calendars';
 import Colors from './assets/styles/colors';
 //import Fonts from './assets/styles/fonts';
 //import { globalStyles } from '../styles/global';
-import TempOutputBox from './assets/components/tempOutputBox';
+//import TempOutputBox from './assets/components/tempOutputBox';
 
 //TODO: In Calendar, can't get the selected day background to changecolor like advertised
-//TODO: How to get Sunday to be on the leftmost side?
 
 //About: There are two versions we could go with: plain old calendar or the agenda version
 //The agenda version has built in events and things that make it cool https://github.com/wix/react-native-calendars#agenda
@@ -46,23 +45,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.DD_CREAM,
-    alignContent: 'center'
+    justifyContent: 'space-evenly'
+  },
+  outputContainer: {
+    color: Colors.DD_RED_3,
+    left: 50,
+    maxWidth: 300,
+    padding: 15,
+    borderWidth: 15,
+    borderColor: Colors.DD_RED_2,
+    backgroundColor: Colors.DD_CREAM
   },
   text: {
     fontSize: 25,
     fontWeight: '500',
+    color: Colors.DD_RED_3,
+    textAlign: 'center',
+    marginTop: 40,
+    //marginBottom: 50,
+    paddingHorizontal: 90,
+    position: 'relative',
+    flexWrap: 'wrap'
   }
 });
 
+const TempOutputBox = (props) => {
+  return (
+    <Text style={styles.outputContainer}>{props.day} was selected</Text>
+  );
+}
 
 export default function App() {
+  const [selectedDay, setSelectedDay] = useState('');
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.text}>My Schedule</Text>
       <Calendar
-        // onDayPress={day => {
-        //   console.log('selected day', day);
-        // }}
-        //onDayPress={ day => {<TempOutputBox />}}
+        onDayPress={day => {
+          console.log('selected day', day);
+          setSelectedDay(day.day);
+        }}
         // Handler which gets executed on day long press. Default = undefined
         onDayLongPress={day => {
           console.log('selected day', day);
@@ -76,9 +98,10 @@ export default function App() {
 
         markedDates={{ //Works but like, it's hard coded
           '2022-04-27': {
-            selected: true, 
-            selectedColor: Colors.DD_RED_3, 
-            selectedDayTextColor: Colors.TEST_PURPLE}
+            selected: true,
+            selectedColor: Colors.DD_RED_3,
+            selectedDayTextColor: Colors.TEST_PURPLE
+          }
         }}
 
         // Hide month navigation arrows. Default = false
@@ -91,7 +114,7 @@ export default function App() {
         // day from another month that is visible in calendar page. Default = false
         disableMonthChange={true}
         // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday
-        firstDay={1}
+        firstDay={0}
         // Hide day names. Default = false
         hideDayNames={false}
         // Show week numbers to the left. Default = false
@@ -113,15 +136,15 @@ export default function App() {
         // Enable the option to swipe between months. Default = false
         enableSwipeMonths={true}
         theme={{
-         // backgroundColor: Colors.TEST_PURPLE, //dunno where this is supposed to show up
+          // backgroundColor: Colors.TEST_PURPLE, //dunno where this is supposed to show up
           calendarBackground: Colors.DD_CREAM,
           textSectionTitleColor: Colors.DD_CREAM,
           // textSectionTitleDisabledColor: '#d9e1e8',
-         // selectedDayBackgroundColor: Colors.TEST_PURPLE,
-         // selectedDayTextColor: Colors.TEST_PURPLE,
+          // selectedDayBackgroundColor: Colors.TEST_PURPLE,
+          // selectedDayTextColor: Colors.TEST_PURPLE,
           todayTextColor: Colors.DD_LIGHT_GRAY, //meh suppper iffy on this one
           dayTextColor: Colors.DD_RED_2,
-         // textDisabledColor: Colors.TEST_PURPLE,
+          // textDisabledColor: Colors.TEST_PURPLE,
           dotColor: Colors.TEST_PURPLE,
           selectedDotColor: '#ffffff',
           arrowColor: Colors.DD_CREAM,
@@ -143,15 +166,22 @@ export default function App() {
           //borderColor: Colors.DD_GRAY,
           backgroundColor: Colors.DD_RED_2,
           paddingBottom: 10,
-          marginTop: 200
-          //height: 350
+          //marginBottom: 50,
+          //position: 'absolute',
+          width: 390
         }}
       />
       {/* look below to see sources for this
        <Navigator /> */}
+       <TempOutputBox day={selectedDay} />
     </SafeAreaView>
   );
 };
+
+
+
+
+
 
 
 
