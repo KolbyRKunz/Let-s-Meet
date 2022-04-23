@@ -54,7 +54,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderWidth: 15,
     borderColor: Colors.DD_RED_2,
-    backgroundColor: Colors.DD_CREAM
+    backgroundColor: Colors.DD_CREAM,
+    fontWeight: 'bold'
   },
   text: {
     fontSize: 25,
