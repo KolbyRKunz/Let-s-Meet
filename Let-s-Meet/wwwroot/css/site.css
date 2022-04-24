@@ -1,10 +1,42 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+:root {
+    /*DESIGN DOCUMENT VERSION 1*/ 
+    --DD_RED_1: '#6F2232';
+    --DD_RED_2: '#950741';
+    --DD_RED_3: '#C3083F';
+    --DD_CREAM: '#EDF5E0';
+    --DD_LIGHT_GRAY: '#979797';
+    --DD_MEDIUM_GRAY: '#4E4E50';
+    --DD_DARK_GRAY: '#1A1A1C';
+    
+    /*CAN'T MISS COLORS FOR TESTING*/ 
+    --TEST_PURPLE: '#790097';
+    --TEST_GREEN: '#5FD66B'; 
+    --TEST_CREAM: '#F4F8ED'; /*not a greeny cream like DD_CREAM*/ 
+    --TEST_BLUE: '#05396B';
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    background-color: #EDF5E0; /*cream*/
+}
+
+.bg-white {
+    background-color: #950741 !important; /*var(--DD_RED_2);*/
+}
+
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+    color: #EDF5E0 !important; /*var(--DD_CREAM);*/
+}
+
+.text-dark {
+    color: #EDF5E0 !important; /*var(--DD_CREAM);*/
 }
 
 /* Provide sufficient contrast against white background */
@@ -12,16 +44,41 @@ a {
   color: #0366d6;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.btn-danger {
+    color: #EDF5E0; /*var(--DD_CREAM);*/
+    background-color: #950741; /*var(--DD_RED_2);*/
+    border-color: #6F2232; /*var(--DD_RED_1);*/
+}
+
+    .btn-danger:hover {
+        color: #EDF5E0; /*var(--DD_CREAM);*/
+        background-color: #6F2232; /*var(--DD_RED_1);*/
+        border-color: #6F2232; /*var(--DD_RED_1);*/
+    }
+    .btn-danger:focus, .btn-danger.focus {
+        box-shadow: 0 0 0 0.2rem rgba(225, 83, 97, 0.5);
+    }
+    .btn-danger.disabled, .btn-danger:disabled {
+        color: #EDF5E0; /*var(--DD_CREAM);*/
+        background-color: #6F2232; /*var(--DD_RED_1);*/
+        border-color: none;
+    }
+.btn-outline-danger {
+    color: #C3083F; /*var(--DD_RED_3);*/
+    border-color: #C3083F; /*var(--DD_RED_3);*/
+}
+
+.border-danger {
+    border-color: lightblue !important;
+}
+.text-danger {
+    color: #dc3545 !important;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #950741; /*var(--DD_RED_2);*/
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 /* Sticky footer styles
@@ -58,16 +115,13 @@ html {
   min-height: 100%;
 }
 
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
-}
+
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
 }
 
 /*INDEX HTML PREPROTOTYPE DEMO CSS*/

@@ -5,25 +5,26 @@
 <head>
     <meta charset='utf-8' />
     <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
     <script src='~/lib/fullcalendar/main.js'></script>
     <script>
 
-      document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth'
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth'
+            });
+            calendar.render();
         });
-        calendar.render();
-      });
 
     </script>
-  </head>
+</head>
 
 
 <div class="text-center">
-    <h1 class="display-4">Welcome To Let's Meet!</h1>
+    <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold" >Let's Meet!</span></h1>
 
-    <button style="background-color:lightblue; border:none" id="button0" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
+    <button id="button0" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
     <hr />
 </div>
 
@@ -33,16 +34,16 @@
 <!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->
 <div style="position:absolute;align-content:center">
     <div style="float:left; padding:10px">
-        <button style="background-color:lightblue; border:none" id="button1" class="btn btn-danger" onclick="getData(1)"> Request User Data </button>
+        <button id="button1" class="btn btn-danger" onclick="getData(1)"> Request User Data </button>
     </div>
 
     <div style="float:left;padding:10px">
-        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="getData(2)"> Request Group Data </button>
+        <button id="button2" class="btn btn-danger" onclick="getData(2)"> Request Group Data </button>
     </div>
 
     <div style="float:left;padding:10px">
 
-        <button style="background-color:lightblue; border:none" id="button2" class="btn btn-danger" onclick="getData(3)"> Request Event Data </button>
+        <button id="button2" class="btn btn-danger" onclick="getData(3)"> Request Event Data </button>
     </div>
 </div>
 
