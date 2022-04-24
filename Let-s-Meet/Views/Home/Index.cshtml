@@ -12,7 +12,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth'
+                initialView: 'dayGridMonth',
+                headerToolbar: {                    left: 'prev,next,title',                    center: '',                    right: 'today'
+                }
             });
             calendar.render();
         });
@@ -28,7 +30,7 @@
     <hr />
 </div>
 
-<div id='calendar'></div>
+<div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
 
 
 <!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->

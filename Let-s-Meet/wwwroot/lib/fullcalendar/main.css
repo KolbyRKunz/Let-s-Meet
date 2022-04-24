@@ -46,14 +46,20 @@
   .fc *:after {
     box-sizing: border-box;
   }
-.fc table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-size: 1em; /* normalize cross-browser */
-  }
-.fc th {
-    text-align: center;
-  }
+    .fc table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        font-size: 1em; /* normalize cross-browser */
+        background-color: #EDF5E0; /*var(--DD_CREAM);*/
+        color: #950741; /*var(--DD_RED_2);*/
+/*        border-radius: 30px;*/
+    }
+    .fc th {
+        text-align: center;
+        /*border-radius: 30px;*/
+        /*color: #EDF5E0;*/ /*var(--DD_CREAM);*/
+        /*background-color: #950741;*/ /*var(--DD_RED_2);*/
+    }
 .fc th,
   .fc td {
     vertical-align: top;
@@ -215,45 +221,45 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
   /* "primary" coloring */
 
 }
-.fc .fc-button-primary {
-    color: #fff;
-    color: var(--fc-button-text-color, #fff);
-    background-color: #2C3E50;
-    background-color: var(--fc-button-bg-color, #2C3E50);
-    border-color: #2C3E50;
-    border-color: var(--fc-button-border-color, #2C3E50);
-  }
+    .fc .fc-button-primary {
+        color: #EDF5E0; /*var(--DD_CREAM);*/
+        /*color: var(--fc-button-text-color, #fff);*/
+/*        background-color: #2C3E50;
+        background-color: var(--fc-button-bg-color, #2C3E50);
+        border-color: #2C3E50;
+        border-color: var(--fc-button-border-color, #2C3E50);*/
+    }
 .fc .fc-button-primary:hover {
-    color: #fff;
+/*    color: #fff;
     color: var(--fc-button-text-color, #fff);
     background-color: #1e2b37;
     background-color: var(--fc-button-hover-bg-color, #1e2b37);
     border-color: #1a252f;
-    border-color: var(--fc-button-hover-border-color, #1a252f);
+    border-color: var(--fc-button-hover-border-color, #1a252f);*/
   }
 .fc .fc-button-primary:disabled { /* not DRY */
-    color: #fff;
+    /*color: #fff;
     color: var(--fc-button-text-color, #fff);
     background-color: #2C3E50;
     background-color: var(--fc-button-bg-color, #2C3E50);
     border-color: #2C3E50;
-    border-color: var(--fc-button-border-color, #2C3E50); /* overrides :hover */
+    border-color: var(--fc-button-border-color, #2C3E50);*/ /* overrides :hover */
   }
 .fc .fc-button-primary:focus {
-    box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+    /*box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);*/
   }
 .fc .fc-button-primary:not(:disabled):active,
   .fc .fc-button-primary:not(:disabled).fc-button-active {
-    color: #fff;
+/*    color: #fff;
     color: var(--fc-button-text-color, #fff);
     background-color: #1a252f;
     background-color: var(--fc-button-active-bg-color, #1a252f);
     border-color: #151e27;
-    border-color: var(--fc-button-active-border-color, #151e27);
+    border-color: var(--fc-button-active-border-color, #151e27);*/
   }
 .fc .fc-button-primary:not(:disabled):active:focus,
   .fc .fc-button-primary:not(:disabled).fc-button-active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+/*    box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);*/
   }
 .fc {
 
@@ -303,7 +309,13 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
+    background-color: #950741; /*var(--DD_RED_2);*/
+}
+
+.fc-toolbar h2 {
+    display: inline;
+}
+
 .fc .fc-toolbar.fc-header-toolbar {
     margin-bottom: 1.5em;
   }
@@ -312,8 +324,9 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
   }
 .fc .fc-toolbar-title {
     font-size: 1.75em;
-    margin: 0;
-  }
+    margin: 15px;
+    color: #EDF5E0; /*var(--DD_CREAM);*/
+}
 .fc-direction-ltr .fc-toolbar > * > :not(:first-child) {
     margin-left: .75em; /* space between */
   }
@@ -326,6 +339,7 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
 .fc .fc-scroller {
     -webkit-overflow-scrolling: touch;
     position: relative; /* for abs-positioned elements within */
+    border-radius: 30px;
   }
 .fc .fc-scroller-liquid {
     height: 100%;
@@ -444,8 +458,9 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
     left: 0;
   }
 .fc .fc-col-header-cell-cushion {
-    display: inline-block; /* x-browser for when sticky (when multi-tier header) */
+    display: inline-block;  /*x-browser for when sticky (when multi-tier header) */
     padding: 2px 4px;
+
   }
 .fc .fc-bg-event,
   .fc .fc-non-business,
