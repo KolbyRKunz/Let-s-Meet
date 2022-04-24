@@ -89,11 +89,11 @@ const CalendarTitle = (props) => {
 //   );
 // }
 
-export default function HomeScreen({ navigation }) {
-  const [selectedDay, setSelectedDay] = useState('');
+function HomeScreen(props) {
+  const [selectedDay, setSelectedDay] = useState('Nothing');
   return (
     <SafeAreaView style={styles.container}>
-      <CalendarTitle groupName='My' />
+      <CalendarTitle groupName={props.groupName} />
       <Calendar
         onDayPress={day => {
           console.log('selected day', day);
@@ -192,7 +192,11 @@ export default function HomeScreen({ navigation }) {
   );
 };
 
+HomeScreen.defaultProps = {
+  groupName: "My"
+}
 
+export default HomeScreen;
 
 //Sources for trying to get drawer navigator to work
 //https://www.youtube.com/watch?v=EaNCi8o8H0A&ab_channel=TheNetNinja

@@ -37,10 +37,11 @@ function ProfileScreen({ navigation }) {
 
 function GroupsScreen({ navigation }) {
   return (
-    <View style={styles.screenContainer}>
-      <Text style={styles.defaultScreentext}> Page for groups</Text>
-      {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
-    </View>
+    <HomeScreen groupName='Group' />
+    // <View style={styles.screenContainer}>
+    //   <Text style={styles.defaultScreentext}> Page for groups</Text>
+    //   {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
+    // </View>
   );
 }
 
