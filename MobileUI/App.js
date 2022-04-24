@@ -3,38 +3,136 @@ import { Button, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from './screens/HomeScreen';
+import { Text, StatusBar, SafeAreaView, StyleSheet } from 'react-native';
+import Colors from './assets/styles/colors';
 
-// function HomeScreen({ navigation }) {
-//   return (
-//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-//       <Button
-//         onPress={() => navigation.navigate('Notifications')}
-//         title="Go to notifications"
-//       />
-//     </View>
-//   );
-// }
+const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    backgroundColor: Colors.DD_CREAM,
+    color: Colors.DD_RED_2
+  },
+  defaultScreentext: {
+    fontSize: 25,
+    fontWeight: '500',
+    color: Colors.DD_RED_2,
+    textAlign: 'center'
+  }
+});
 
-function NotificationsScreen({ navigation }) {
+//TODO: turn these mini screens into their own screen files
+
+function ProfileScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Button onPress={() => navigation.goBack()} title="Go back home" />
+    <View style={styles.screenContainer}>
+      <Text style={styles.defaultScreentext}> This is my profile</Text>
+      <Text style={styles.defaultScreentext}> QR code</Text>
+      <Text style={styles.defaultScreentext}> Swipe from the left to open navigation tool</Text>
+      {/* <Button onPress={() => navigation.goback} title="Go back home" /> */}
+    </View>
+  );
+}
+
+function GroupsScreen({ navigation }) {
+  return (
+    <View style={styles.screenContainer}>
+      <Text style={styles.defaultScreentext}> Page for groups</Text>
+      {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
+    </View>
+  );
+}
+
+function FriendsScreen({ navigation }) {
+  return (
+    <View style={styles.screenContainer}>
+      <Text style={styles.defaultScreentext}> List of friends</Text>
+      <Text style={styles.defaultScreentext}> Add friends</Text>
+      {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
+    </View>
+  );
+}
+function SettingsScreen({ navigation }) {
+  return (
+    <View style={styles.screenContainer}>
+      <Text style={styles.defaultScreentext}>Change profile info</Text>
+      <Text style={styles.defaultScreentext}>Change password</Text>
+      <Text style={styles.defaultScreentext}>Change privacy settings</Text>
+      {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
     </View>
   );
 }
 
 const Drawer = createDrawerNavigator();
+//navigation.openDrawer();
 
+//({ focused, color, size }) => <Icon color={color} size={size} name={focused ? 'heart' : 'heart-outline'} />
 export default function App() {
   return (
     <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Notifications" component={NotificationsScreen} />
+      <Drawer.Navigator 
+      initialRouteName="Home"
+      screenOptions={{
+        drawerType: 'front',
+        //drawerIcon(),
+        drawerActiveBackgroundColor: Colors.DD_CREAM,
+        drawerActiveTintColor: Colors.DD_RED_3,
+        drawerInactiveTintColor: Colors.DD_LIGHT_GRAY,
+        drawerLabelStyle: {
+          fontSize: 24
+        },
+        drawerStyle: {
+          backgroundColor: Colors.DD_CREAM,
+        }
+      }}
+      >
+        <Drawer.Screen 
+          name="Profile" 
+          component={ProfileScreen} 
+          options={{
+            headerShown: false
+          }}
+        />
+        <Drawer.Screen 
+          name="My Schedule"
+          component={HomeScreen} 
+          options={{
+            headerShown: false
+            // headerStyle: {
+            //   height: 0,
+            // }
+          }}
+        />
+        <Drawer.Screen 
+          name="Groups" 
+          component={GroupsScreen} 
+          options={{
+            headerShown: false
+          }}
+        />
+        <Drawer.Screen 
+          name="Friends" 
+          component={FriendsScreen} 
+          options={{
+            headerShown: false
+          }}
+        />
+        <Drawer.Screen 
+          name="Settings" 
+          component={SettingsScreen} 
+          options={{
+            headerShown: false
+          }}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
   );
 }
+
+//Important links
+//https://reactnavigation.org/docs/drawer-based-navigation/
+//https://reactnavigation.org/docs/drawer-navigator/
 
 
 

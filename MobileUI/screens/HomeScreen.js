@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
 import { Text, StatusBar, SafeAreaView, StyleSheet } from 'react-native';
-//import { NavigationContainer } from "@react-navigation/native";
-//import { createStackNavigator } from '@react-navigation/stack';
 // import HttpExample from './http_example.js'
 // import Demo from './demo.js'
-//import Navigator from './routes/drawer';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { LocaleConfig } from 'react-native-calendars';
 import Colors from '../assets/styles/colors';
-//import * as React from 'react';
-import { Button, View } from 'react-native';
-//import Fonts from './assets/styles/fonts';
-//import { globalStyles } from '../styles/global';
-//import TempOutputBox from './assets/components/tempOutputBox';
+//import { Button, View } from 'react-native';
+
 
 //TODO: In Calendar, can't get the selected day background to changecolor like advertised
-//TODO: Figure out draw navigator 
 
 //About: There are two versions we could go with: plain old calendar or the agenda version
 //The agenda version has built in events and things that make it cool https://github.com/wix/react-native-calendars#agenda
@@ -64,7 +57,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: Colors.DD_RED_2,
     textAlign: 'center',
-    marginTop: 40,
+    //marginTop: 10,
     //marginBottom: 50,
     paddingHorizontal: 90,
     position: 'relative',
@@ -84,7 +77,7 @@ const CalendarTitle = (props) => {
   );
 }
 
-
+//Keep for posterity just in case we need another button to interact with navigator
 // function HomeScreen({ navigation }) {
 //   return (
 //     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -100,10 +93,6 @@ export default function HomeScreen({ navigation }) {
   const [selectedDay, setSelectedDay] = useState('');
   return (
     <SafeAreaView style={styles.container}>
-      <Button
-        onPress={() => navigation.navigate('Notifications')}
-        title="Go to notifications"
-      />
       <CalendarTitle groupName='My' />
       <Calendar
         onDayPress={day => {
