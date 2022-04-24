@@ -14,7 +14,13 @@
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: {                    left: 'prev,next,title',                    center: '',                    right: 'today'
-                }
+                },
+                editable:true,
+                selectable:true,
+
+                select:function(info){
+                    createEvent(info.startStr);
+                },
             });
             calendar.render();
         });
@@ -65,6 +71,11 @@
 
 
 <script>
+    function createEvent(date) {
+        $(".output_box").html(date);
+        console.log(date);
+    }
+
     function doFunction() {
 
         let url = "Api/post"
