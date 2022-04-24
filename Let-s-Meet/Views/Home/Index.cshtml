@@ -20,6 +20,8 @@
 
                 select:function(info){
                     createEvent(info.startStr);
+                    let event = prompt('Enter event name');
+                    if (event == null || event == "") {                        alert("Not valid event");                    } else {                        calendar.addEvent({                            title: event,                            start: info.start,                            end: info.end                        });                        //TODO: connect event create to backend                    }
                 },
             });
             calendar.render();
