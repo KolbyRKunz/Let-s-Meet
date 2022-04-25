@@ -15,14 +15,40 @@
                 initialView: 'dayGridMonth',
                 headerToolbar: {                    left: 'prev,next,title',                    center: '',                    right: 'today'
                 },
+
                 editable:true,
                 selectable:true,
 
-                select:function(info){
-                    createEvent(info.startStr);
-                    let event = prompt('Enter event name');
-                    if (event == null || event == "") {                        alert("Not valid event");                    } else {                        calendar.addEvent({                            title: event,                            start: info.start,                            end: info.end                        });                        //TODO: connect event create to backend                    }
+                select: function(data){
+                  $(".submitForm").bind();
+                  $(".popup").show();
+                  //var start = Date.parse(start) / 1000;
+                  //var end = Date.parse(end) / 1000;
+                  //var allDay = allDay;
+                  //var wipit = // create a session id such as a random number that can be cleared later to prevent double submission
+
+                  $(".submitForm").off('click').click(function(){
+                  var title = $(".title").val();
+
+                  if(title == null || title == ""){
+                    alert("Event name must be entered")
+                  } else {
+                    // clear all information, unselect events, and alert that a title needs to be entered
+                    calendar.addEvent({
+                        title: title,
+                        start: data.start,
+                        end: data.end
+                    });
+                  }
+                  $(".popup").hide();
+                  });
+
+                  $(".exit").off('click').click(function(){
+                    // clear all info, unselect events and...
+                    $(".popup").hide();
+                  });
                 },
+                
             });
             calendar.render();
         });
@@ -40,6 +66,28 @@
 
 <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
 
+<div class="popup" style="display:none; position:fixed; top:25%; left:25%; background-color:white;z-index:10">
+  <form style="background-color:#EDF5E0;color:#950741;padding:10px;border: 2px solid #950741">
+      <div style="display:block">
+          <label>Event Name</label>
+          <input type="text" class="title" autofocus>
+      </div>
+
+      <div style="display:block">
+          <label>Start Time</label>
+          <input type="text" class="startTime">
+      </div>
+
+      <div style="display:block">
+          <label>End Time</label>
+          <input type="text" class="endTime">
+      </div>
+
+      <input type="button" value="Submit" href="#" onclick="return false" class="submitForm" style="background-color:#EDF5E0;color:#950741">
+      <input type="button" value="Cancel "href="#" onclick="return false" class="exit" style="background-color:#EDF5E0;color:#950741">
+  </form>
+</div>
+
 
 <!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->
 <div style="position:absolute;align-content:center">
@@ -52,7 +100,6 @@
     </div>
 
     <div style="float:left;padding:10px">
-
         <button id="button2" class="btn btn-danger" onclick="getData(3)"> Request Event Data </button>
     </div>
 </div>
@@ -64,11 +111,7 @@
 <br />
 
 <div class="output_box" style="position:relative;border: 1px solid black;">
-
 </div>
-
-
-
 
 
 
@@ -145,5 +188,4 @@
                 $(".output_box").html(output);
             })
     }
-
 </script>
