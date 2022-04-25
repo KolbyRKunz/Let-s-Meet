@@ -13,7 +13,10 @@
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                headerToolbar: {                    left: 'prev,next,title',                    center: '',                    right: 'today'
+                headerToolbar: {
+                    left: 'prev,next,title',
+                    center: '',
+                    right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
                 editable:true,
@@ -22,6 +25,7 @@
                 select: function(data){
                   $(".submitForm").bind();
                   $(".popup").show();
+                  $(".title").focus();
                   //var start = Date.parse(start) / 1000;
                   //var end = Date.parse(end) / 1000;
                   //var allDay = allDay;
@@ -29,24 +33,33 @@
 
                   $(".submitForm").off('click').click(function(){
                   var title = $(".title").val();
+                  var startTime = $(".startTime").val();
+                  var endTime = $(".endTime").val();
 
-                  if(title == null || title == ""){
-                    alert("Event name must be entered")
-                  } else {
-                    // clear all information, unselect events, and alert that a title needs to be entered
-                    calendar.addEvent({
-                        title: title,
-                        start: data.start,
-                        end: data.end
+                    if(title == null || title == ""){
+                        alert("Event name must be entered")
+                    } else {
+                        // clear all information, unselect events, and alert that a title needs to be entered
+                        calendar.addEvent({
+                            title: title,
+                            start: data.start,
+                            end: data.end,
+                        });
+                        //TODO: need to update the database about this event
+                    }
+                        $(".popup").hide();
+                        $(".title").val("");
+                        $(".startTime").val("");
+                        $(".endTime").val("");
                     });
-                  }
-                  $(".popup").hide();
-                  });
 
-                  $(".exit").off('click').click(function(){
-                    // clear all info, unselect events and...
-                    $(".popup").hide();
-                  });
+                    $(".exit").off('click').click(function(){
+                        // clear all info, unselect events and...
+                        $(".popup").hide();
+                        $(".title").val("");
+                        $(".startTime").val("");
+                        $(".endTime").val("");
+                    });
                 },
                 
             });
