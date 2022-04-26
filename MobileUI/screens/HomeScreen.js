@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Text, StatusBar, SafeAreaView, StyleSheet } from 'react-native';
+import { Button, Alert, Text, StatusBar, SafeAreaView, StyleSheet } from 'react-native';
 // import HttpExample from './http_example.js'
 // import Demo from './demo.js'
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { LocaleConfig } from 'react-native-calendars';
 import Colors from '../assets/styles/colors';
+import createEventPopup from './createEventPopup';
 //import { Button, View } from 'react-native';
 
 
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
 
 const TempOutputBox = (props) => {
   return (
-    <Text style={styles.outputContainer}>{props.day} was selected</Text>
+    <Text style={styles.outputContainer}>{props.day.dateString} was selected</Text>
   );
 }
 
@@ -89,19 +90,99 @@ const CalendarTitle = (props) => {
 //   );
 // }
 
+function markDatesInList(list, selectedDay)
+{
+  let mark = {};
+  list.forEach(day => {
+    //console.log(day);
+    if (day == selectedDay.dateString) {
+      mark[day] = {
+        selected: true,
+        selectedColor: Colors.DD_RED_3
+      };
+    } else {
+      mark[day] = {
+        marked: true,
+        dotColor: Colors.DD_RED_3
+      }
+    }
+  });
+
+  return mark;
+}
+
+const initialMarkedDateList = []; //this is where we will plug in all the stuff from database
+
 function HomeScreen(props) {
-  const [selectedDay, setSelectedDay] = useState('Nothing');
+  const [selectedDay, setSelectedDay] = useState(new Date());
+  const [markedDateList, setMarkedDateList] = useState(initialMarkedDateList);
+  let nextDate = [
+    selectedDay.dateString,
+    '2022-04-29',
+    '2022-04-04',
+    '2022-04-5',
+    '2022-04-06',
+    '2022-04-05',
+  ];
+
+  //let mark = markDatesInList(markedDateList, selectedDay);
+  let mark = {};
+
+  nextDate.forEach(day => {
+    //console.log(day);
+    if (day == selectedDay.dateString) {
+      mark[day] = {
+        selected: true,
+        selectedColor: Colors.DD_RED_3
+      };
+    } else {
+      mark[day] = {
+        marked: true,
+        dotColor: Colors.DD_RED_3
+      }
+    }
+  });
+
+  function handleAddToMarkedDateList()
+  {
+    // const newMarkedDateList = markedDateList.concat(selectedDay.dateString);
+    // setMarkedDateList(newMarkedDateList);
+    // console.log(markedDateList);
+    // mark = markDatesInList(markedDateList, selectedDay);
+    nextDate.push(selectedDay.dateString);
+    console.log(nextDate);
+    nextDate.forEach(day => {
+      //console.log(day);
+      if (day == selectedDay.dateString) {
+        mark[day] = {
+          selected: true,
+          selectedColor: Colors.DD_RED_3
+        };
+      } else {
+        mark[day] = {
+          marked: true,
+          dotColor: Colors.DD_RED_3
+        }
+      }
+    });
+    Alert.alert("Event on " + selectedDay.dateString + " created");
+
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <CalendarTitle groupName={props.groupName} />
       <Calendar
         onDayPress={day => {
           console.log('selected day', day);
-          setSelectedDay(day.day);
+          setSelectedDay(day);
         }}
+
         // Handler which gets executed on day long press. Default = undefined
         onDayLongPress={day => {
           console.log('selected day', day);
+          //<createEventPopup />
+
         }}
         // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
         monthFormat={'MMMM'}
@@ -109,15 +190,25 @@ function HomeScreen(props) {
         onMonthChange={month => {
           console.log('month changed', month);
         }}
-
-        markedDates={{ //Works but like, it's hard coded
-          '2022-04-27': {
+        // markingType={'multi-dot'}
+        // markedDates={{
+        //   '2017-10-25': {dots: [vacation, massage, workout], selected: true, selectedColor: 'red'},
+        //   '2017-10-26': {dots: [massage, workout], disabled: true}
+        // }}
+        markedDates={{
+          [selectedDay.dateString]: {
             selected: true,
-            selectedColor: Colors.DD_RED_3,
-            selectedDayTextColor: Colors.TEST_PURPLE
+            selectedColor: Colors.DD_RED_3
           }
         }}
-
+        //markedDates={//{ 
+          // [selectedDay.dateString]: {
+          //   selected: true,
+          //   //marked: true, //leaves a little dot
+          //   selectedColor: Colors.DD_RED_3
+          // },
+          //mark
+        //}//}
         // Hide month navigation arrows. Default = false
         hideArrows={false}
         // Replace default arrows with custom ones (direction can be 'left' or 'right')
@@ -137,16 +228,6 @@ function HomeScreen(props) {
         onPressArrowLeft={subtractMonth => subtractMonth()}
         // Handler which gets executed when press arrow icon right. It receive a callback can go next month
         onPressArrowRight={addMonth => addMonth()}
-        // Disable left arrow. Default = false
-        //disableArrowLeft={true}
-        // Disable right arrow. Default = false
-        //disableArrowRight={true}
-        // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
-        //disableAllTouchEventsForDisabledDays={true}
-        // Replace default month and year title with custom one. the function receive a date as parameter
-        //renderHeader={date => {
-        /*Return JSX*/
-        //}}
         // Enable the option to swipe between months. Default = false
         enableSwipeMonths={true}
         theme={{
@@ -188,6 +269,11 @@ function HomeScreen(props) {
       {/* look below to see sources for this
        <Navigator /> */}
       <TempOutputBox day={selectedDay} />
+      <Button
+        title='Create Event'
+        color={Colors.DD_RED_2}
+        onPress={handleAddToMarkedDateList}
+      />
     </SafeAreaView>
   );
 };

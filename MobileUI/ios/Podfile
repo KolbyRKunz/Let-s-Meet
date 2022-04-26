@@ -12,6 +12,8 @@ target 'MobileUI' do
     :hermes_enabled => false
   )
 
+  pod 'RNSweetAlert', :path => '../node_modules/react-native-sweet-alert'
+
   target 'MobileUITests' do
     inherit! :complete
     # Pods for testing
