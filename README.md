@@ -15,4 +15,6 @@ Lindsay Wilde, Ethan Christensen, Hope Welch, Kolby Kunz
 
 <a href="https://github.com/hopefully-purple/Mobile-Let-s-Meet"> Link to Mobile Repo </a>
 
+<a href="https://letsmeetteam10.weebly.com/"> Link to our team website </a>
+
 <h2>ARCHITECTURE/LAYOUT?</h2>
