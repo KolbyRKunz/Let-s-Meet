@@ -90,69 +90,75 @@ const CalendarTitle = (props) => {
 //   );
 // }
 
-function markDatesInList(list, selectedDay)
-{
-  let mark = {};
-  list.forEach(day => {
-    //console.log(day);
-    if (day == selectedDay.dateString) {
-      mark[day] = {
-        selected: true,
-        selectedColor: Colors.DD_RED_3
-      };
-    } else {
-      mark[day] = {
-        marked: true,
-        dotColor: Colors.DD_RED_3
-      }
-    }
-  });
 
-  return mark;
-}
 
 const initialMarkedDateList = []; //this is where we will plug in all the stuff from database
 
 function HomeScreen(props) {
-  const [selectedDay, setSelectedDay] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState('');
   const [markedDateList, setMarkedDateList] = useState(initialMarkedDateList);
-  let nextDate = [
-    selectedDay.dateString,
-    '2022-04-29',
-    '2022-04-04',
-    '2022-04-5',
-    '2022-04-06',
-    '2022-04-05',
-  ];
+  const [mark, setMark] = useState({});
+
+//TODO: none of this is gonna make sense until I relearn about life cycle and how states and hooks work.
+
+  // let nextDate = [
+  //   selectedDay.dateString,
+  //   '2022-04-29',
+  //   '2022-04-04',
+  //   '2022-04-5',
+  //   '2022-04-06',
+  //   '2022-04-05',
+  // ];
 
   //let mark = markDatesInList(markedDateList, selectedDay);
-  let mark = {};
+  //let mark = {};
 
-  nextDate.forEach(day => {
-    //console.log(day);
-    if (day == selectedDay.dateString) {
-      mark[day] = {
-        selected: true,
-        selectedColor: Colors.DD_RED_3
-      };
-    } else {
-      mark[day] = {
-        marked: true,
-        dotColor: Colors.DD_RED_3
-      }
-    }
-  });
+  // nextDate.forEach(day => {
+  //   //console.log(day);
+  //   if (day == selectedDay.dateString) {
+  //     mark[day] = {
+  //       selected: true,
+  //       selectedColor: Colors.DD_RED_3
+  //     };
+  //   } else {
+  //     mark[day] = {
+  //       marked: true,
+  //       dotColor: Colors.DD_RED_3
+  //     }
+  //   }
+  // });
 
-  function handleAddToMarkedDateList()
-  {
-    // const newMarkedDateList = markedDateList.concat(selectedDay.dateString);
-    // setMarkedDateList(newMarkedDateList);
-    // console.log(markedDateList);
-    // mark = markDatesInList(markedDateList, selectedDay);
-    nextDate.push(selectedDay.dateString);
-    console.log(nextDate);
-    nextDate.forEach(day => {
-      //console.log(day);
+  function handleAddToMarkedDateList() {
+    const newMarkedDateList = markedDateList.concat(selectedDay.dateString);
+    setMarkedDateList(newMarkedDateList);
+    setMark(markDatesInList(markedDateList));
+    console.log("(handleAdd)markedDateList: " + markedDateList);
+    console.log("(handleAdd)mark: " + mark);
+    // nextDate.push(selectedDay.dateString + '');
+    // console.log(nextDate);
+    // nextDate.forEach(day => {
+    //   //console.log(day);
+    //   if (day == selectedDay.dateString) {
+    //     mark[day] = {
+    //       selected: true,
+    //       selectedColor: Colors.DD_RED_3
+    //     };
+    //   } else {
+    //     mark[day] = {
+    //       marked: true,
+    //       dotColor: Colors.DD_RED_3
+    //     }
+    //   }
+    // });
+    Alert.alert("Event on " + selectedDay.dateString + " created");
+
+  }
+
+  function markDatesInList() {
+    console.log("from function markDatesInlist: selectedDay = " + selectedDay.dateString);
+    let mark = {};
+    markedDateList.forEach(day => {
+      console.log("from function markDatesInList (in foreach loop) day in given list " + day);
       if (day == selectedDay.dateString) {
         mark[day] = {
           selected: true,
@@ -165,8 +171,8 @@ function HomeScreen(props) {
         }
       }
     });
-    Alert.alert("Event on " + selectedDay.dateString + " created");
 
+    return mark;
   }
 
   return (
@@ -176,39 +182,37 @@ function HomeScreen(props) {
         onDayPress={day => {
           console.log('selected day', day);
           setSelectedDay(day);
+          console.log("on day press, selectedDay = " + selectedDay.dateString);
+          //console.log("set Mark and call function");
+          //setMark(markDatesInList(markedDateList));
         }}
 
         // Handler which gets executed on day long press. Default = undefined
         onDayLongPress={day => {
           console.log('selected day', day);
-          //<createEventPopup />
-
-        }}
-        // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-        monthFormat={'MMMM'}
-        // Handler which gets executed when visible month changes in calendar. Default = undefined
-        onMonthChange={month => {
-          console.log('month changed', month);
         }}
         // markingType={'multi-dot'}
         // markedDates={{
         //   '2017-10-25': {dots: [vacation, massage, workout], selected: true, selectedColor: 'red'},
         //   '2017-10-26': {dots: [massage, workout], disabled: true}
         // }}
-        markedDates={{
-          [selectedDay.dateString]: {
-            selected: true,
-            selectedColor: Colors.DD_RED_3
-          }
+        // markedDates={{
+        //   [selectedDay.dateString]: {
+        //     selected: true,
+        //     selectedColor: Colors.DD_RED_3
+        //   }
+        // }}
+
+        //markedDates={mark}
+
+        markedDates={markDatesInList()}
+
+        // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+        monthFormat={'MMMM'}
+        // Handler which gets executed when visible month changes in calendar. Default = undefined
+        onMonthChange={month => {
+          console.log('month changed', month);
         }}
-        //markedDates={//{ 
-          // [selectedDay.dateString]: {
-          //   selected: true,
-          //   //marked: true, //leaves a little dot
-          //   selectedColor: Colors.DD_RED_3
-          // },
-          //mark
-        //}//}
         // Hide month navigation arrows. Default = false
         hideArrows={false}
         // Replace default arrows with custom ones (direction can be 'left' or 'right')
@@ -241,11 +245,11 @@ function HomeScreen(props) {
           dayTextColor: Colors.DD_RED_2,
           // textDisabledColor: Colors.TEST_PURPLE,
           dotColor: Colors.TEST_PURPLE,
-          selectedDotColor: '#ffffff',
+          //selectedDotColor: '#ffffff',
           arrowColor: Colors.DD_CREAM,
           // disabledArrowColor: '#d9e1e8',
           monthTextColor: Colors.DD_CREAM, //does it do anything?
-          indicatorColor: 'blue',
+          //indicatorColor: 'blue',
           // textDayFontFamily: 'monospace',
           // textMonthFontFamily: 'monospace',
           // textDayHeaderFontFamily: 'monospace',

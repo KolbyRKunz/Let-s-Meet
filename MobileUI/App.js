@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
   }
 });
 
-//TODO: turn these mini screens into their own screen files
 
 function ProfileScreen({ navigation }) {
   return (
@@ -30,7 +29,6 @@ function ProfileScreen({ navigation }) {
       <Text style={styles.defaultScreentext}> This is my profile</Text>
       <Text style={styles.defaultScreentext}> QR code</Text>
       <Text style={styles.defaultScreentext}> Swipe from the left to open navigation tool</Text>
-      {/* <Button onPress={() => navigation.goback} title="Go back home" /> */}
     </View>
   );
 }
@@ -38,10 +36,6 @@ function ProfileScreen({ navigation }) {
 function GroupsScreen({ navigation }) {
   return (
     <HomeScreen groupName='Group' />
-    // <View style={styles.screenContainer}>
-    //   <Text style={styles.defaultScreentext}> Page for groups</Text>
-    //   {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
-    // </View>
   );
 }
 
@@ -50,7 +44,6 @@ function FriendsScreen({ navigation }) {
     <View style={styles.screenContainer}>
       <Text style={styles.defaultScreentext}> List of friends</Text>
       <Text style={styles.defaultScreentext}> Add friends</Text>
-      {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
     </View>
   );
 }
@@ -60,15 +53,12 @@ function SettingsScreen({ navigation }) {
       <Text style={styles.defaultScreentext}>Change profile info</Text>
       <Text style={styles.defaultScreentext}>Change password</Text>
       <Text style={styles.defaultScreentext}>Change privacy settings</Text>
-      {/* <Button onPress={() => navigation.goBack()} title="Go back home" /> */}
     </View>
   );
 }
 
 const Drawer = createDrawerNavigator();
-//navigation.openDrawer();
 
-//({ focused, color, size }) => <Icon color={color} size={size} name={focused ? 'heart' : 'heart-outline'} />
 export default function App() {
   return (
     <NavigationContainer>
@@ -76,7 +66,6 @@ export default function App() {
       initialRouteName="Home"
       screenOptions={{
         drawerType: 'front',
-        //drawerIcon(),
         drawerActiveBackgroundColor: Colors.DD_CREAM,
         drawerActiveTintColor: Colors.DD_RED_3,
         drawerInactiveTintColor: Colors.DD_LIGHT_GRAY,
@@ -100,9 +89,6 @@ export default function App() {
           component={HomeScreen} 
           options={{
             headerShown: false
-            // headerStyle: {
-            //   height: 0,
-            // }
           }}
         />
         <Drawer.Screen 
