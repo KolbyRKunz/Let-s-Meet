@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Let_s_Meet.Models;
+using Let_s_Meet.Data;
 
 namespace Let_s_Meet.Areas.Identity.Pages.Account
 {
@@ -24,17 +26,20 @@ namespace Let_s_Meet.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly MeetContext _context;
 
         public RegisterModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            MeetContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
@@ -46,6 +51,16 @@ namespace Let_s_Meet.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Required]
+            [StringLength(100, ErrorMessage = "Name must have less than 100 characters. Please abbreviate!")]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            [Required]
+            [StringLength(100, ErrorMessage = "Name must have less than 100 characters. Please abbreviate!")]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -75,7 +90,11 @@ namespace Let_s_Meet.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = Input.Email, Email = Input.Email };
+                UserModel newUser = new UserModel { FirstName = Input.FirstName, LastName = Input.LastName };
+                _context.Add(newUser);
+                _context.SaveChanges();
+
+                var user = new User { UserName = Input.Email, Email = Input.Email, UserID = newUser.UserID};
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
