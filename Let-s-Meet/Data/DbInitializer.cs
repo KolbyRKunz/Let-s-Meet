@@ -30,11 +30,35 @@ namespace Let_s_Meet.Data
             // Create some users
             List<UserModel> users = CreateUsers(context);
 
+            context.SaveChanges();
+
             // Create some groups
             List<GroupModel> groups = CreateGroups(context, users);
 
+            context.SaveChanges();
+
             // Create some events
             List<EventModel> events = CreateEvents(context, groups);
+
+            context.SaveChanges();
+
+            //Create some onboarding objects
+            List<OnboardingModel> onboardingModels = CreateOnboarding(context, users);
+
+            context.SaveChanges();
+
+            //Create some event prompts
+            List<EventPromptModel> eventPrompts = CreateEventPrompts(context, users, events);
+
+            context.SaveChanges();
+
+            //Create some comments
+            List<CommentsModel> comments = CreateComments(context, users, events);
+
+            context.SaveChanges();
+
+            //Create attendance table
+            List<AttendanceModel> attendance = CreateAttendance(context, events);
 
             context.SaveChanges();
 
@@ -57,7 +81,7 @@ namespace Let_s_Meet.Data
                 // Create event
                 EventModel eventModel = new EventModel
                 {
-                    //Group = groups[i],
+                    Group = groups[i],
                     //Title = "Event " + i,
                     //Description = "Description " + i,
                     StartTime = DateTime.Now.AddDays(i),
@@ -83,13 +107,13 @@ namespace Let_s_Meet.Data
         private static List<GroupModel> CreateGroups(MeetContext context, List<UserModel> users)
         {
             List<GroupModel> groupModels = new List<GroupModel>();
-
+            
             int numGroups = 4;
 
             // Create some groups
             for (int i = 0; i < numGroups; i++)
             {
-                HashSet<UserModel> groupMembers = new HashSet<UserModel>();
+                List<UserModel> groupMembers = new List<UserModel>();
 
                 // Add some random users to the group
                 for (int j = 0; j < 3; j++)
@@ -113,7 +137,7 @@ namespace Let_s_Meet.Data
             // Add the groups to the DB
             context.Groups.AddRange(groupModels);
 
-            return groupModels;
+            return groupModels; //check groupModels
         }
 
         /// <summary>
@@ -140,9 +164,117 @@ namespace Let_s_Meet.Data
             }
 
             // Add the users to the DB
-            context.Users.AddRange(users);
+            //context.Users.AddRange(users);
+            foreach (UserModel u in users)
+            {
+                context.Users.Add(u);
+            }
+
 
             return users;
+        }
+
+        /// <summary>
+        /// Creates onboarding objects and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <returns></returns>
+        public static List<OnboardingModel> CreateOnboarding(MeetContext context, List<UserModel> users)
+        {
+            List<OnboardingModel> onboarding = new List<OnboardingModel>();
+
+            foreach (UserModel user in users)
+            {
+                //All users start at step 1 of onboarding process, so their last step completed is 0
+                //since they haven't onboarded yet
+                onboarding.Add(new OnboardingModel
+                {
+                    UserID = user.UserID,
+                    LastStepCompleted = 0
+                });
+            }
+
+            //Add the onboarding objects to the DB
+            context.Onboarding.AddRange(onboarding);
+            return onboarding;
+        }
+
+        /// <summary>
+        /// Creates event prompts and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        public static List<EventPromptModel> CreateEventPrompts(MeetContext context, List<UserModel> users, List<EventModel> events)
+        {
+            List<EventPromptModel> eventPrompts = new List<EventPromptModel>();
+
+            //Create one event prompt for first user and first event
+            eventPrompts.Add(new EventPromptModel
+            {
+                UserID = users.First().UserID,
+                EventID = events.First().EventID
+            });
+
+            //Add the onboarding objects to the DB
+            context.EventPrompt.AddRange(eventPrompts);
+            return eventPrompts;
+        }
+
+        /// <summary>
+        /// Creates comments and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        public static List<CommentsModel> CreateComments(MeetContext context, List<UserModel> users, List<EventModel> events)
+        {
+            List<CommentsModel> comments = new List<CommentsModel>();
+
+            //Create one comment for first user and first event
+            comments.Add(new CommentsModel
+            {
+                UserID = users.First().UserID,
+                EventID = events.First().EventID,
+                Time = DateTime.Now
+            });
+
+            //Add the onboarding objects to the DB
+            context.Comments.AddRange(comments);
+            return comments;
+        }
+
+        /// <summary>
+        /// Creates attendance info and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        public static List<AttendanceModel> CreateAttendance(MeetContext context, List<EventModel> events)
+        {
+            List<AttendanceModel> attendance = new List<AttendanceModel>();
+
+            //For the first event in db, mark the whole group as attending
+            GroupModel eventGroup = events.First().Group;
+            int eventId = events.First().EventID;
+
+            foreach (UserModel u in eventGroup.Users)
+            {
+                
+                attendance.Add(new AttendanceModel
+                {
+                    UserID = u.UserID,
+                    EventID = eventId
+                });
+            }
+
+            //Add the onboarding objects to the DB
+            context.Attendance.AddRange(attendance);
+            return attendance;
         }
     }
 }
