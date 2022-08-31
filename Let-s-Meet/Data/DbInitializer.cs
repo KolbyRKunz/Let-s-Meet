@@ -36,6 +36,12 @@ namespace Let_s_Meet.Data
             // Create some events
             List<EventModel> events = CreateEvents(context, groups);
 
+            //Create some onboarding objects
+            List<OnboardingModel> onboardingModels = CreateOnboarding(context, users);
+
+            //Create some event prompts
+            List<EventPromptModel> eventPrompts = CreateEventPrompts(context, users, events);
+
             context.SaveChanges();
 
         }
@@ -143,6 +149,55 @@ namespace Let_s_Meet.Data
             context.Users.AddRange(users);
 
             return users;
+        }
+
+        /// <summary>
+        /// Creates onboarding objects and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <returns></returns>
+        public static List<OnboardingModel> CreateOnboarding(MeetContext context, List<UserModel> users)
+        {
+            List<OnboardingModel> onboarding = new List<OnboardingModel>();
+
+            foreach (UserModel user in users)
+            {
+                //All users start at step 1 of onboarding process, so their last step completed is 0
+                //since they haven't onboarded yet
+                onboarding.Add(new OnboardingModel
+                {
+                    UserID = user.UserID,
+                    LastStepCompleted = 0
+                });
+            }
+
+            //Add the onboarding objects to the DB
+            context.Onboarding.AddRange(onboarding);
+            return onboarding;
+        }
+
+        /// <summary>
+        /// Creates event prompts and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        public static List<EventPromptModel> CreateEventPrompts(MeetContext context, List<UserModel> users, List<EventModel> events)
+        {
+            List<EventPromptModel> eventPrompts = new List<EventPromptModel>();
+
+            //Create one event prompt for one user and one event
+            eventPrompts.Add(new EventPromptModel
+            {
+                UserID = users.First().UserID,
+                EventID = events.First().EventID
+            });
+
+            //Add the onboarding objects to the DB
+            context.EventPrompt.AddRange(eventPrompts);
+            return eventPrompts;
         }
     }
 }
