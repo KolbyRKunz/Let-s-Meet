@@ -30,23 +30,35 @@ namespace Let_s_Meet.Data
             // Create some users
             List<UserModel> users = CreateUsers(context);
 
+            context.SaveChanges();
+
             // Create some groups
             List<GroupModel> groups = CreateGroups(context, users);
+
+            context.SaveChanges();
 
             // Create some events
             List<EventModel> events = CreateEvents(context, groups);
 
+            context.SaveChanges();
+
             //Create some onboarding objects
             List<OnboardingModel> onboardingModels = CreateOnboarding(context, users);
+
+            context.SaveChanges();
 
             //Create some event prompts
             List<EventPromptModel> eventPrompts = CreateEventPrompts(context, users, events);
 
+            context.SaveChanges();
+
             //Create some comments
             List<CommentsModel> comments = CreateComments(context, users, events);
 
+            context.SaveChanges();
+
             //Create attendance table
-            List<AttendanceModel> attendance = CreateAttendance(context, users, events);
+            List<AttendanceModel> attendance = CreateAttendance(context, events);
 
             context.SaveChanges();
 
@@ -101,7 +113,7 @@ namespace Let_s_Meet.Data
             // Create some groups
             for (int i = 0; i < numGroups; i++)
             {
-                HashSet<UserModel> groupMembers = new HashSet<UserModel>();
+                List<UserModel> groupMembers = new List<UserModel>();
 
                 // Add some random users to the group
                 for (int j = 0; j < 3; j++)
@@ -125,7 +137,7 @@ namespace Let_s_Meet.Data
             // Add the groups to the DB
             context.Groups.AddRange(groupModels);
 
-            return groupModels;
+            return groupModels; //check groupModels
         }
 
         /// <summary>
@@ -152,7 +164,12 @@ namespace Let_s_Meet.Data
             }
 
             // Add the users to the DB
-            context.Users.AddRange(users);
+            //context.Users.AddRange(users);
+            foreach (UserModel u in users)
+            {
+                context.Users.Add(u);
+            }
+
 
             return users;
         }
@@ -237,19 +254,21 @@ namespace Let_s_Meet.Data
         /// <param name="users"></param>
         /// <param name="events"></param>
         /// <returns></returns>
-        public static List<AttendanceModel> CreateAttendance(MeetContext context, List<UserModel> users, List<EventModel> events)
+        public static List<AttendanceModel> CreateAttendance(MeetContext context, List<EventModel> events)
         {
             List<AttendanceModel> attendance = new List<AttendanceModel>();
 
             //For the first event in db, mark the whole group as attending
-            EventModel e1 = events.First();
+            GroupModel eventGroup = events.First().Group;
+            int eventId = events.First().EventID;
 
-            foreach (UserModel u in e1.Group.Users)
+            foreach (UserModel u in eventGroup.Users)
             {
+                
                 attendance.Add(new AttendanceModel
                 {
                     UserID = u.UserID,
-                    EventID = e1.EventID
+                    EventID = eventId
                 });
             }
 
