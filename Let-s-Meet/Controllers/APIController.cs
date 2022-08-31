@@ -47,95 +47,62 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(string data)
+        public OkObjectResult Post(string data)
         {
-            return Ok(new { message = ("Hello from web server!!" + data) });
+            return Ok(new { message = "Hello from web server!!" + data });
         }
 
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> getUsers(string data)
+        /// <summary>
+        /// Get all events related to the currently signed in user
+        /// </summary>
+        /// <returns>json object containing all related events</returns>
+        public OkObjectResult getAllUserEvents()
         {
-            var element = _context.Users.Select(u => new
-            {
-                firstName = u.FirstName,
-                lastName = u.LastName,
-                groups = u.Groups.Select(g => new 
-                { 
-                    groupName = g.GroupName,
-                    /*members = g.Users.Select(m => new 
-                    { 
-                        firstName = m.FirstName,
-                        lastName = m.LastName
-                    })*/
-                }),
-                /*friends = u.Friends.Select(f => new 
-                { 
-                    firstName = f.FirstName,
-                    lastName = f.LastName
-                }),*/
-                events = u.Events.Select(e => new 
-                { 
-                    startTime = e.StartTime,
-                    endTime = e.EndTime
-                })
-            });
-            return Ok(JsonConvert.SerializeObject(element));
+            return null;
         }
 
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> getEvents(string data)
+        public OkObjectResult importExistingCalendar()
         {
-            var element = _context.Events.Select(e => new
-            {
-                startTime = e.StartTime,
-                endTime = e.EndTime,
-                groups = e.Groups.Select(g => new 
-                { 
-                    groupName = g.GroupName
-                }),
-                users = e.Users.Select(u => new 
-                { 
-                    firstName = u.FirstName,
-                    lastName = u.LastName
-                })
-            }) ;
-            return Ok(JsonConvert.SerializeObject(element));
+            return null;
         }
 
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> getGroups(string data)
+        public OkObjectResult getUsersFriends()
         {
-            var element = _context.Groups.Select(g => new 
-            { 
-                groupName = g.GroupName,
-                members = g.Users.Select(m => new 
-                { 
-                    firstName = m.FirstName,
-                    lastName = m.LastName
-                }),
-                events = g.Events.Select(e => new 
-                { 
-                    startTime = e.StartTime,
-                    endTime = e.EndTime
-                })
-            });
-            return Ok(JsonConvert.SerializeObject(element));
+            return null;
         }
 
-        [HttpGet]
-        [Produces("application/json")]
-        public async Task<IActionResult> Echo(string data)
+        public OkObjectResult getAllGroupEvents()
         {
-            /*var element = "Hello from the web server";
-            return Ok(JsonConvert.SerializeObject(element));*/
+            return null;
+        }
 
-			return Ok(new { body = "Hello from the web " + data });
+        public OkObjectResult addFriend(int friendCode)
+        {
+            return null;
+        }
 
-			//return Ok(new { message = ("Hello from web server!!" + data) });
-		}
+        public OkObjectResult addFriend(int friendCode, int userCode)
+        {
+            return null;
+        }
+
+        public OkObjectResult removeFriend(int friendCode)
+        {
+            return null;
+        }
+
+        public OkObjectResult removeFriend(int friendCode, int usercode)
+        {
+            return null;
+        }
+        /// <summary>
+        /// Restrict this to a single group for the moment for complexity sake
+        /// </summary>
+        /// <returns></returns>
+        public OkObjectResult findTime()
+        {
+            return null;
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
