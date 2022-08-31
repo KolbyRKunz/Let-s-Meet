@@ -15,6 +15,7 @@ namespace Let_s_Meet.Data
         public DbSet<OnboardingModel> Onboarding { get; set; }
         public DbSet<EventPromptModel> EventPrompt { get; set; }
         public DbSet<CommentsModel> Comments { get; set; }
+        public DbSet<AttendanceModel> Attendance { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +25,7 @@ namespace Let_s_Meet.Data
             modelBuilder.Entity<OnboardingModel>().ToTable("Onboarding");
             modelBuilder.Entity<EventPromptModel>().ToTable("EventPrompt");
             modelBuilder.Entity<CommentsModel>().ToTable("Comments");
+            modelBuilder.Entity<AttendanceModel>().ToTable("Attendance");
         }
     }
 }

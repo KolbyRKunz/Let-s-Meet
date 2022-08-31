@@ -45,6 +45,9 @@ namespace Let_s_Meet.Data
             //Create some comments
             List<CommentsModel> comments = CreateComments(context, users, events);
 
+            //Create attendance table
+            List<AttendanceModel> attendance = CreateAttendance(context, users, events);
+
             context.SaveChanges();
 
         }
@@ -66,7 +69,7 @@ namespace Let_s_Meet.Data
                 // Create event
                 EventModel eventModel = new EventModel
                 {
-                    //Group = groups[i],
+                    Group = groups[i],
                     //Title = "Event " + i,
                     //Description = "Description " + i,
                     StartTime = DateTime.Now.AddDays(i),
@@ -92,7 +95,7 @@ namespace Let_s_Meet.Data
         private static List<GroupModel> CreateGroups(MeetContext context, List<UserModel> users)
         {
             List<GroupModel> groupModels = new List<GroupModel>();
-
+            
             int numGroups = 4;
 
             // Create some groups
@@ -225,6 +228,34 @@ namespace Let_s_Meet.Data
             //Add the onboarding objects to the DB
             context.Comments.AddRange(comments);
             return comments;
+        }
+
+        /// <summary>
+        /// Creates attendance info and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        public static List<AttendanceModel> CreateAttendance(MeetContext context, List<UserModel> users, List<EventModel> events)
+        {
+            List<AttendanceModel> attendance = new List<AttendanceModel>();
+
+            //For the first event in db, mark the whole group as attending
+            EventModel e1 = events.First();
+
+            foreach (UserModel u in e1.Group.Users)
+            {
+                attendance.Add(new AttendanceModel
+                {
+                    UserID = u.UserID,
+                    EventID = e1.EventID
+                });
+            }
+
+            //Add the onboarding objects to the DB
+            context.Attendance.AddRange(attendance);
+            return attendance;
         }
     }
 }
