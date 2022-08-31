@@ -42,6 +42,9 @@ namespace Let_s_Meet.Data
             //Create some event prompts
             List<EventPromptModel> eventPrompts = CreateEventPrompts(context, users, events);
 
+            //Create some comments
+            List<CommentsModel> comments = CreateComments(context, users, events);
+
             context.SaveChanges();
 
         }
@@ -188,7 +191,7 @@ namespace Let_s_Meet.Data
         {
             List<EventPromptModel> eventPrompts = new List<EventPromptModel>();
 
-            //Create one event prompt for one user and one event
+            //Create one event prompt for first user and first event
             eventPrompts.Add(new EventPromptModel
             {
                 UserID = users.First().UserID,
@@ -198,6 +201,30 @@ namespace Let_s_Meet.Data
             //Add the onboarding objects to the DB
             context.EventPrompt.AddRange(eventPrompts);
             return eventPrompts;
+        }
+
+        /// <summary>
+        /// Creates comments and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        public static List<CommentsModel> CreateComments(MeetContext context, List<UserModel> users, List<EventModel> events)
+        {
+            List<CommentsModel> comments = new List<CommentsModel>();
+
+            //Create one comment for first user and first event
+            comments.Add(new CommentsModel
+            {
+                UserID = users.First().UserID,
+                EventID = events.First().EventID,
+                Time = DateTime.Now
+            });
+
+            //Add the onboarding objects to the DB
+            context.Comments.AddRange(comments);
+            return comments;
         }
     }
 }

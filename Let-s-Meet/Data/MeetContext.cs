@@ -14,6 +14,7 @@ namespace Let_s_Meet.Data
         public DbSet<UserModel> Users { get; set; }  //Tempory value. Identity will take care of this later
         public DbSet<OnboardingModel> Onboarding { get; set; }
         public DbSet<EventPromptModel> EventPrompt { get; set; }
+        public DbSet<CommentsModel> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,7 @@ namespace Let_s_Meet.Data
             modelBuilder.Entity<UserModel>().ToTable("User");
             modelBuilder.Entity<OnboardingModel>().ToTable("Onboarding");
             modelBuilder.Entity<EventPromptModel>().ToTable("EventPrompt");
+            modelBuilder.Entity<CommentsModel>().ToTable("Comments");
         }
     }
 }
