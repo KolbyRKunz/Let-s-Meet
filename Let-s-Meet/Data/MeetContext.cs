@@ -28,6 +28,10 @@ namespace Let_s_Meet.Data
             modelBuilder.Entity<AttendanceModel>().ToTable("Attendance");
             modelBuilder.Entity<FriendsModel>().ToTable("Friends")
                 .HasKey(c => new { c.RequestedBy, c.RequestedTo });
+            modelBuilder.Entity<CalendarModel>().ToTable("Calendar");
+            modelBuilder.Entity<SettingsModel>().ToTable("Settings");
+            modelBuilder.Entity<CalendarPrivacyModel>().ToTable("CalendarPrivacy");
+            modelBuilder.Entity<EventPrivacyModel>().ToTable("EventPrivacy");
         }
     }
 }

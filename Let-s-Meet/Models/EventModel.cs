@@ -30,6 +30,9 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "group")]
         public GroupModel Group { get; set; }
 
+        [JsonProperty(PropertyName = "calendar")]
+        public CalendarModel Calendar { get; set; }
+
         //TODO: any other columns we would want an event to have
 
     }
