@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Let_s_Meet.Controllers
 {
@@ -71,9 +72,39 @@ namespace Let_s_Meet.Controllers
             return null;
         }
 
-        public OkObjectResult getAllGroupEvents()
+        /// <summary>
+        /// Given the groupID this will return all groups associated with them
+        /// </summary>
+        /// <returns>Json result of every group event</returns>
+        [HttpGet]
+        public OkObjectResult getAllGroupEvents(int groupID)
         {
-            return null;
+            var group = _context.Groups
+                .Include(g => g.Events)
+                .Include(g => g.Users)
+                .Where(g => g.GroupID == groupID)
+                .Single();
+
+            var events = group.Events.Select(e => new 
+            { 
+                StartTime = e.StartTime,
+                Members = group.Users.Select(u => new 
+                { 
+                    firstName = u.FirstName
+                })
+            });
+
+            return Ok(JsonConvert.SerializeObject(events));
+        }
+
+        /// <summary>
+        /// This is used when needing to check if the endpoints can be hit without worrying about other items
+        /// </summary>
+        /// <returns>simple Hello Json object</returns>
+        [HttpGet]
+        public OkObjectResult testEndpoint()
+        {
+            return Ok(new { Hi = "hello" });
         }
 
         public OkObjectResult addFriend(int friendCode)
