@@ -12,29 +12,51 @@
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                initialView: 'timeGridWeek',
                 headerToolbar: {
                     left: 'prev,next,title',
                     center: '',
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
+                events: '/api/displayUserEvents',
+
                 editable:true,
                 selectable:true,
+
+                eventClick: function(info){
+                    var eventID = info.id;
+                    var userID = 3; //This will need to be changed later with actual id
+
+                    if(confirm("Are you sure you want to remove"))
+                    {
+                        info.event.remove();
+                        $.ajax({
+                            url: '/api/removeUserEvent?userID=' + userID + '&eventID=' + eventID, //This will need to change to be for specific user and event
+                            type: 'DELETE'
+                        });
+                    }
+                },
 
                 select: function(data){
                   $(".submitForm").bind();
                   $(".popup").show();
                   $(".title").focus();
-                  //var start = Date.parse(start) / 1000;
-                  //var end = Date.parse(end) / 1000;
-                  //var allDay = allDay;
-                  //var wipit = // create a session id such as a random number that can be cleared later to prevent double submission
 
                   $(".submitForm").off('click').click(function(){
                   var title = $(".title").val();
+                  var startDate = $(".startDate").val();
+                  var endDate = $(".endDate").val();
                   var startTime = $(".startTime").val();
                   var endTime = $(".endTime").val();
+
+                  console.log("startDate = " + startDate);
+                  console.log("startTime = " + startTime);
+                  console.log("endDate = " + endDate);
+                  console.log("endTime = " + endTime);
+                  console.log("offset = " + new Date().getTimezoneOffset()); //it's in minutes not hours
+                  
+                  console.log(data);
 
                     if(title == null || title == ""){
                         alert("Event name must be entered")
@@ -46,11 +68,23 @@
                             end: data.end,
                         });
                         //TODO: need to update the database about this event
+                        $.post('/api/addUserEvent',
+                            {
+                                eventId: 'a', //is this needed? and how to get the correct id if so?
+                                title: title,
+                                start: data.start,
+                                end: data.end,
+                                userId: 3 //This will need to change
+                            }
+                        )
+                            
                     }
                         $(".popup").hide();
                         $(".title").val("");
                         $(".startTime").val("");
                         $(".endTime").val("");
+                        $(".startDate").val("");
+                        $(".endDate").val("");
                     });
 
                     $(".exit").off('click').click(function(){
@@ -59,6 +93,8 @@
                         $(".title").val("");
                         $(".startTime").val("");
                         $(".endTime").val("");
+                        $(".startDate").val("");
+                        $(".endDate").val("");
                     });
                 },
                 
@@ -70,14 +106,9 @@
 </head>
 
 
-<div class="text-center">
-    <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold" >Let's Meet!</span></h1>
-
-    <button id="button0" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
-    <hr />
-</div>
 
 <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
+
 
 <div class="popup" style="display:none; position:fixed; top:25%; left:25%; background-color:white;z-index:10">
   <form style="background-color:#EDF5E0;color:#950741;padding:10px;border: 2px solid #950741">
@@ -87,13 +118,17 @@
       </div>
 
       <div style="display:block">
+          <label>Start Date</label>
+          <input type="date" class="startDate">
           <label>Start Time</label>
-          <input type="text" class="startTime">
+          <input type="time" class="startTime">
       </div>
 
       <div style="display:block">
+          <label>End Date</label>
+          <input type="date" class="endDate">
           <label>End Time</label>
-          <input type="text" class="endTime">
+          <input type="time" class="endTime">
       </div>
 
       <input type="button" value="Submit" href="#" onclick="return false" class="submitForm" style="background-color:#EDF5E0;color:#950741">
@@ -102,103 +137,3 @@
 </div>
 
 
-<!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->
-<div style="position:absolute;align-content:center">
-    <div style="float:left; padding:10px">
-        <button id="button1" class="btn btn-danger" onclick="getData(1)"> Request User Data </button>
-    </div>
-
-    <div style="float:left;padding:10px">
-        <button id="button2" class="btn btn-danger" onclick="getData(2)"> Request Group Data </button>
-    </div>
-
-    <div style="float:left;padding:10px">
-        <button id="button2" class="btn btn-danger" onclick="getData(3)"> Request Event Data </button>
-    </div>
-</div>
-
-<br />
-
-<br />
-
-<br />
-
-<div class="output_box" style="position:relative;border: 1px solid black;">
-</div>
-
-
-
-<script>
-    function createEvent(date) {
-        $(".output_box").html(date);
-        console.log(date);
-    }
-
-    function doFunction() {
-
-        let url = "Api/post"
-        let data = "string"
-
-        $.post(url, data).done(function (result) {
-
-            $("#button0").html(result.message);
-            $(".output_box").html("");
-        })
-    }
-
-    function getData(buttonNumber) {
-
-        let url = "Api/get"
-
-        if (buttonNumber == 1)
-            url = url + "Users"
-        else if (buttonNumber == 2)
-            url = url + "Groups"
-        else if (buttonNumber == 3)
-            url = url + "Events"
-
-        let data = "string"
-
-        $.get(url, data)
-            .fail(function (result) {
-                console.log("Something went wrong: " + JSON.stringify(result));
-            })
-            .done(function (result) {
-                var list = JSON.parse(result);
-                var output = "";
-                
-                console.log(list);
-
-                //Display User information
-                if (buttonNumber == 1) {
-                    for (var k in list) {
-                        output = output + list[k].firstName + " " + list[k].lastName + "<br/>";
-                    }
-                }
-                //Display Group information
-                else if (buttonNumber == 2) {
-
-                    // Set output to list of groups showing the users in each group
-                    for (var k in list) {
-                        output = output + "Group: " + list[k].groupID + " Users: ";
-                        for (var i in list[k].Users) {
-                            output = output + list[k].Users[i].firstName + " " + list[k].Users[i].lastName + ", ";
-                        }
-                        
-                        output += "<br/>";
-                    }
-                }
-                //Display Event information
-                else if (buttonNumber == 3) {
-                    for (var k in list) {
-                        console.log(list[k]);
-                        output = output +
-                            "Start: " + list[k].startTime +
-                            " End: " + list[k].endTime + "<br/>";
-                        //^^for now until group id is resolved?
-                    }
-                }
-                $(".output_box").html(output);
-            })
-    }
-</script>

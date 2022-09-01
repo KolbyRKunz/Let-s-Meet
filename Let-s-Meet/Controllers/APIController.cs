@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Let_s_Meet.Controllers
 {
@@ -95,6 +97,54 @@ namespace Let_s_Meet.Controllers
             });
 
             return Ok(JsonConvert.SerializeObject(events));
+        }
+
+        /// <summary>
+        /// Finds all of a given User's events for the purpose of displaying on
+        /// their individual calendar
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns>A given users events in the time frame in Json</returns>
+        [HttpGet]
+        public OkObjectResult displayUserEvents(int userID)
+        {
+            var userEvents = new[] {
+                new {
+                    id = "1", //FullCalendar wants it as a String not int
+                    title = "Event1", 
+                    start = DateTime.UtcNow.ToString("O"),
+                    end = DateTime.UtcNow.AddHours(2).ToString("O")
+                },
+                new{
+                    id = "2", //FullCalendar wants it as a String not int
+                    title = "Event2",
+                    start = DateTime.UtcNow.AddHours(15).ToString("O"),
+                    end = DateTime.UtcNow.AddHours(18).ToString("O")
+                }
+            };
+
+            return Ok(userEvents);
+        }
+
+        /// <summary>
+        /// Removes a given event from the user's event
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public OkObjectResult removeUserEvent(int userID, int eventID)
+        {
+            Debug.WriteLine(userID + " " + eventID);
+            return Ok(new { data = "remove from database", 
+                userId = userID,
+                eventId = eventID 
+            });
+        }
+
+        [HttpPost]
+        public OkObjectResult addUserEvent(int userId, int eventId, string title, DateTime start, DateTime end)
+        {
+            return Ok(new { userID = userId, eventID = eventId});
         }
 
         /// <summary>
