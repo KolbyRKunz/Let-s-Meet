@@ -26,6 +26,8 @@ namespace Let_s_Meet.Data
             modelBuilder.Entity<EventPromptModel>().ToTable("EventPrompt");
             modelBuilder.Entity<CommentsModel>().ToTable("Comments");
             modelBuilder.Entity<AttendanceModel>().ToTable("Attendance");
+            modelBuilder.Entity<FriendsModel>().ToTable("Friends")
+                .HasKey(c => new { c.RequestedBy, c.RequestedTo });
         }
     }
 }
