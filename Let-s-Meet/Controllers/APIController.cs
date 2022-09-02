@@ -36,7 +36,7 @@ namespace Let_s_Meet.Controllers
             _context = context;
         }
 
-       //[Authorize]
+        [Authorize]
         [HttpPost]
         public OkObjectResult Post(string data)
         {

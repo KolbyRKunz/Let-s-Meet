@@ -21,10 +21,12 @@ using System.Text;
 
 namespace Let_s_Meet.Controllers
 {
+    [Route("Auth")]
     public class AuthController : Controller
     {
         private readonly UserManager<User> userManager;
         private readonly IConfiguration _configuration;
+        private readonly string userId;
 
         public AuthController(UserManager<User> userManager, IConfiguration config)
         {
@@ -32,8 +34,18 @@ namespace Let_s_Meet.Controllers
             this._configuration = config;
         }
 
+        public async Task<IActionResult> IndexAsync()
+        {
+            var usr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (usr == null)
+            {
+                ViewBag.Name = usr;
+            }
+            return View();
+        }
+
         [HttpPost]
-        [Route("login")]
+        [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {       
             var user = await userManager.FindByNameAsync(model.Username);

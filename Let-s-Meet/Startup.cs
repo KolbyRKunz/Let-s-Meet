@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Let_s_Meet.Areas.Identity.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace Let_s_Meet
 {
@@ -35,6 +38,12 @@ namespace Let_s_Meet
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddSession();
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<IdentityContext>()
+                .AddDefaultTokenProviders();
 
             services.AddAuthentication(options =>
             {
@@ -73,6 +82,18 @@ namespace Let_s_Meet
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseSession();
+            app.Use(async (context, next) =>
+            {
+                var token = context.Session.GetString("Token");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Request.Headers.Add("Authorization", "Bearer " + token);
+                }
+                await next();
+            });
+
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
 

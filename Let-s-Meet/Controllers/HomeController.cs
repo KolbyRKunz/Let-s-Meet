@@ -1,4 +1,5 @@
 ﻿using Let_s_Meet.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,7 +23,7 @@ namespace Let_s_Meet.Controllers
         {
             return View();
         }
-
+        [Authorize]
         public IActionResult Groups()
         {
             return View();

@@ -1,0 +1,55 @@
+﻿@model LoginModel
+@{
+}
+<div class="row">
+    @if (ViewBag.Name != null)
+    {
+        <p>Hello @ViewBag.Name </p>
+    }
+    <div class="col-md-4">
+        <form id="account">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Username"></label>
+                <input id ="Username" asp-for="Username" />
+                <span asp-validation-for="Username" class="text-danger">
+                </span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input id ="Password" type="password" asp-for="Password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+        </form>
+        <button onclick="submit()" class="btn btn-primary">Log in</button>
+    </div>
+</div>
+
+<script>
+
+    function submit() {
+        let url = "Auth/Login"
+        let data = {
+            "Username": $("#Username").val(),
+            "Password": $("#Password").val()
+        }
+        
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+            console.log(response)
+      }
+    })
+    }
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
