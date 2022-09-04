@@ -79,7 +79,7 @@ namespace Let_s_Meet.Controllers
         /// </summary>
         /// <returns>Json result of every group event</returns>
         [HttpGet]
-        public OkObjectResult getAllGroupEvents(int groupID)
+        public OkObjectResult getGroupEventsQueryVersion(int groupID)
         {
             var group = _context.Groups
                 .Include(g => g.Events)
@@ -97,6 +97,32 @@ namespace Let_s_Meet.Controllers
             });
 
             return Ok(JsonConvert.SerializeObject(events));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public OkObjectResult getGroupEvents(int groupID)
+        {
+            var userEvents = new[] {
+                new {
+                    id = "1", //FullCalendar wants it as a String not int
+                    title = "Event1",
+                    start = DateTime.UtcNow.AddHours(0).ToString("O"),
+                    end = DateTime.UtcNow.AddHours(3).ToString("O")
+                },
+                new{
+                    id = "2", //FullCalendar wants it as a String not int
+                    title = "Event2",
+                    start = DateTime.UtcNow.AddHours(28).ToString("O"),
+                    end = DateTime.UtcNow.AddHours(31).ToString("O")
+                }
+            };
+
+            return Ok(userEvents);
         }
 
         /// <summary>
@@ -147,6 +173,27 @@ namespace Let_s_Meet.Controllers
             return Ok(new { userID = userId, eventID = eventId});
         }
 
+        [HttpGet]
+        public OkObjectResult getUserGroups(int userID)
+        {
+            var userGroups = new[] {
+                new {
+                    groupName = "Group 1"
+                },
+                new{
+                    groupName = "Group 2"
+                },
+                new{
+                    groupName = "Group 3"
+                },
+                new{
+                    groupName = "Group 4"
+                }
+            };
+
+            return Ok(userGroups);
+        }
+
         /// <summary>
         /// This is used when needing to check if the endpoints can be hit without worrying about other items
         /// </summary>
@@ -155,6 +202,32 @@ namespace Let_s_Meet.Controllers
         public OkObjectResult testEndpoint()
         {
             return Ok(new { Hi = "hello" });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public OkObjectResult getUserFriends(int userID)
+        {
+            var userFriends = new[] {
+                new {
+                    firstName = "Friend",
+                    lastName = "A"
+                },
+                new{
+                    firstName = "Friend",
+                    lastName = "B"
+                },
+                new{
+                    firstName = "Friend",
+                    lastName = "C"
+                },
+            };
+
+            return Ok(userFriends);
         }
 
         public OkObjectResult addFriend(int friendCode)

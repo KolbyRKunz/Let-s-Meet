@@ -48,6 +48,8 @@ a {
     color: #EDF5E0; /*var(--DD_CREAM);*/
     background-color: #950741; /*var(--DD_RED_2);*/
     border-color: #6F2232; /*var(--DD_RED_1);*/
+    padding: 15px;
+    margin: 20px;
 }
 
     .btn-danger:hover {
@@ -131,4 +133,10 @@ html {
 
 .something{
     background-color:purple;
+}
+
+#groupList {
+    display:flex;
+    justify-content:flex-end;
+    flex-direction:column;
 }

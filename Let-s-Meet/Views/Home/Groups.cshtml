@@ -2,14 +2,40 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-left">
-    <h2>Groups</h2>
-    <hr />
-</div>
+<body>
+    <div class="text-left">
+        <h2>Groups</h2>
+        <hr />
+    </div>
 
-<div>
-    <button id="button0" class="btn btn-danger">Create Group</button>
-</div>
+    <div>
+        <button id="button0" class="btn btn-danger">Create Group</button>
+    </div>
+
+    <div id="groupList" style="display:flex;justify-content:flex-end;flex-direction:column;"></div> <!--Figure out how to get the css into the site.css-->
+</body>
 
 
+<script>
+    fetch('../api/getUserGroups')
+        .then(function (response){
+            return response.json();
+        })
+        .then(function (data) {
+            getGroupData(data);
+        })
+        .catch(function (e){
+            console.log("error in groups: " + e);
+        })
 
+    function getGroupData(data){
+        var groupContainer = document.getElementById("groupList");
+        for(var i = 0; i < data.length; i++){
+            var div = document.createElement("a");
+            div.setAttribute('href', '../Group/Index');
+            div.setAttribute('class', 'groupLink'); //Use this later for styling, once the site.css is connected better
+            div.innerHTML = data[i].groupName;
+            groupContainer.appendChild(div);
+        }
+    }
+</script>

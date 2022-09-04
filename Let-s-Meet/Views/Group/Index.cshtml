@@ -1,0 +1,36 @@
+﻿<head>
+    <meta charset='utf-8' />
+    <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
+    <script src='~/lib/fullcalendar/main.js'></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next,title',
+                    center: '',
+                    right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
+                },
+
+                events: '/api/getGroupEvents',
+
+            });
+            calendar.render();
+        });
+
+    </script>
+</head>
+
+
+<h1>Group Calendar</h1>
+
+<div>
+    <button id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
+</div>
+
+
+
+<div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
