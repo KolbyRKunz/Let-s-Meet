@@ -2,6 +2,10 @@
     ViewData["Title"] = "Home Page";
 }
 
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
+
 <body>
     <div class="text-left">
         <h2>Groups</h2>
@@ -9,7 +13,7 @@
     </div>
 
     <div>
-        <button id="button0" class="btn btn-danger">Create Group</button>
+        <button onClick="createGroup()" id="createGroupBtn" class="btn btn-danger">Create Group</button>
     </div>
 
     <div id="groupList" style="display:flex;justify-content:flex-end;flex-direction:column;"></div> <!--Figure out how to get the css into the site.css-->
@@ -32,10 +36,45 @@
         var groupContainer = document.getElementById("groupList");
         for(var i = 0; i < data.length; i++){
             var div = document.createElement("a");
-            div.setAttribute('href', '../Group/Index');
-            div.setAttribute('class', 'groupLink'); //Use this later for styling, once the site.css is connected better
+            div.setAttribute('href', '../Group/Index'); //will need to make this related to the specific gorup and groupId for query
+            div.setAttribute('class', 'groupLink'); //Use this later for styling on site.css
             div.innerHTML = data[i].groupName;
             groupContainer.appendChild(div);
         }
     }
+
+    async function createGroup() {
+        const { value: formValues } = await Swal.fire({
+            title: 'Event Info',
+            html: //This does no input checking currently
+                '<label>Event Name</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/>' +
+                '<label>Start Date</label>' +
+                '<input type="date" id="startDate" class="swal2-input">' +
+                '<br/>' +
+                '<label>End Date</label>' +
+                '<input type="date" id="endDate" class="swal2-input">' +
+                '<br/>' +
+                '<label>Start Time</label>' +
+                '<input type="time" id="startTime" class="swal2-input">' +
+                '<br/>' +
+                '<label>End Time</label>' +
+                '<input type="time" id="endTime" class="swal2-input">',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton: true,
+            preConfirm: () => {
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                    startTime: $('#startTime').val(),
+                    endTime: $('#endTime').val()
+                }
+            }
+        });
+        return formValues;
+    }
+    
 </script>

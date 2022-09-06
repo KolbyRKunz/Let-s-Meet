@@ -12,9 +12,7 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--<script src="sweetalert2.all.min.js"></script>-->
 
-
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -25,10 +23,11 @@
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
-                events: '/api/displayUserEvents',
+                events: '/api/displayUserEvents', //will need to pass in the userId later in the non-mock data call to query the database
 
                 //editable:true,
                 selectable:true,
+                nowIndicator: true,
 
                 eventClick: function(info){
                     var eventID = info.id;
@@ -56,72 +55,26 @@
 
                 select: function(data){
                     console.log(data);
-                    addEvent().then((value) => { //JS promise
-                        console.log(value);
+                    addEvent().then((values) => { //JS promise
+                        console.log(values);//this is a JSON/object of stuff from the promise
+                        var eventName = values.eventName
                         calendar.addEvent({
-                            title: value,
+                            title: eventName,
                             start: data.start,
                             end: data.end
-                        });
-                    });
-
-                    /*$(".submitForm").bind();
-                    $(".popup").show();
-                    $(".title").focus();
-
-                    $(".submitForm").off('click').click(function(){
-                    var title = $(".title").val();
-                    var startDate = $(".startDate").val();
-                    var endDate = $(".endDate").val();
-                    var startTime = $(".startTime").val();
-                    var endTime = $(".endTime").val();
-
-                    console.log("startDate = " + startDate);
-                    console.log("startTime = " + startTime);
-                    console.log("endDate = " + endDate);
-                    console.log("endTime = " + endTime);
-                    console.log("offset = " + new Date().getTimezoneOffset()); //it's in minutes not hours
-                  
-                    console.log(data);
-
-                    if(title == null || title == ""){
-                        alert("Event name must be entered")
-                    } else {
-                        // clear all information, unselect events, and alert that a title needs to be entered
-                        calendar.addEvent({
-                            title: title,
-                            start: data.start,
-                            end: data.end,
                         });
                         //TODO: need to update the database about this event
                         $.post('/api/addUserEvent',
                             {
-                                eventId: 'a', //is this needed? and how to get the correct id if so?
-                                title: title,
+                                //eventId: 'a', //Let the server handle id creation for database //is this needed? and how to get the correct id if so?
+                                title: eventName,
                                 start: data.start,
                                 end: data.end,
-                                userId: 3 //This will need to change
+                                userId: 3 //This will need to change to actual userID
                             }
                         )
-                            
-                    }
-                        $(".popup").hide();
-                        $(".title").val("");
-                        $(".startTime").val("");
-                        $(".endTime").val("");
-                        $(".startDate").val("");
-                        $(".endDate").val("");
-                    });
-
-                    $(".exit").off('click').click(function(){
-                        // clear all info, unselect events and...
-                        $(".popup").hide();
-                        $(".title").val("");
-                        $(".startTime").val("");
-                        $(".endTime").val("");
-                        $(".startDate").val("");
-                        $(".endDate").val("");
-                    });*/
+                    })
+                    .catch(error => console.log(error));
                 },
                 
             });
@@ -135,53 +88,11 @@
 
 <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
 
-
-<div class="popup" style="display:none; position:fixed; top:25%; left:25%; background-color:white;z-index:10">
-  <form style="background-color:#EDF5E0;color:#950741;padding:10px;border: 2px solid #950741">
-      <div style="display:block">
-          <label>Event Name</label>
-          <input type="text" class="title" autofocus>
-      </div>
-
-      <div style="display:block">
-          <label>Start Date</label>
-          <input type="date" class="startDate">
-          <label>Start Time</label>
-          <input type="time" class="startTime">
-      </div>
-
-      <div style="display:block">
-          <label>End Date</label>
-          <input type="date" class="endDate">
-          <label>End Time</label>
-          <input type="time" class="endTime">
-      </div>
-
-      <input type="button" value="Submit" href="#" onclick="return false" class="submitForm" style="background-color:#EDF5E0;color:#950741">
-      <input type="button" value="Cancel "href="#" onclick="return false" class="exit" style="background-color:#EDF5E0;color:#950741">
-  </form>
-</div>
-x
-
 <script>
     async function addEvent(){
-        const { value: eName } = await Swal.fire({
-            title: 'Enter event name',
-            input: 'text',
-            showCancelButton: true,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to write something!'
-                }
-            }
-        })
-
-        return eName;
-
-
-        /*Swal.fire({
+       const { value: formValues } = await Swal.fire({
             title: 'Event Info',
-            html:
+            html: //This does no input checking currently
                 '<label>Event Name</label>' +
                 '<input type="text" id="eventName" class="swal2-input">' +
                 '<br/>' +
@@ -200,15 +111,15 @@ x
             position: 'top-end',
             showCancelButton:true,
             preConfirm: () => {
-                return [
-                    $('eventName').val(),
-                    $('startDate').val(),
-                    $('endDate').val(),
-                    $('startTime').val(),
-                    $('endTime').val()
-                ]
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                    startTime: $('#startTime').val(),
+                    endTime: $('#endTime').val()
+                }
             }
-        });*/
+        });
+        return formValues;
     }
-
 </script>
