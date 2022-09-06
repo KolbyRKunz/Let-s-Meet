@@ -2,22 +2,22 @@
 @{
 }
 <div class="row">
-    @if (ViewBag.Name != null)
+    @if (User.Identity.Name != null)
     {
-        <p>Hello @ViewBag.Name </p>
+        <p>Hello @User.Identity.Name! </p>
     }
     <div class="col-md-4">
         <form id="account">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Username"></label>
-                <input id ="Username" asp-for="Username" />
+                <input id="Username" asp-for="Username" />
                 <span asp-validation-for="Username" class="text-danger">
                 </span>
             </div>
             <div class="form-group">
                 <label asp-for="Password"></label>
-                <input id ="Password" type="password" asp-for="Password" />
+                <input id="Password" type="password" asp-for="Password" />
                 <span asp-validation-for="Password"></span>
             </div>
         </form>
@@ -33,7 +33,7 @@
             "Username": $("#Username").val(),
             "Password": $("#Password").val()
         }
-        
+
         $.ajax({
             url: url,
             type: "POST",
@@ -41,9 +41,12 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
-            console.log(response)
-      }
-    })
+               location.reload()
+            }
+            error: function (request, status, error){
+                console.log(error)
+            }
+        })
     }
 
 </script>

@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Let_s_Meet.Models.JWTModels;
 
 namespace Let_s_Meet.Controllers
 {
@@ -26,7 +27,6 @@ namespace Let_s_Meet.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly IConfiguration _configuration;
-        private readonly string userId;
 
         public AuthController(UserManager<User> userManager, IConfiguration config)
         {
@@ -34,13 +34,8 @@ namespace Let_s_Meet.Controllers
             this._configuration = config;
         }
 
-        public async Task<IActionResult> IndexAsync()
+        public IActionResult IndexAsync()
         {
-            var usr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (usr == null)
-            {
-                ViewBag.Name = usr;
-            }
             return View();
         }
 
@@ -74,16 +69,26 @@ namespace Let_s_Meet.Controllers
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
 
+                var writtenToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                HttpContext.Session.SetString("Token", writtenToken);
+
                 return Ok(new
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    token = writtenToken,
                     expiration = token.ValidTo
                 });
             }
             return Unauthorized();
         }
 
+        public NoContentResult LogOut()
+        {
+            HttpContext.Session.Remove("Token");
+            return NoContent();
+        }
 
+        //Could use addition of adding password parameters
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
