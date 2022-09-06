@@ -1,4 +1,9 @@
-﻿<head>
+﻿
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
+
+<head>
     <meta charset='utf-8' />
     <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
     <link rel="stylesheet" type="text/css" href="~/css/site.css" />
@@ -28,9 +33,44 @@
 <h1>Group Calendar</h1>
 
 <div>
-    <button id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
+    <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
 </div>
 
-
-
 <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
+
+
+<script>
+    async function createMeetingPopUp() {
+        const { value: formValues } = await Swal.fire({
+            title: 'Meeting Reason',
+            html: //This does no input checking currently
+                //'<label>Event Reason</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/>' +
+                '<label>Start Date</label>' +
+                '<input type="date" id="startDate" class="swal2-input">' +
+                '<br/>' +
+                '<label>End Date</label>' +
+                '<input type="date" id="endDate" class="swal2-input">' +
+                '<br/>',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton: true,
+            preConfirm: () => { //TODO: only need days here because the user is picking the time frame they want it to occur from
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                }
+            }
+        });
+        return formValues;
+    }
+
+    function createMeeting() {
+        createMeetingPopUp().then((values) => {
+            console.log(values);
+        })
+        .catch(error => console.log(error));
+    }
+</script>

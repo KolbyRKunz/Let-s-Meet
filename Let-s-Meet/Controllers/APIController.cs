@@ -75,6 +75,19 @@ namespace Let_s_Meet.Controllers
         }
 
         /// <summary>
+        /// Create a new group from the given groupName and members in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public OkObjectResult createGroup(string groupName, string[] groupMembers)
+        {
+            return Ok(new { 
+                groupName = groupName,
+                groupMembers = groupMembers
+            });
+        }
+
+        /// <summary>
         /// Given the groupID this will return all groups associated with them
         /// </summary>
         /// <returns>Json result of every group event</returns>

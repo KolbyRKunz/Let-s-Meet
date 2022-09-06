@@ -64,7 +64,7 @@
                             end: data.end
                         });
                         //TODO: need to update the database about this event
-                        $.post('/api/addUserEvent',
+                        $.post('/api/addUserEvent', //TODO: This needs to be changed, I didn't know what I was doing intially and will probably do an ajax here
                             {
                                 //eventId: 'a', //Let the server handle id creation for database //is this needed? and how to get the correct id if so?
                                 title: eventName,

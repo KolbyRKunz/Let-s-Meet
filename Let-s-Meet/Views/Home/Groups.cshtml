@@ -22,17 +22,17 @@
 
 <script>
     fetch('../api/getUserGroups')
-        .then(function (response){
+        .then(function (response) {
             return response.json();
         })
         .then(function (data) {
-            getGroupData(data);
+            getUserGroupData(data);
         })
-        .catch(function (e){
+        .catch(function (e) {
             console.log("error in groups: " + e);
         })
 
-    function getGroupData(data){
+    function getUserGroupData(data){ //TODO: This will have to be greatly change when no longer using mock data to display groups
         var groupContainer = document.getElementById("groupList");
         for(var i = 0; i < data.length; i++){
             var div = document.createElement("a");
@@ -43,38 +43,51 @@
         }
     }
 
-    async function createGroup() {
+    async function createGroupPopUp() {
         const { value: formValues } = await Swal.fire({
-            title: 'Event Info',
+            title: 'Create Group',
             html: //This does no input checking currently
-                '<label>Event Name</label>' +
-                '<input type="text" id="eventName" class="swal2-input">' +
-                '<br/>' +
-                '<label>Start Date</label>' +
-                '<input type="date" id="startDate" class="swal2-input">' +
-                '<br/>' +
-                '<label>End Date</label>' +
-                '<input type="date" id="endDate" class="swal2-input">' +
-                '<br/>' +
-                '<label>Start Time</label>' +
-                '<input type="time" id="startTime" class="swal2-input">' +
-                '<br/>' +
-                '<label>End Time</label>' +
-                '<input type="time" id="endTime" class="swal2-input">',
+                '<label>Group Name</label>' +
+                '<input type="text" id="groupName" class="swal2-input">' +
+                '<br/>'+
+                '<label>Enter group members email (separate with a comma)</label>' +
+                '<input type="text" id="members" class="swal2-input">' +
+                '<br/>',
             focusConfirm: false,
-            position: 'top-end',
+            position: 'center',
             showCancelButton: true,
             preConfirm: () => {
                 return {
-                    eventName: $('#eventName').val(),
-                    startDate: $('#startDate').val(),
-                    endDate: $('#endDate').val(),
-                    startTime: $('#startTime').val(),
-                    endTime: $('#endTime').val()
+                    groupName: $('#groupName').val(),
+                    members: $('#members').val()
                 }
             }
         });
         return formValues;
     }
+
+    function createGroup() {
+        createGroupPopUp().then((values) => {
+            var data = {
+                groupName: values.groupName,
+                members: values.members
+            }
+
+            $.ajax({ //This needs to be improved upon, right now it's error 404
+                url: "../api/createGroup",
+                type: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json; carset=utf-8",
+                dataType: "json",
+                success: function(response){
+                    loaction.reload()
+                },
+                error: function (request, status, error){
+                    console.log(error)
+                }
+            })
+        })
+        .catch(error => console.log(error));
+    }   
     
 </script>
