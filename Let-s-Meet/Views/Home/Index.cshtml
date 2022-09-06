@@ -4,9 +4,15 @@
 
 <head>
     <meta charset='utf-8' />
+    <!--Full Calendar-->
     <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
     <link rel="stylesheet" type="text/css" href="~/css/site.css" />
     <script src='~/lib/fullcalendar/main.js'></script>
+    <!--Sweet Alert 2-->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!--<script src="sweetalert2.all.min.js"></script>-->
+
+
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -21,42 +27,62 @@
 
                 events: '/api/displayUserEvents',
 
-                editable:true,
+                //editable:true,
                 selectable:true,
 
                 eventClick: function(info){
                     var eventID = info.id;
                     var userID = 3; //This will need to be changed later with actual id
 
-                    if(confirm("Are you sure you want to remove"))
-                    {
-                        info.event.remove();
-                        $.ajax({
-                            url: '/api/removeUserEvent?userID=' + userID + '&eventID=' + eventID, //This will need to change to be for specific user and event
-                            type: 'DELETE'
-                        });
-                    }
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if(result.isConfirmed)
+                        {
+                            info.event.remove();
+                            $.ajax({  ///now we need to update the backend
+                                url: '/api/removeUserEvent?userID=' + userID + '&eventID=' + eventID, //This will need to change to be for specific user and event
+                                type: 'DELETE'
+                            });
+                        }
+                    })
                 },
 
                 select: function(data){
-                  $(".submitForm").bind();
-                  $(".popup").show();
-                  $(".title").focus();
+                    console.log(data);
+                    addEvent().then((value) => { //JS promise
+                        console.log(value);
+                        calendar.addEvent({
+                            title: value,
+                            start: data.start,
+                            end: data.end
+                        });
+                    });
 
-                  $(".submitForm").off('click').click(function(){
-                  var title = $(".title").val();
-                  var startDate = $(".startDate").val();
-                  var endDate = $(".endDate").val();
-                  var startTime = $(".startTime").val();
-                  var endTime = $(".endTime").val();
+                    /*$(".submitForm").bind();
+                    $(".popup").show();
+                    $(".title").focus();
 
-                  console.log("startDate = " + startDate);
-                  console.log("startTime = " + startTime);
-                  console.log("endDate = " + endDate);
-                  console.log("endTime = " + endTime);
-                  console.log("offset = " + new Date().getTimezoneOffset()); //it's in minutes not hours
+                    $(".submitForm").off('click').click(function(){
+                    var title = $(".title").val();
+                    var startDate = $(".startDate").val();
+                    var endDate = $(".endDate").val();
+                    var startTime = $(".startTime").val();
+                    var endTime = $(".endTime").val();
+
+                    console.log("startDate = " + startDate);
+                    console.log("startTime = " + startTime);
+                    console.log("endDate = " + endDate);
+                    console.log("endTime = " + endTime);
+                    console.log("offset = " + new Date().getTimezoneOffset()); //it's in minutes not hours
                   
-                  console.log(data);
+                    console.log(data);
 
                     if(title == null || title == ""){
                         alert("Event name must be entered")
@@ -95,7 +121,7 @@
                         $(".endTime").val("");
                         $(".startDate").val("");
                         $(".endDate").val("");
-                    });
+                    });*/
                 },
                 
             });
@@ -135,5 +161,54 @@
       <input type="button" value="Cancel "href="#" onclick="return false" class="exit" style="background-color:#EDF5E0;color:#950741">
   </form>
 </div>
+x
+
+<script>
+    async function addEvent(){
+        const { value: eName } = await Swal.fire({
+            title: 'Enter event name',
+            input: 'text',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!'
+                }
+            }
+        })
+
+        return eName;
 
 
+        /*Swal.fire({
+            title: 'Event Info',
+            html:
+                '<label>Event Name</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/>' +
+                '<label>Start Date</label>' +
+                '<input type="date" id="startDate" class="swal2-input">' +
+                '<br/>' +
+                '<label>End Date</label>' +
+                '<input type="date" id="endDate" class="swal2-input">' +
+                '<br/>' +
+                '<label>Start Time</label>' +
+                '<input type="time" id="startTime" class="swal2-input">' +
+                '<br/>' +
+                '<label>End Time</label>' +
+                '<input type="time" id="endTime" class="swal2-input">',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton:true,
+            preConfirm: () => {
+                return [
+                    $('eventName').val(),
+                    $('startDate').val(),
+                    $('endDate').val(),
+                    $('startTime').val(),
+                    $('endTime').val()
+                ]
+            }
+        });*/
+    }
+
+</script>
