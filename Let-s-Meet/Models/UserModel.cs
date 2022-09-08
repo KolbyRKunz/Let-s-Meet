@@ -32,5 +32,7 @@ namespace Let_s_Meet.Models
         public ICollection<EventModel> Events { get; set; }
 
 
+        [JsonProperty(PropertyName = "settings")]
+        public SettingsModel settings { get; set; }
     }
 }

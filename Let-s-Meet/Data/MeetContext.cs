@@ -16,6 +16,11 @@ namespace Let_s_Meet.Data
         public DbSet<EventPromptModel> EventPrompt { get; set; }
         public DbSet<CommentsModel> Comments { get; set; }
         public DbSet<AttendanceModel> Attendance { get; set; }
+        public DbSet<FriendsModel> Friends { get; set; }
+        public DbSet<CalendarModel> Calendar { get; set; }
+        public DbSet<SettingsModel> Settings { get; set; }
+        public DbSet<CalendarPrivacyModel> CalendarPrivacy { get; set; }
+        public DbSet<EventPrivacyModel> EventPrivacy { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -28,10 +28,14 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "members")]
         public List<UserModel> Members { get; set; }
 
+        [JsonProperty(PropertyName = "group")]
+        public GroupModel Group { get; set; }
+
         [JsonProperty(PropertyName = "events")]
         public List<EventModel> Events { get; set; }
 
-        
+        [JsonProperty(PropertyName = "privacy")]
+        public CalendarPrivacyModel Privacy { get; set; }
 
 
     }

@@ -22,7 +22,7 @@ namespace Let_s_Meet.Models
         public string Location { get; set; }
 
         [JsonProperty(PropertyName = "privacy")]
-        public string Privacy { get; set; }
+        public EventPrivacyModel Privacy { get; set; }
 
         [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
