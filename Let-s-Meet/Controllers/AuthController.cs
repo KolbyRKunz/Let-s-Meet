@@ -82,6 +82,7 @@ namespace Let_s_Meet.Controllers
             return Unauthorized();
         }
 
+        [Route("LogOut")]
         public NoContentResult LogOut()
         {
             HttpContext.Session.Remove("Token");

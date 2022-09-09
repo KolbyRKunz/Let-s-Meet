@@ -1,4 +1,5 @@
-﻿@model LoginModel
+﻿@using Let_s_Meet.Models.JWTModels
+@model LoginModel
 @{
 }
 <div class="row">
@@ -21,13 +22,14 @@
                 <span asp-validation-for="Password"></span>
             </div>
         </form>
-        <button onclick="submit()" class="btn btn-primary">Log in</button>
+        <button onclick="signIn()" class="btn btn-primary">Log in</button>
     </div>
 </div>
 
+
 <script>
 
-    function submit() {
+    function signIn() {
         let url = "Auth/Login"
         let data = {
             "Username": $("#Username").val(),
@@ -42,9 +44,10 @@
             dataType: "json",
             success: function (response) {
                location.reload()
-            }
-            error: function (request, status, error){
-                console.log(error)
+               console.log("signed in")
+            },
+            error: function () {
+                console.log("something went wrong")
             }
         })
     }
