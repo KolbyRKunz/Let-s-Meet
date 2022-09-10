@@ -34,7 +34,7 @@ namespace Let_s_Meet.Controllers
             this._configuration = config;
         }
 
-        public IActionResult IndexAsync()
+        public IActionResult Index()
         {
             return View();
         }
@@ -91,7 +91,7 @@ namespace Let_s_Meet.Controllers
 
         //Could use addition of adding password parameters
         [HttpPost]
-        [Route("register")]
+        [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userExists = await userManager.FindByNameAsync(model.Username);
