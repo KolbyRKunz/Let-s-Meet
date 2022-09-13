@@ -28,11 +28,14 @@
                 //editable:true,
                 selectable:true,
                 nowIndicator: true,
-                timeZone:'UTC',
+                //timeZone:'UTC',
 
                 eventClick: function(info){
-                    var eventID = info.id;
-                    var userID = 3; //This will need to be changed later with actual id
+                    var eventID = info.event.id;
+                    var userID = 3; //TODO: This will need to be changed later with actual id
+                    console.log(info);
+                    console.log(eventID);
+                    console.log(typeof eventID);
 
                     Swal.fire({
                         title: 'Are you sure?',
@@ -47,7 +50,7 @@
                         {
                             info.event.remove();
                             $.ajax({  ///now we need to update the backend
-                                url: '/api/removeUserEvent?userID=' + userID + '&eventID=' + eventID, //This will need to change to be for specific user and event
+                                url: '/api/deleteUserEvent?userID=' + userID + '&eventID=' + eventID, //This will need to change to be for specific user and event
                                 type: 'DELETE'
                             });
                         }
@@ -65,8 +68,9 @@
                             end: data.end
                         });
 
+                        //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event
-                        var url = 'api/addUserEvent?startTime=' + data.start + '&endTime=' + data.end + '&title=' + eventName + '&userId=' + '@User.Identity.Name'
+                        var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&userId=' + 3 //TODO: Need to change userId
 
                         var eventData = {
                             title: eventName,
@@ -81,6 +85,12 @@
                             dataType: 'json',
                             data: JSON.stringify(eventData)
                         });
+
+                        /*TODO: figure out a cleaner fix
+                        Need to reload the calendar after adding an event
+                        If you try to delete right after creating without this, 
+                        there is a database/api call error*/
+                        location.reload();
                     })
                     .catch(error => console.log(error));
                 },

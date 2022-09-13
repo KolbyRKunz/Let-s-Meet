@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Dynamic;
+using System.Transactions;
 
 namespace Let_s_Meet.Controllers
 {
@@ -188,16 +189,12 @@ namespace Let_s_Meet.Controllers
         
         /// <summary>
         /// Adds a given event to the user's event data
+        /// startTime and endTime need to be a string in UTC format
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         public OkObjectResult addUserEvent(int userId, string title, string startTime, string endTime)
         {
-            Console.WriteLine(userId);
-            Console.WriteLine(title);
-            Console.WriteLine(startTime);
-            Console.WriteLine(endTime);
-
             UserModel user = (UserModel)_context.Users
                 .Include(e => e.Events)
                 .Include(f => f.Friends)
@@ -210,14 +207,14 @@ namespace Let_s_Meet.Controllers
 
             var eventModel = new EventModel
             {
-                StartTime = Convert.ToDateTime(startTime), //Sat, 10 May 2008 14:32:17 GMT this is the format needed for this method
-                EndTime = Convert.ToDateTime(endTime),
+                StartTime = Convert.ToDateTime(startTime), //Sep 16 2022 04:30:00 GMT this is the format needed for this method, date, time, timezone
+                EndTime = Convert.ToDateTime(endTime),   //This way causes it to throw errors outside of postman
                 Title = title,
                 Users = eventsConnectedUser
             };
 
             _context.Add(eventModel);
-            _context.SaveChanges();
+            _context.SaveChanges();   //Do this instead? _context.SaveChangesAsync();
 
             return Ok(new { StartTime = Convert.ToDateTime(startTime), EndTime = Convert.ToDateTime(endTime), Title = title, userId = userId }); //TODO: fix what is returned since I'm not sure what it's supposed to return really
         }
