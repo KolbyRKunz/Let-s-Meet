@@ -148,6 +148,7 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public OkObjectResult getUserEvents(int userId)
         {
+
             var user = _context.Users
                 .Include(e => e.Events)
                 .Where(u => u.UserID == userId)
@@ -169,11 +170,20 @@ namespace Let_s_Meet.Controllers
         /// <param name="userID"></param>
         /// <returns></returns>
         [HttpDelete]
-        public OkObjectResult removeUserEvent(int userID, int eventID)
+        public OkObjectResult deleteUserEvent(int userID, int eventID)
         {
+            //TODO: Is the userID needed here? eventID should be primary key and unique enough to delete the event
             
+            //TODO: Need to error check incase something that doesn't exist tries to get deleted
+            var eventToDelete = _context.Events
+                .Include(u => u.Users)
+                .Where(e => e.EventID == eventID)
+                .Single(); //single should be alright, if not probably a bigger problem in how eventIds are being assigned
 
-            return Ok(new { data = "remove from database" });
+            _context.Remove(eventToDelete);
+            _context.SaveChanges();
+
+            return Ok(eventToDelete);
         }
         
         /// <summary>
