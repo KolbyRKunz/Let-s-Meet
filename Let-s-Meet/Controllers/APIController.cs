@@ -148,20 +148,20 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public OkObjectResult getUserEvents(int userId)
         {
-
             var user = _context.Users
                 .Include(e => e.Events)
                 .Where(u => u.UserID == userId)
-                .Select(e => new { 
-                    userEvents = e.Events.Select( ev => new {
-                        id = ev.EventID.ToString(), //FullCalendar wants it as string
-                        title = ev.Title,
-                        start = ev.StartTime.ToString("O"), //full calendar wants it as a ISO8601 format and need to use the datetime tostring argument for that
-                        end = ev.EndTime.ToString("O"),
-                    })
+                .Single();
+
+            var events = user.Events
+                .Select(e => new {
+                    id = e.EventID.ToString(), //FullCalendar wants it as string
+                    title = e.Title,
+                    start = e.StartTime.ToString("O"), //full calendar wants it as a ISO8601 format and need to use the datetime tostring argument for that
+                    end = e.EndTime.ToString("O")
                 });
 
-            return Ok(user);
+            return Ok(events);
         }
 
         /// <summary>
