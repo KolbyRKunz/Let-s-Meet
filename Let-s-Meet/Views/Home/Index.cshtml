@@ -23,11 +23,12 @@
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
-                events: '/api/displayUserEvents', //will need to pass in the userId later in the non-mock data call to query the database
+                events: '/api/getUserEvents?userId=' + 3, //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
 
                 //editable:true,
                 selectable:true,
                 nowIndicator: true,
+                timeZone:'UTC',
 
                 eventClick: function(info){
                     var eventID = info.id;
@@ -63,16 +64,23 @@
                             start: data.start,
                             end: data.end
                         });
+
                         //TODO: need to update the database about this event
-                        $.post('/api/addUserEvent', //TODO: This needs to be changed, I didn't know what I was doing intially and will probably do an ajax here
-                            {
-                                //eventId: 'a', //Let the server handle id creation for database //is this needed? and how to get the correct id if so?
-                                title: eventName,
-                                start: data.start,
-                                end: data.end,
-                                userId: 3 //This will need to change to actual userID
-                            }
-                        )
+                        var url = 'api/addUserEvent?startTime=' + data.start + '&endTime=' + data.end + '&title=' + eventName + '&userId=' + '@User.Identity.Name'
+
+                        var eventData = {
+                            title: eventName,
+                            start: data.start.toUTCString(),
+                            end: data.end.toUTCString(),
+                            userId: 3 //'@User.Identity.Name'  //Will this work on the back end as far as database
+                        }
+
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            dataType: 'json',
+                            data: JSON.stringify(eventData)
+                        });
                     })
                     .catch(error => console.log(error));
                 },

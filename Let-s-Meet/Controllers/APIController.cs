@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Dynamic;
 
 namespace Let_s_Meet.Controllers
 {
@@ -145,24 +146,21 @@ namespace Let_s_Meet.Controllers
         /// <param name=""></param>
         /// <returns>A given users events in the time frame in Json</returns>
         [HttpGet]
-        public OkObjectResult displayUserEvents(int userID)
+        public OkObjectResult getUserEvents(int userId)
         {
-            var userEvents = new[] {
-                new {
-                    id = "1", //FullCalendar wants it as a String not int
-                    title = "Event1", 
-                    start = DateTime.UtcNow.ToString("O"),
-                    end = DateTime.UtcNow.AddHours(2).ToString("O")
-                },
-                new{
-                    id = "2", //FullCalendar wants it as a String not int
-                    title = "Event2",
-                    start = DateTime.UtcNow.AddHours(15).ToString("O"),
-                    end = DateTime.UtcNow.AddHours(18).ToString("O")
-                }
-            };
+            var user = _context.Users
+                .Include(e => e.Events)
+                .Where(u => u.UserID == userId)
+                .Select(e => new { 
+                    userEvents = e.Events.Select( ev => new {
+                        id = ev.EventID.ToString(), //FullCalendar wants it as string
+                        title = ev.Title,
+                        start = ev.StartTime.ToString("O"), //full calendar wants it as a ISO8601 format and need to use the datetime tostring argument for that
+                        end = ev.EndTime.ToString("O"),
+                    })
+                });
 
-            return Ok(userEvents);
+            return Ok(user);
         }
 
         /// <summary>
@@ -173,17 +171,45 @@ namespace Let_s_Meet.Controllers
         [HttpDelete]
         public OkObjectResult removeUserEvent(int userID, int eventID)
         {
-            Debug.WriteLine(userID + " " + eventID);
-            return Ok(new { data = "remove from database", 
-                userId = userID,
-                eventId = eventID 
-            });
-        }
+            
 
+            return Ok(new { data = "remove from database" });
+        }
+        
+        /// <summary>
+        /// Adds a given event to the user's event data
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public OkObjectResult addUserEvent(int userId, int eventId, string title, DateTime start, DateTime end)
+        public OkObjectResult addUserEvent(int userId, string title, string startTime, string endTime)
         {
-            return Ok(new { userID = userId, eventID = eventId});
+            Console.WriteLine(userId);
+            Console.WriteLine(title);
+            Console.WriteLine(startTime);
+            Console.WriteLine(endTime);
+
+            UserModel user = (UserModel)_context.Users
+                .Include(e => e.Events)
+                .Include(f => f.Friends)
+                .Include(g => g.Groups)
+                .Where(u => u.UserID == userId)
+                .Single();
+
+            var eventsConnectedUser = new List<UserModel>();
+            eventsConnectedUser.Add(user);
+
+            var eventModel = new EventModel
+            {
+                StartTime = Convert.ToDateTime(startTime), //Sat, 10 May 2008 14:32:17 GMT this is the format needed for this method
+                EndTime = Convert.ToDateTime(endTime),
+                Title = title,
+                Users = eventsConnectedUser
+            };
+
+            _context.Add(eventModel);
+            _context.SaveChanges();
+
+            return Ok(new { StartTime = Convert.ToDateTime(startTime), EndTime = Convert.ToDateTime(endTime), Title = title, userId = userId }); //TODO: fix what is returned since I'm not sure what it's supposed to return really
         }
 
         [HttpGet]
