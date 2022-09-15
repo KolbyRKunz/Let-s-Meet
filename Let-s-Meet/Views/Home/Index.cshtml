@@ -23,7 +23,7 @@
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
-                events: '/api/getUserEvents?userId=' + 3, //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
+                events: '/api/getUserEvents?name=' + '@User.Identity.Name', //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
 
                 //editable:true,
                 selectable:true,
@@ -32,7 +32,7 @@
 
                 eventClick: function(info){
                     var eventID = info.event.id;
-                    var userID = 3; //TODO: This will need to be changed later with actual id
+                    var name = '@User.Identity.Name'; //TODO: This will need to be changed later with actual id
                     console.log(info);
                     console.log(eventID);
                     console.log(typeof eventID);
@@ -50,7 +50,7 @@
                         {
                             info.event.remove();
                             $.ajax({  ///now we need to update the backend
-                                url: '/api/deleteUserEvent?userID=' + userID + '&eventID=' + eventID, //This will need to change to be for specific user and event
+                                url: '/api/deleteUserEvent?userID=' + name + '&eventID=' + eventID, //This will need to change to be for specific user and event
                                 type: 'DELETE'
                             });
                         }
@@ -70,13 +70,13 @@
 
                         //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event
-                        var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&userId=' + 3 //TODO: Need to change userId
+                        var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
 
                         var eventData = {
                             title: eventName,
                             start: data.start.toUTCString(),
                             end: data.end.toUTCString(),
-                            userId: 3 //'@User.Identity.Name'  //Will this work on the back end as far as database
+                            name: '@User.Identity.Name' //'@User.Identity.Name'  //Will this work on the back end as far as database
                         }
 
                         $.ajax({

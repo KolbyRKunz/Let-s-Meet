@@ -15,6 +15,9 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Dynamic;
 using System.Transactions;
+using Microsoft.AspNetCore.Identity;
+using Let_s_Meet.Areas.Identity.Data;
+using System.Xml.Linq;
 
 namespace Let_s_Meet.Controllers
 {
@@ -22,6 +25,7 @@ namespace Let_s_Meet.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly MeetContext _context;
+        private readonly IdentityContext _identity_context;
 
         //public OpportunitiesController(URC_Context context)
         //{
@@ -35,10 +39,11 @@ namespace Let_s_Meet.Controllers
         //    return View(await _context.Opportunities.ToListAsync());
         //}
 
-        public APIController(ILogger<HomeController> logger, MeetContext context)
+        public APIController(ILogger<HomeController> logger, MeetContext context, IdentityContext identity_context)
         {
             _logger = logger;
             _context = context;
+            _identity_context = identity_context;
         }
 
         public IActionResult Index()
@@ -147,11 +152,17 @@ namespace Let_s_Meet.Controllers
         /// <param name=""></param>
         /// <returns>A given users events in the time frame in Json</returns>
         [HttpGet]
-        public OkObjectResult getUserEvents(int userId)
+        public OkObjectResult getUserEvents(string name)
         {
+            //TODO: is there a better way to do this than querying database
+            //Is there a way to get the index to pass in the UserID somehow
+            User userIDFromName = _identity_context.Users
+                .Where(u => u.UserName == name)
+                .Single(); //This should be fine since each email should only have 1 account attached
+
             var user = _context.Users
                 .Include(e => e.Events)
-                .Where(u => u.UserID == userId)
+                .Where(u => u.UserID == userIDFromName.UserID)
                 .Single();
 
             var events = user.Events
@@ -159,7 +170,7 @@ namespace Let_s_Meet.Controllers
                     id = e.EventID.ToString(), //FullCalendar wants it as string
                     title = e.Title,
                     start = e.StartTime.ToString("O"), //full calendar wants it as a ISO8601 format and need to use the datetime tostring argument for that
-                    end = e.EndTime.ToString("O")
+                    end = e.EndTime.ToString("O"),
                 });
 
             return Ok(events);
@@ -171,10 +182,9 @@ namespace Let_s_Meet.Controllers
         /// <param name="userID"></param>
         /// <returns></returns>
         [HttpDelete]
-        public OkObjectResult deleteUserEvent(int userID, int eventID)
+        public OkObjectResult deleteUserEvent(string name, int eventID)
         {
             //TODO: Is the userID needed here? eventID should be primary key and unique enough to delete the event
-            
             //TODO: Need to error check incase something that doesn't exist tries to get deleted
             var eventToDelete = _context.Events
                 .Include(u => u.Users)
@@ -193,13 +203,17 @@ namespace Let_s_Meet.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public OkObjectResult addUserEvent(int userId, string title, string startTime, string endTime)
+        public OkObjectResult addUserEvent(string name, string title, string startTime, string endTime)
         {
-            UserModel user = (UserModel)_context.Users
+            //TODO: is there a better way to do this than querying database
+            //Is there a way to get the index to pass in the UserID somehow
+            User userIDFromName = _identity_context.Users
+                .Where(u => u.UserName == name)
+                .Single(); //This should be fine since each email should only have 1 account attached
+
+            UserModel user = _context.Users
                 .Include(e => e.Events)
-                .Include(f => f.Friends)
-                .Include(g => g.Groups)
-                .Where(u => u.UserID == userId)
+                .Where(u => u.UserID == userIDFromName.UserID) //TODO: need to change the 0
                 .Single();
 
             var eventsConnectedUser = new List<UserModel>();
@@ -216,7 +230,7 @@ namespace Let_s_Meet.Controllers
             _context.Add(eventModel);
             _context.SaveChanges();   //Do this instead? _context.SaveChangesAsync();
 
-            return Ok(new { StartTime = Convert.ToDateTime(startTime), EndTime = Convert.ToDateTime(endTime), Title = title, userId = userId }); //TODO: fix what is returned since I'm not sure what it's supposed to return really
+            return Ok(new { StartTime = Convert.ToDateTime(startTime), EndTime = Convert.ToDateTime(endTime), Title = title, userId = name }); //TODO: fix what is returned since I'm not sure what it's supposed to return really
         }
 
         [HttpGet]
