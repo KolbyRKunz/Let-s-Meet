@@ -39,6 +39,12 @@ namespace Let_s_Meet.Controllers
             return View();
         }
 
+        [Route("Register")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -91,8 +97,8 @@ namespace Let_s_Meet.Controllers
 
         //Could use addition of adding password parameters
         [HttpPost]
-        [Route("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        [Route("CreateUser")]
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterModel model)
         {
             var userExists = await userManager.FindByNameAsync(model.Username);
             if (userExists != null)
