@@ -21,16 +21,30 @@ namespace Let_s_Meet.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
             return View();
         }
-        [Authorize]
+        
         public IActionResult Groups()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
+
             return View();
         }
 
         public IActionResult Friends()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
+
             return View();
         }
 
