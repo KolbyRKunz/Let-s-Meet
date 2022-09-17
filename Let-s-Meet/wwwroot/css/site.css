@@ -132,3 +132,22 @@ html {
 .something{
     background-color:purple;
 }
+
+/*Stuff related to the login page*/
+#welcomeContainer {
+    text-align: center;
+}
+
+.form-group {
+    display: grid;
+    padding: 1%;
+    font-size: 115%;
+}
+
+.accountLink {
+    padding: 2%;
+}
+
+.createButton {
+    padding: 2%;
+}

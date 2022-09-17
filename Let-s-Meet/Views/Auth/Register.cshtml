@@ -2,30 +2,47 @@
 @model RegisterModel
 @{
 }
+
+<div id="welcomeContainer" class="centerClass">
+    <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold">Let's Meet!</span></h1>
+</div>
+
+<div>
+    <h1> Register here</h1>
+    <hr />
+</div>
+
 <div class="row">
     <div class="col-md-4">
         <form id="account">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Username"></label>
-                <input id="Username" asp-for="Username" />
+                <input placeholder="Username" id="Username" asp-for="Username" />
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Email"></label>
-                <input id="Email" asp-for="Email" />
+                <input placeholder="Email" id="Email" asp-for="Email" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Password"></label>
-                <input id="Password" type="password" asp-for="Password" />
+                <input placeholder="Password" id="Password" type="password" asp-for="Password" />
                 <span asp-validation-for="Password"></span>
+            </div>
+            <div class="form-group">
                 <label>Retype Password</label>
-                <input id="RePassword" type="password"/>
+                <input placeholder="Retype Password" id="RePassword" type="password" />
                 <span asp-validation-for="Password"></span>
             </div>
         </form>
-        <button onclick="register()" class="btn btn-primary">Create Account</button>
+        <div class="createButton">
+            <button onclick="register()" class="btn btn-danger">Create Account</button>
+        </div>
+        <div class="accountLink">
+            <a href="../Auth">Already have an account? Log in here</a>
+        </div>
     </div>
 </div>
 
