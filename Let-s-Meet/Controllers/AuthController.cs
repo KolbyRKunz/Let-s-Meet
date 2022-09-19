@@ -36,12 +36,22 @@ namespace Let_s_Meet.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.Name != null) //don't let user access log in or register once logged in? make them logout first?
+            {
+                return new RedirectResult("/Home");
+            }
+
             return View();
         }
 
         [Route("Register")]
         public IActionResult Register()
         {
+            if (User.Identity.Name != null) //don't let user access log in or register once logged in? make them logout first?
+            {
+                return new RedirectResult("/Home");
+            }
+
             return View();
         }
 
@@ -89,10 +99,10 @@ namespace Let_s_Meet.Controllers
         }
 
         [Route("LogOut")]
-        public NoContentResult LogOut()
+        public RedirectResult LogOut()
         {
             HttpContext.Session.Remove("Token");
-            return NoContent();
+            return new RedirectResult("/Auth");
         }
 
         //Could use addition of adding password parameters

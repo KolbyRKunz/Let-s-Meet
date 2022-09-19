@@ -30,7 +30,7 @@
         </div>
         <div class="form-group">
             <label asp-for="Password"></label>
-            <input class="inputBox" id="Password" placeholder="Password"  type="password" asp-for="Password" />
+            <input class="inputBox" id="Password" placeholder="Password" type="password" asp-for="Password" />
             <span asp-validation-for="Password"></span>
         </div>
     </form>
@@ -45,6 +45,16 @@
 
 
 <script>
+
+    window.onload = function () {
+        document.getElementById("Username").focus();
+    };
+
+    document.getElementById('Password').onkeydown = function (e) {
+        if (e.keyCode == 13) {
+            signIn();
+        }
+    };
 
     function signIn() {
         let url = "Auth/Login"

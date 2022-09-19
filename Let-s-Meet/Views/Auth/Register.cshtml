@@ -49,6 +49,16 @@
 
 <script>
 
+    window.onload = function () {
+        document.getElementById("Username").focus();
+    };
+
+    document.getElementById('RePassword').onkeydown = function (e) {
+        if (e.keyCode == 13) {
+            register();
+        }
+    };
+
     function register() {
         let url = "CreateUser"
         const pass = $("#Password").val()
