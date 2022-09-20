@@ -25,14 +25,15 @@
 
                 events: '/api/getUserEvents?name=' + '@User.Identity.Name', //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
 
-                //editable:true,
+                //editable:true, //TODO: Try to add this back later, the clicking and dragging of events doesn't update on the database correctly yet
                 selectable:true,
                 nowIndicator: true,
                 //timeZone:'UTC',
+                //timeZone:'local',
 
                 eventClick: function(info){
                     var eventID = info.event.id;
-                    var name = '@User.Identity.Name'; //TODO: This will need to be changed later with actual id
+                    var name = '@User.Identity.Name'; //TODO: Will this will need to be changed later with actual id
                     console.log(info);
                     console.log(eventID);
                     console.log(typeof eventID);
@@ -58,24 +59,43 @@
                 },
 
                 select: function(data){
-                    console.log(data);
-                    addEvent().then((values) => { //JS promise
-                        console.log(values);//this is a JSON/object of stuff from the promise
+                    console.log(data); //this is the data given by the select callback, fullcalendar
+                    var startDate = formatStartEndDate(data.startStr)
+                    var endDate = formatStartEndDate(data.endStr)
+
+                    addEvent(startDate, endDate).then((values) => { //JS promise?
+                        console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
                         var eventName = values.eventName
-                        calendar.addEvent({
-                            title: eventName,
-                            start: data.start,
-                            end: data.end
-                        });
+
+                        var startDate = $('#startDate').val()
+                        var endDate = $('#endDate').val()
+
+                        startDate = new Date(startDate)
+                        endDate = new Date(endDate)
+
+                        if(endDate.getTime() < startDate.getTime()) //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'The End Date can\'t be less than Start Date',
+                            })
+                            return
+                        }
+
+                        //Need to convert to UTC for database
+                        startDate = startDate.toUTCString()
+                        endDate = endDate.toUTCString()
 
                         //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event
-                        var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
+                        //var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
+                        var url = 'api/addUserEvent?startTime=' + startDate + '&endTime=' + endDate + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
 
                         var eventData = {
                             title: eventName,
-                            start: data.start.toUTCString(),
-                            end: data.end.toUTCString(),
+                            start: startDate,
+                            end: endDate,
                             name: '@User.Identity.Name' //'@User.Identity.Name'  //Will this work on the back end as far as database
                         }
 
@@ -85,11 +105,18 @@
                             dataType: 'json',
                             data: JSON.stringify(eventData)
                         });
+                        
+                        calendar.addEvent({
+                            title: eventName,
+                            start: startDate,
+                            end: endDate
+                        });
 
                         /*TODO: figure out a cleaner fix
                         Need to reload the calendar after adding an event
-                        If you try to delete right after creating without this, 
-                        there is a database/api call error*/
+                        If you try to delete right after creating without this reload, 
+                        there is a database/api call error saying it doesn't exist*/
+                        
                         location.reload();
                     })
                     .catch(error => console.log(error));
@@ -107,24 +134,30 @@
 <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
 
 <script>
-    async function addEvent(){
-       const { value: formValues } = await Swal.fire({
+
+    async function addEvent(startDate, endDate){
+        /*Make it so you can't create events in the past?
+        If we don't want this it's easy to remove */
+        var minTime = new Date()
+        var d = minTime.getDate()
+        var m = String(minTime.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var y = minTime.getFullYear();
+        var h = String(minTime.getHours()).padStart(2, '0');
+        var mi = String(minTime.getMinutes()).padStart(2, '0')
+        minTime = y + "-" + m + "-" + d + "T" + h + ":" + mi
+
+        const { value: formValues } = await Swal.fire({
             title: 'Event Info',
             html: //This does no input checking currently
-                '<label>Event Name</label>' +
+                '<div style="display:grid"><label>Event Name</label>' +
                 '<input type="text" id="eventName" class="swal2-input">' +
-                '<br/>' +
-                '<label>Start Date</label>' +
-                '<input type="date" id="startDate" class="swal2-input">' +
-                '<br/>' +
-                '<label>End Date</label>' +
-                '<input type="date" id="endDate" class="swal2-input">' +
-                '<br/>' +
-                '<label>Start Time</label>' +
-                '<input type="time" id="startTime" class="swal2-input">' +
-                '<br/>' +
-                '<label>End Time</label>' +
-                '<input type="time" id="endTime" class="swal2-input">',
+                '<br/></div>' +
+                '<div style="display:grid"><label>Start Date</label>' +
+                `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}" min="${minTime}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
+                '<br/></div>' +
+                '<div style="display:grid"><label>End Date</label>' +
+                `<input type="datetime-local" id="endDate" class="swal2-input" value="${endDate}" min="${minTime}">` +
+                '<br/></div>',
             focusConfirm: false,
             position: 'top-end',
             showCancelButton:true,
@@ -133,11 +166,20 @@
                     eventName: $('#eventName').val(),
                     startDate: $('#startDate').val(),
                     endDate: $('#endDate').val(),
-                    startTime: $('#startTime').val(),
-                    endTime: $('#endTime').val()
                 }
             }
         });
         return formValues;
+    }
+
+    function formatStartEndDate(date) {
+        var formattedDate = new Date(date)
+        var d = formattedDate.getDate()
+        var m = String(formattedDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var y = formattedDate.getFullYear();
+        var h = String(formattedDate.getHours()).padStart(2, '0');
+        var mi = String(formattedDate.getMinutes()).padStart(2, '0')
+        formattedDate = y + "-" + m + "-" + d + "T" + h + ":" + mi
+        return formattedDate
     }
 </script>

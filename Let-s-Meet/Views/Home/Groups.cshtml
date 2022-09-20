@@ -68,21 +68,29 @@
 
     function createGroup() {
         createGroupPopUp().then((values) => {
-            var data = {
-                groupName: values.groupName,
-                members: values.members
+            let data = {
+                groupName: values.groupName.toString(),
+                groupMembers: values.members //.split(",") //Change this if needed. Right now it's just passing the string to the api and letting c# separate the members by comma
             }
+            console.log(data);
+            
+            //TODO: use ajax instead here?
+            let url = "../Api/createGroup?groupName=" + values.groupName + "&groupMembers=" + values.members;
+            
+            console.log(url)
 
+            //TODO: get ajax working with api calls, I can't get them to work I have to use the above option
             $.ajax({ //This needs to be improved upon, right now it's error 404
-                url: "../api/createGroup",
+                url: url, //TODO: get ajax to work, right now the let url is doing the work not the ajax
                 type: "POST",
                 data: JSON.stringify(data),
-                contentType: "application/json; carset=utf-8",
+                contentType: "application/json;carset=utf-8",
                 dataType: "json",
                 success: function(response){
-                    loaction.reload()
+                    //location.reload() //is this needed?
+                    console.log(response);
                 },
-                error: function (request, status, error){
+                error: function (error){
                     console.log(error)
                 }
             })

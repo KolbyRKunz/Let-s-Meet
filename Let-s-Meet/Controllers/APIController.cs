@@ -86,8 +86,11 @@ namespace Let_s_Meet.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public OkObjectResult createGroup(string groupName, string[] groupMembers)
+        public OkObjectResult createGroup(string groupName, string groupMembers)
         {
+            //TODO:The groupMembers is a string that has the members separated by a comma
+            //I couldn't figure out how to pass in an array via http. I figure pass the entire array of group members and let the back end do it
+
             return Ok(new { 
                 groupName = groupName,
                 groupMembers = groupMembers
