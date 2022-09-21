@@ -39,13 +39,13 @@
                     console.log(typeof eventID);
 
                     Swal.fire({
-                        title: 'Are you sure?',
+                        title: 'Are you sure you want to delete this event?',
                         text: "You won't be able to revert this!",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
+                        confirmButtonText: 'Yes, delete event!'
                     }).then((result) => {
                         if(result.isConfirmed)
                         {
@@ -78,7 +78,16 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: 'The End Date can\'t be less than Start Date',
+                                text: 'The End Date can\'t be before Start Date',
+                            })
+                            return
+                        }
+                        if (eventName == "") //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Please enter Event Name',
                             })
                             return
                         }
@@ -139,7 +148,7 @@
         /*Make it so you can't create events in the past?
         If we don't want this it's easy to remove */
         var minTime = new Date()
-        var d = minTime.getDate()
+        var d = String(minTime.getDate()).padStart(2, '0');
         var m = String(minTime.getMonth() + 1).padStart(2, '0'); //January is 0!
         var y = minTime.getFullYear();
         var h = String(minTime.getHours()).padStart(2, '0');
@@ -149,6 +158,8 @@
         const { value: formValues } = await Swal.fire({
             title: 'Event Info',
             html: //This does no input checking currently
+                //TODO: Figure out how to style in css not inline like this. 
+                //Was struggling to get site.css to acess parts of the popup
                 '<div style="display:grid"><label>Event Name</label>' +
                 '<input type="text" id="eventName" class="swal2-input">' +
                 '<br/></div>' +
@@ -174,7 +185,7 @@
 
     function formatStartEndDate(date) {
         var formattedDate = new Date(date)
-        var d = formattedDate.getDate()
+        var d = String(formattedDate.getDate()).padStart(2, '0')
         var m = String(formattedDate.getMonth() + 1).padStart(2, '0'); //January is 0!
         var y = formattedDate.getFullYear();
         var h = String(formattedDate.getHours()).padStart(2, '0');

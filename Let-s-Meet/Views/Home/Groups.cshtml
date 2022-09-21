@@ -47,12 +47,12 @@
         const { value: formValues } = await Swal.fire({
             title: 'Create Group',
             html: //This does no input checking currently
-                '<label>Group Name</label>' +
+                '<div style="display:grid"><label>Group Name</label>' +
                 '<input type="text" id="groupName" class="swal2-input">' +
-                '<br/>'+
+                '<br/></div>'+
                 '<label>Enter group members email (separate with a comma)</label>' +
                 '<input type="text" id="members" class="swal2-input">' +
-                '<br/>',
+                '<br/></div>',
             focusConfirm: false,
             position: 'center',
             showCancelButton: true,
