@@ -31,9 +31,14 @@ namespace Let_s_Meet.Data
             modelBuilder.Entity<EventPromptModel>().ToTable("EventPrompt");
             modelBuilder.Entity<CommentsModel>().ToTable("Comments");
             modelBuilder.Entity<AttendanceModel>().ToTable("Attendance");
-            modelBuilder.Entity<FriendsModel>().ToTable("Friends")
-                .HasKey(c => new { c.RequestedBy, c.RequestedTo });
             modelBuilder.Entity<CalendarModel>().ToTable("Calendar");
+
+            modelBuilder.Entity<FriendsModel>().ToTable("Friends")
+                .HasAlternateKey("RequestedByID", "RequestedToID");
+            modelBuilder.Entity<FriendsModel>().HasOne(f => f.RequestedBy).WithMany().HasForeignKey("RequestedByID").OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<FriendsModel>().HasOne(f => f.RequestedTo).WithMany().HasForeignKey("RequestedToID").OnDelete(DeleteBehavior.NoAction);
+
+            //.HasAlternateKey(c => new { c.RequestedBy, c.RequestedTo });
             modelBuilder.Entity<SettingsModel>().ToTable("Settings");
             modelBuilder.Entity<CalendarPrivacyModel>().ToTable("CalendarPrivacy");
             modelBuilder.Entity<EventPrivacyModel>().ToTable("EventPrivacy");

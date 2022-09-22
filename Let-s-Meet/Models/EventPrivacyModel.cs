@@ -9,6 +9,10 @@ namespace Let_s_Meet.Models
     [JsonObject(MemberSerialization.OptIn)]
     public class EventPrivacyModel
     {
+        [Key]
+        [JsonProperty(PropertyName = "calendarPrivacyID")]
+        public int EventPrivacyID { get; set; }
+
         [JsonProperty(PropertyName = "event")]
         public EventModel Event { get; set; }
 

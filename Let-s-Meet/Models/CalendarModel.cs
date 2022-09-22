@@ -20,7 +20,7 @@ namespace Let_s_Meet.Models
         public string Description { get; set; }
 
         [JsonProperty(PropertyName = "color")]
-        public Color Color { get; set; }
+        public string Color { get; set; }
 
         [JsonProperty(PropertyName = "owner")]
         public UserModel Owner { get; set; }
