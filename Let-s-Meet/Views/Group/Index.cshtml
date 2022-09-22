@@ -1,7 +1,8 @@
-﻿
+﻿<link rel="stylesheet" type="text/css" href="~/css/site.css" />
 <!--Sweet Alert 2-->
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--<script src="sweetalert2.all.min.js"></script>-->
+
 
 <head>
     <meta charset='utf-8' />
@@ -20,6 +21,8 @@
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
+                height: "auto",
+
                 events: '/api/getGroupEvents', //will need to add the groupId to the call for querys later
                 nowIndicator: true
             });
@@ -30,15 +33,16 @@
 </head>
 
 
-<h1>Group Calendar</h1> <!--TODO: instead of Group, put the group name here later-->
+<h1 class="description">Group Calendar</h1> <!--TODO: instead of Group, put the group name here later-->
 
 <div style="padding:1%">
     <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
     <button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>
 </div>
 
-<div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
-
+<div class="calendarContainer">
+    <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
+</div>
 
 <script>
     async function createMeetingPopUp() {

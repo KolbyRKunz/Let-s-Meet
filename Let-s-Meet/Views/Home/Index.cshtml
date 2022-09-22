@@ -23,11 +23,14 @@
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
+                height: "auto",
+
                 events: '/api/getUserEvents?name=' + '@User.Identity.Name', //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
 
                 //editable:true, //TODO: Try to add this back later, the clicking and dragging of events doesn't update on the database correctly yet
                 selectable:true,
                 nowIndicator: true,
+                navLinks: true,
                 //timeZone:'UTC',
                 //timeZone:'local',
 
@@ -96,6 +99,13 @@
                         startDate = startDate.toUTCString()
                         endDate = endDate.toUTCString()
 
+                        var event = {
+                            title: eventName,
+                            start: startDate,
+                            end: endDate
+                        };
+                        calendar.addEvent(event);
+
                         //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event
                         //var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
@@ -113,20 +123,10 @@
                             url: url,
                             dataType: 'json',
                             data: JSON.stringify(eventData)
+                        }).done(function() {
+                            calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
                         });
                         
-                        calendar.addEvent({
-                            title: eventName,
-                            start: startDate,
-                            end: endDate
-                        });
-
-                        /*TODO: figure out a cleaner fix
-                        Need to reload the calendar after adding an event
-                        If you try to delete right after creating without this reload, 
-                        there is a database/api call error saying it doesn't exist*/
-                        
-                        location.reload();
                     })
                     .catch(error => console.log(error));
                 },
@@ -138,23 +138,15 @@
     </script>
 </head>
 
-<h1>My Schedule</h1>
+<h1 class="description">My Schedule</h1>
 
-<div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
+<div class="calendarContainer">
+    <div id='calendar' style=" padding: 15px; background-color: #950741; border-radius: 30px"></div>
+</div>
 
 <script>
 
     async function addEvent(startDate, endDate){
-        /*Make it so you can't create events in the past?
-        If we don't want this it's easy to remove */
-        var minTime = new Date()
-        var d = String(minTime.getDate()).padStart(2, '0');
-        var m = String(minTime.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var y = minTime.getFullYear();
-        var h = String(minTime.getHours()).padStart(2, '0');
-        var mi = String(minTime.getMinutes()).padStart(2, '0')
-        minTime = y + "-" + m + "-" + d + "T" + h + ":" + mi
-
         const { value: formValues } = await Swal.fire({
             title: 'Event Info',
             html: //This does no input checking currently
@@ -164,10 +156,10 @@
                 '<input type="text" id="eventName" class="swal2-input">' +
                 '<br/></div>' +
                 '<div style="display:grid"><label>Start Date</label>' +
-                `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}" min="${minTime}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
+                `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
                 '<br/></div>' +
                 '<div style="display:grid"><label>End Date</label>' +
-                `<input type="datetime-local" id="endDate" class="swal2-input" value="${endDate}" min="${minTime}">` +
+                `<input type="datetime-local" id="endDate" class="swal2-input" value="${endDate}">` +
                 '<br/></div>',
             focusConfirm: false,
             position: 'top-end',

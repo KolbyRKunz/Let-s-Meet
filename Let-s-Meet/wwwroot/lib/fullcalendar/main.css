@@ -67,9 +67,11 @@
   }
 .fc a[data-navlink] {
     cursor: pointer;
+    color:#950741;
   }
 .fc a[data-navlink]:hover {
     text-decoration: underline;
+    color:#950741;
   }
 .fc-direction-ltr {
   direction: ltr;
@@ -460,7 +462,7 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
 .fc .fc-col-header-cell-cushion {
     display: inline-block;  /*x-browser for when sticky (when multi-tier header) */
     padding: 2px 4px;
-
+    color:#950741;
   }
 .fc .fc-bg-event,
   .fc .fc-non-business,
@@ -1498,9 +1500,10 @@ A VERTICAL event
 
 
 
-  .fc-theme-bootstrap a:not([href]) {
-    color: inherit; /* natural color for navlinks */
-  }
+.fc-theme-bootstrap a:not([href]) {
+    //color: inherit; /* natural color for navlinks */
+    color: #950741;
+}
 
 
 

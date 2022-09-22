@@ -140,3 +140,25 @@ html {
     justify-content:flex-end;
     flex-direction:column;
 }
+
+.description {
+    color: gray;
+}
+
+.groupLink {
+    color: #950741;
+    padding: 0.5%;
+    font-size: 115%;
+}
+
+#groupList a:hover {
+    color: darkslategray;
+}
+
+.calendarContainer { /*add if we want the calendar to be left to right, full page, will need more in other places also, calenar needs height: "100%", not auto*/
+    /*position: fixed;
+    top: 15%;
+    left: 0;
+    right: 0;
+    bottom: 5%;*/
+}
