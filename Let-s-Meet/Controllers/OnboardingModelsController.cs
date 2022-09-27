@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Let_s_Meet.Data;
 using Let_s_Meet.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Let_s_Meet.Controllers
 {
+    [Authorize]
     public class OnboardingModelsController : Controller
     {
         private readonly MeetContext _context;

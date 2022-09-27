@@ -25,9 +25,6 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "owner")]
         public UserModel Owner { get; set; }
 
-        [JsonProperty(PropertyName = "members")]
-        public List<UserModel> Members { get; set; }
-
         [JsonProperty(PropertyName = "group")]
         public GroupModel Group { get; set; }
 

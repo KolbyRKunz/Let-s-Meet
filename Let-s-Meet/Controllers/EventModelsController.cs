@@ -7,22 +7,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Let_s_Meet.Data;
 using Let_s_Meet.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Let_s_Meet.Areas.Identity.Data;
 
 namespace Let_s_Meet.Controllers
 {
+    [Authorize]
     public class EventModelsController : Controller
     {
         private readonly MeetContext _context;
+        private readonly UserManager<User> _um;
 
-        public EventModelsController(MeetContext context)
+        public EventModelsController(MeetContext context, UserManager<User> userManager)
         {
             _context = context;
+            _um = userManager;
         }
 
         // GET: EventModels
         public async Task<IActionResult> Index()
         {
             return View(await _context.Events.ToListAsync());
+        }
+
+        // GET: EventModels/Mine
+        public async Task<IActionResult> Mine()
+        {
+            User user = await _um.GetUserAsync(User);
+            int id = user.UserID;
+            return Ok(await _context.Events.ToListAsync());
+            return Ok(await _context.Events.Include(e => e.Users).Where(e => e.Users.Any(u => u.UserID == id)).ToListAsync());
         }
 
         // GET: EventModels/Details/5

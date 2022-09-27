@@ -328,7 +328,6 @@ namespace Let_s_Meet.Data
                 {
                     Owner = u,
                     Name = u.FirstName + "'s Calendar",
-                    Members = members,
                 });
             }
 
