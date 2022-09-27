@@ -48,6 +48,8 @@ a {
     color: #EDF5E0; /*var(--DD_CREAM);*/
     background-color: #950741; /*var(--DD_RED_2);*/
     border-color: #6F2232; /*var(--DD_RED_1);*/
+    padding: 15px;
+    margin: 20px;
 }
 
     .btn-danger:hover {
@@ -131,4 +133,32 @@ html {
 
 .something{
     background-color:purple;
+}
+
+#groupList {
+    display:flex;
+    justify-content:flex-end;
+    flex-direction:column;
+}
+
+.description {
+    color: gray;
+}
+
+.groupLink {
+    color: #950741;
+    padding: 0.5%;
+    font-size: 115%;
+}
+
+#groupList a:hover {
+    color: darkslategray;
+}
+
+.calendarContainer { /*add if we want the calendar to be left to right, full page, will need more in other places also, calenar needs height: "100%", not auto*/
+    /*position: fixed;
+    top: 15%;
+    left: 0;
+    right: 0;
+    bottom: 5%;*/
 }

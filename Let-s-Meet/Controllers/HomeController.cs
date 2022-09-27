@@ -1,4 +1,5 @@
 ﻿using Let_s_Meet.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Let_s_Meet.Controllers
 {
+    [Authorize] //This is to make it so users have to be logged in before accessing the site
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
