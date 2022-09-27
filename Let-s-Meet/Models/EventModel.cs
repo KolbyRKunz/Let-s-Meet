@@ -18,6 +18,9 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "endTime")]
         public DateTime EndTime { get; set; }
 
+        [JsonProperty(PropertyName = "title")]
+        public string Title { get; set; }
+
         [JsonProperty(PropertyName = "location")]
         public string Location { get; set; }
 

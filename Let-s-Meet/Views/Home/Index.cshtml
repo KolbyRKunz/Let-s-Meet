@@ -4,62 +4,131 @@
 
 <head>
     <meta charset='utf-8' />
+    <!--Full Calendar-->
     <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
     <link rel="stylesheet" type="text/css" href="~/css/site.css" />
     <script src='~/lib/fullcalendar/main.js'></script>
-    <script>
+    <!--Sweet Alert 2-->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!--<script src="sweetalert2.all.min.js"></script>-->
 
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                initialView: 'timeGridWeek',
                 headerToolbar: {
                     left: 'prev,next,title',
                     center: '',
                     right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
                 },
 
-                editable:true,
+                height: "auto",
+
+                events: '/api/getUserEvents?name=' + '@User.Identity.Name', //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
+
+                //editable:true, //TODO: Try to add this back later, the clicking and dragging of events doesn't update on the database correctly yet
                 selectable:true,
+                nowIndicator: true,
+                navLinks: true,
+                //timeZone:'UTC',
+                //timeZone:'local',
+
+                eventClick: function(info){
+                    var eventID = info.event.id;
+                    var name = '@User.Identity.Name'; //TODO: Will this will need to be changed later with actual id
+                    console.log(info);
+                    console.log(eventID);
+                    console.log(typeof eventID);
+
+                    Swal.fire({
+                        title: 'Are you sure you want to delete this event?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete event!'
+                    }).then((result) => {
+                        if(result.isConfirmed)
+                        {
+                            info.event.remove();
+                            $.ajax({  ///now we need to update the backend
+                                url: '/api/deleteUserEvent?userID=' + name + '&eventID=' + eventID, //This will need to change to be for specific user and event
+                                type: 'DELETE'
+                            });
+                        }
+                    })
+                },
 
                 select: function(data){
-                  $(".submitForm").bind();
-                  $(".popup").show();
-                  $(".title").focus();
-                  //var start = Date.parse(start) / 1000;
-                  //var end = Date.parse(end) / 1000;
-                  //var allDay = allDay;
-                  //var wipit = // create a session id such as a random number that can be cleared later to prevent double submission
+                    console.log(data); //this is the data given by the select callback, fullcalendar
+                    var startDate = formatStartEndDate(data.startStr)
+                    var endDate = formatStartEndDate(data.endStr)
 
-                  $(".submitForm").off('click').click(function(){
-                  var title = $(".title").val();
-                  var startTime = $(".startTime").val();
-                  var endTime = $(".endTime").val();
+                    addEvent(startDate, endDate).then((values) => { //JS promise?
+                        console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
+                        var eventName = values.eventName
 
-                    if(title == null || title == ""){
-                        alert("Event name must be entered")
-                    } else {
-                        // clear all information, unselect events, and alert that a title needs to be entered
-                        calendar.addEvent({
-                            title: title,
-                            start: data.start,
-                            end: data.end,
-                        });
+                        var startDate = $('#startDate').val()
+                        var endDate = $('#endDate').val()
+
+                        startDate = new Date(startDate)
+                        endDate = new Date(endDate)
+
+                        if(endDate.getTime() < startDate.getTime()) //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'The End Date can\'t be before Start Date',
+                            })
+                            return
+                        }
+                        if (eventName == "") //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Please enter Event Name',
+                            })
+                            return
+                        }
+
+                        //Need to convert to UTC for database
+                        startDate = startDate.toUTCString()
+                        endDate = endDate.toUTCString()
+
+                        var event = {
+                            title: eventName,
+                            start: startDate,
+                            end: endDate
+                        };
+                        calendar.addEvent(event);
+
+                        //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event
-                    }
-                        $(".popup").hide();
-                        $(".title").val("");
-                        $(".startTime").val("");
-                        $(".endTime").val("");
-                    });
+                        //var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
+                        var url = 'api/addUserEvent?startTime=' + startDate + '&endTime=' + endDate + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
 
-                    $(".exit").off('click').click(function(){
-                        // clear all info, unselect events and...
-                        $(".popup").hide();
-                        $(".title").val("");
-                        $(".startTime").val("");
-                        $(".endTime").val("");
-                    });
+                        var eventData = {
+                            title: eventName,
+                            start: startDate,
+                            end: endDate,
+                            name: '@User.Identity.Name' //'@User.Identity.Name'  //Will this work on the back end as far as database
+                        }
+
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            dataType: 'json',
+                            data: JSON.stringify(eventData)
+                        }).done(function() {
+                            calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
+                        });
+                        
+                    })
+                    .catch(error => console.log(error));
                 },
                 
             });
@@ -69,136 +138,51 @@
     </script>
 </head>
 
+<h1 class="description">My Schedule</h1>
 
-<div class="text-center">
-    <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold" >Let's Meet!</span></h1>
-
-    <button id="button0" class="btn btn-danger" onclick="doFunction()"> This is a button </button>
-    <hr />
+<div class="calendarContainer">
+    <div id='calendar' style=" padding: 15px; background-color: #950741; border-radius: 30px"></div>
 </div>
-
-<div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
-
-<div class="popup" style="display:none; position:fixed; top:25%; left:25%; background-color:white;z-index:10">
-  <form style="background-color:#EDF5E0;color:#950741;padding:10px;border: 2px solid #950741">
-      <div style="display:block">
-          <label>Event Name</label>
-          <input type="text" class="title" autofocus>
-      </div>
-
-      <div style="display:block">
-          <label>Start Time</label>
-          <input type="text" class="startTime">
-      </div>
-
-      <div style="display:block">
-          <label>End Time</label>
-          <input type="text" class="endTime">
-      </div>
-
-      <input type="button" value="Submit" href="#" onclick="return false" class="submitForm" style="background-color:#EDF5E0;color:#950741">
-      <input type="button" value="Cancel "href="#" onclick="return false" class="exit" style="background-color:#EDF5E0;color:#950741">
-  </form>
-</div>
-
-
-<!--CSHTML FOR RETREIVING DUMMY DATA IN DATABASE-->
-<div style="position:absolute;align-content:center">
-    <div style="float:left; padding:10px">
-        <button id="button1" class="btn btn-danger" onclick="getData(1)"> Request User Data </button>
-    </div>
-
-    <div style="float:left;padding:10px">
-        <button id="button2" class="btn btn-danger" onclick="getData(2)"> Request Group Data </button>
-    </div>
-
-    <div style="float:left;padding:10px">
-        <button id="button2" class="btn btn-danger" onclick="getData(3)"> Request Event Data </button>
-    </div>
-</div>
-
-<br />
-
-<br />
-
-<br />
-
-<div class="output_box" style="position:relative;border: 1px solid black;">
-</div>
-
-
 
 <script>
-    function createEvent(date) {
-        $(".output_box").html(date);
-        console.log(date);
+
+    async function addEvent(startDate, endDate){
+        const { value: formValues } = await Swal.fire({
+            title: 'Event Info',
+            html: //This does no input checking currently
+                //TODO: Figure out how to style in css not inline like this. 
+                //Was struggling to get site.css to acess parts of the popup
+                '<div style="display:grid"><label>Event Name</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Start Date</label>' +
+                `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
+                '<br/></div>' +
+                '<div style="display:grid"><label>End Date</label>' +
+                `<input type="datetime-local" id="endDate" class="swal2-input" value="${endDate}">` +
+                '<br/></div>',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton:true,
+            preConfirm: () => {
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                }
+            }
+        });
+        return formValues;
     }
 
-    function doFunction() {
-
-        let url = "Api/post"
-        let data = "string"
-
-        $.post(url, data).done(function (result) {
-
-            $("#button0").html(result.message);
-            $(".output_box").html("");
-        })
-    }
-
-    function getData(buttonNumber) {
-
-        let url = "Api/get"
-
-        if (buttonNumber == 1)
-            url = url + "Users"
-        else if (buttonNumber == 2)
-            url = url + "Groups"
-        else if (buttonNumber == 3)
-            url = url + "Events"
-
-        let data = "string"
-
-        $.get(url, data)
-            .fail(function (result) {
-                console.log("Something went wrong: " + JSON.stringify(result));
-            })
-            .done(function (result) {
-                var list = JSON.parse(result);
-                var output = "";
-                
-                console.log(list);
-
-                //Display User information
-                if (buttonNumber == 1) {
-                    for (var k in list) {
-                        output = output + list[k].firstName + " " + list[k].lastName + "<br/>";
-                    }
-                }
-                //Display Group information
-                else if (buttonNumber == 2) {
-
-                    // Set output to list of groups showing the users in each group
-                    for (var k in list) {
-                        output = output + "Group: " + list[k].groupID + " Users: ";
-                        for (var i in list[k].Users) {
-                            output = output + list[k].Users[i].firstName + " " + list[k].Users[i].lastName + ", ";
-                        }
-                        
-                        output += "<br/>";
-                    }
-                }
-                //Display Event information
-                else if (buttonNumber == 3) {
-                    for (var k in list) {
-                        console.log(list[k]);
-                        output = output +
-                            "Start: " + list[k].startTime +
-                            " End: " + list[k].endTime + "<br/>";
-                        //^^for now until group id is resolved?
-                    }
-                }
-                $(".output_box").html(output);
-            })
+    function formatStartEndDate(date) {
+        var formattedDate = new Date(date)
+        var d = String(formattedDate.getDate()).padStart(2, '0')
+        var m = String(formattedDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var y = formattedDate.getFullYear();
+        var h = String(formattedDate.getHours()).padStart(2, '0');
+        var mi = String(formattedDate.getMinutes()).padStart(2, '0')
+        formattedDate = y + "-" + m + "-" + d + "T" + h + ":" + mi
+        return formattedDate
     }
 </script>
