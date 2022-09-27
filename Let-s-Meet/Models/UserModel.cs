@@ -31,6 +31,8 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "events")]
         public ICollection<EventModel> Events { get; set; }
 
+        [JsonProperty(PropertyName = "calendars")]
+        public ICollection<CalendarModel> Calendars { get; set; }
 
         [JsonProperty(PropertyName = "settings")]
         public SettingsModel settings { get; set; }

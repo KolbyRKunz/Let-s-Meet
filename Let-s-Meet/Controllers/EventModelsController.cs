@@ -36,9 +36,9 @@ namespace Let_s_Meet.Controllers
         {
             User user = await _um.GetUserAsync(User);
             int id = user.UserID;
-            return Ok(await _context.Events.ToListAsync());
             return Ok(await _context.Events.Include(e => e.Users).Where(e => e.Users.Any(u => u.UserID == id)).ToListAsync());
         }
+
 
         // GET: EventModels/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -69,15 +69,29 @@ namespace Let_s_Meet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,startTime,endTime")] EventModel eventModel)
+        public async Task<IActionResult> Create([Bind("ID,startTime,endTime,title,location")] EventModel eventModel)
         {
+
+            User user = await _um.GetUserAsync(User);
+            UserModel userModel = await _context.Users.FindAsync(user.UserID);
+
+            List<UserModel> users = new List<UserModel> { userModel };
+
+            eventModel.Users = users;
+
             if (ModelState.IsValid)
             {
                 _context.Add(eventModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(eventModel);
+            return Ok(new {
+                StartTime = eventModel.StartTime,
+                EndTime = eventModel.EndTime,
+                Title = eventModel.Title,
+                Location = eventModel.Location,
+                Users = users
+            });
         }
 
         // GET: EventModels/Edit/5
@@ -157,7 +171,7 @@ namespace Let_s_Meet.Controllers
             var eventModel = await _context.Events.FindAsync(id);
             _context.Events.Remove(eventModel);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Ok();//RedirectToAction(nameof(Index));
         }
 
         private bool EventModelExists(int id)

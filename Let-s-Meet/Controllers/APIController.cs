@@ -157,6 +157,8 @@ namespace Let_s_Meet.Controllers
         [HttpGet]
         public OkObjectResult getUserEvents(string name)
         {
+            return Ok(null); // TODO handle error from "var user = ..." line or ignore
+            
             //TODO: is there a better way to do this than querying database
             //Is there a way to get the index to pass in the UserID somehow
             User userIDFromName = _identity_context.Users
