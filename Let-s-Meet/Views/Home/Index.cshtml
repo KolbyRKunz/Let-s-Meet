@@ -64,8 +64,8 @@
 
                 select: function(data){
                     console.log(data); //this is the data given by the select callback, fullcalendar
-                    var startDate = formatStartEndDate(data.startStr)
-                    var endDate = formatStartEndDate(data.endStr)
+                    var startDate = formatStartEndDate(data.start)//FIXED: Have to give it start/end and not startStr/endStr becuase it will leave out important data
+                    var endDate = formatStartEndDate(data.end)
 
                     addEvent(startDate, endDate).then((values) => { //JS promise?
                         console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
