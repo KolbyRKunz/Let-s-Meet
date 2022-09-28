@@ -32,18 +32,31 @@ namespace Let_s_Meet.Controllers
         }
 
         // GET: EventModels/Mine
-        public async Task<IActionResult> Mine()
+        public async Task<IActionResult> GetEvents()
         {
             User user = await _um.GetUserAsync(User);
             int id = user.UserID;
-            return Ok(await _context
+            var events = await _context
                 .Events
                 .Include(e => e.Users)
+                .Include(e => e.Calendar)
                 .Where(e => e.Users.Any(u => u.UserID == id))
-                .ToListAsync()
-                );
+                .Select(e => new
+                {
+                    id = e.EventID,
+                    title = e.Title,
+                    start = e.StartTime.ToString("O"),
+                    end = e.EndTime.ToString("O"),
+                    location = e.Location,
+                    color = e.Calendar.Color,
+                    background = e.Calendar.Color,
+                    backgroundColor = e.Calendar.Color,
+                    // TODO users w/o infinite loop
+                })
+                .ToListAsync();
+            return Ok(events);
         }
-
+        
 
         // GET: EventModels/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -73,29 +86,35 @@ namespace Let_s_Meet.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,startTime,endTime,title,location")] EventModel eventModel)
+        public async Task<IActionResult> Create(string title, string location, string startTime, string endTime, int calendarID)
         {
+
+            EventModel eventModel = new EventModel {
+                Title = title,
+                Location = location,
+                StartTime = DateTime.Parse(startTime),
+                EndTime = DateTime.Parse(endTime)
+            };
 
             User user = await _um.GetUserAsync(User);
             UserModel userModel = await _context.Users.FindAsync(user.UserID);
+            CalendarModel cal = await _context.Calendars.FindAsync(calendarID);
 
             List<UserModel> users = new List<UserModel> { userModel };
-
+            
             eventModel.Users = users;
+            eventModel.Calendar = cal;
 
-            if (ModelState.IsValid)
-            {
-                _context.Add(eventModel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            // Add to database
+            _context.Events.Add(eventModel);
+            await _context.SaveChangesAsync();
+
             return Ok(new {
                 StartTime = eventModel.StartTime,
                 EndTime = eventModel.EndTime,
                 Title = eventModel.Title,
                 Location = eventModel.Location,
-                Users = users
+                //Users = users // TODO format for no infinite
             });
         }
 
@@ -170,7 +189,6 @@ namespace Let_s_Meet.Controllers
 
         // POST: EventModels/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var eventModel = await _context.Events.FindAsync(id);

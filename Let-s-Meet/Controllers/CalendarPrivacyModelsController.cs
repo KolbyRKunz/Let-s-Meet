@@ -50,7 +50,7 @@ namespace Let_s_Meet.Controllers
         // GET: CalendarPrivacyModels/Create
         public IActionResult Create()
         {
-            ViewData["CalendarID"] = new SelectList(_context.Calendar, "CalendarID", "CalendarID");
+            ViewData["CalendarID"] = new SelectList(_context.Calendars, "CalendarID", "CalendarID");
             return View();
         }
 
@@ -67,7 +67,7 @@ namespace Let_s_Meet.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CalendarID"] = new SelectList(_context.Calendar, "CalendarID", "CalendarID", calendarPrivacyModel.CalendarID);
+            ViewData["CalendarID"] = new SelectList(_context.Calendars, "CalendarID", "CalendarID", calendarPrivacyModel.CalendarID);
             return View(calendarPrivacyModel);
         }
 
@@ -84,7 +84,7 @@ namespace Let_s_Meet.Controllers
             {
                 return NotFound();
             }
-            ViewData["CalendarID"] = new SelectList(_context.Calendar, "CalendarID", "CalendarID", calendarPrivacyModel.CalendarID);
+            ViewData["CalendarID"] = new SelectList(_context.Calendars, "CalendarID", "CalendarID", calendarPrivacyModel.CalendarID);
             return View(calendarPrivacyModel);
         }
 
@@ -120,7 +120,7 @@ namespace Let_s_Meet.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CalendarID"] = new SelectList(_context.Calendar, "CalendarID", "CalendarID", calendarPrivacyModel.CalendarID);
+            ViewData["CalendarID"] = new SelectList(_context.Calendars, "CalendarID", "CalendarID", calendarPrivacyModel.CalendarID);
             return View(calendarPrivacyModel);
         }
 

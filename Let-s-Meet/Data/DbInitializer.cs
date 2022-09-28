@@ -343,7 +343,7 @@ namespace Let_s_Meet.Data
             }
 
             //Add the calendar objects to the DB
-            context.Calendar.AddRange(calendars);
+            context.Calendars.AddRange(calendars);
             context.CalendarPrivacy.AddRange(privacy);
             return calendars;
         }

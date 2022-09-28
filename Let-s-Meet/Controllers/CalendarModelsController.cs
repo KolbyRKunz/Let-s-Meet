@@ -34,7 +34,7 @@ namespace Let_s_Meet.Controllers
 
             // Get current user's calendars
             return View(await _context
-                .Calendar
+                .Calendars
                 .Include(c => c.Owner)
                 .Where(c => c.Owner.UserID == id)
                 .ToListAsync()
@@ -49,7 +49,7 @@ namespace Let_s_Meet.Controllers
                 return NotFound();
             }
 
-            var calendarModel = await _context.Calendar
+            var calendarModel = await _context.Calendars
                 .FirstOrDefaultAsync(m => m.CalendarID == id);
             if (calendarModel == null)
             {
@@ -94,7 +94,7 @@ namespace Let_s_Meet.Controllers
                 return NotFound();
             }
 
-            var calendarModel = await _context.Calendar.FindAsync(id);
+            var calendarModel = await _context.Calendars.FindAsync(id);
             if (calendarModel == null)
             {
                 return NotFound();
@@ -145,7 +145,7 @@ namespace Let_s_Meet.Controllers
                 return NotFound();
             }
 
-            var calendarModel = await _context.Calendar
+            var calendarModel = await _context.Calendars
                 .FirstOrDefaultAsync(m => m.CalendarID == id);
             if (calendarModel == null)
             {
@@ -160,15 +160,15 @@ namespace Let_s_Meet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var calendarModel = await _context.Calendar.FindAsync(id);
-            _context.Calendar.Remove(calendarModel);
+            var calendarModel = await _context.Calendars.FindAsync(id);
+            _context.Calendars.Remove(calendarModel);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CalendarModelExists(int id)
         {
-            return _context.Calendar.Any(e => e.CalendarID == id);
+            return _context.Calendars.Any(e => e.CalendarID == id);
         }
     }
 }

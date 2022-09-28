@@ -25,7 +25,8 @@
 
                 height: "auto",
 
-                events: '/api/getUserEvents?name=' + '@User.Identity.Name', //TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
+                events: '/EventModels/GetEvents',
+                //events: '/api/getUserEvents?name=' + '@User.Identity.Name',// TODO: CHANGE, will need to pass in the userId later in the non-mock data call to query the database
 
                 //editable:true, //TODO: Try to add this back later, the clicking and dragging of events doesn't update on the database correctly yet
                 selectable:true,
@@ -54,8 +55,8 @@
                         {
                             info.event.remove();
                             $.ajax({  ///now we need to update the backend
-                                url: '/api/deleteUserEvent?userID=' + name + '&eventID=' + eventID, //This will need to change to be for specific user and event
-                                type: 'DELETE'
+                                url: '/EventModels/Delete/' + eventID, //This will need to change to be for specific user and event
+                                type: 'POST'
                             });
                         }
                     })
@@ -69,6 +70,7 @@
                     addEvent(startDate, endDate).then((values) => { //JS promise?
                         console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
                         var eventName = values.eventName
+                        var calendarID = values.calendarID
 
                         var startDate = $('#startDate').val()
                         var endDate = $('#endDate').val()
@@ -109,21 +111,23 @@
                         //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event
                         //var url = 'api/addUserEvent?startTime=' + data.start.toUTCString() + '&endTime=' + data.end.toUTCString() + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
-                        var url = 'api/addUserEvent?startTime=' + startDate + '&endTime=' + endDate + '&title=' + eventName + '&name=' + '@User.Identity.Name' //TODO: Need to change userId
+                        //var url = 'api/addUserEvent?startTime=' + startDate + '&endTime=' + endDate + '&title=' + eventName + '&name=' + '@User.Identity.Name' TODO: Need to change userId
+                        var url = 'EventModels/Create';
 
                         var eventData = {
                             title: eventName,
-                            start: startDate,
-                            end: endDate,
-                            name: '@User.Identity.Name' //'@User.Identity.Name'  //Will this work on the back end as far as database
+                            startTime: startDate,
+                            endTime: endDate,
+                            calendarID: calendarID
                         }
 
                         $.ajax({
                             type: 'POST',
                             url: url,
                             dataType: 'json',
-                            data: JSON.stringify(eventData)
-                        }).done(function() {
+                            data: eventData
+                        })
+                        .done(function() {
                             calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
                         });
                         
@@ -147,6 +151,18 @@
 <script>
 
     async function addEvent(startDate, endDate){
+
+        
+        // Generate html string for calendar select input using calendars in ViewBag
+        var calendars = JSON.parse('@Html.Raw(@ViewBag.Calendars)');
+        var calendarInput = '<select class="swal2-input" name="calendars">';
+        for (var i = 0; i < calendars.length; i++) {
+            calendarInput += '<option value="' + calendars[i].calendarID + '">' + calendars[i].name + '</option>';
+        }
+        calendarInput += '</select>';
+
+        
+
         const { value: formValues } = await Swal.fire({
             title: 'Event Info',
             html: //This does no input checking currently
@@ -154,6 +170,9 @@
                 //Was struggling to get site.css to acess parts of the popup
                 '<div style="display:grid"><label>Event Name</label>' +
                 '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Calendar</label>' +
+                calendarInput +
                 '<br/></div>' +
                 '<div style="display:grid"><label>Start Date</label>' +
                 `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
@@ -169,6 +188,7 @@
                     eventName: $('#eventName').val(),
                     startDate: $('#startDate').val(),
                     endDate: $('#endDate').val(),
+                    calendarID: $('select[name="calendars"]').val()
                 }
             }
         });
