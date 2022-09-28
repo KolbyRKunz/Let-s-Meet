@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Let_s_Meet.Data;
 using Let_s_Meet.Models;
 using Microsoft.AspNetCore.Authorization;
+using Let_s_Meet.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace Let_s_Meet.Controllers
 {
@@ -15,16 +17,28 @@ namespace Let_s_Meet.Controllers
     public class CalendarModelsController : Controller
     {
         private readonly MeetContext _context;
+        private readonly UserManager<User> _um;
 
-        public CalendarModelsController(MeetContext context)
+        public CalendarModelsController(MeetContext context, UserManager<User> userManager)
         {
             _context = context;
+            _um = userManager;
         }
 
         // GET: CalendarModels
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Calendar.ToListAsync());
+            User user = await _um.GetUserAsync(User);
+            int id = user.UserID;
+            //return View(await _context.Calendar.ToListAsync()); // This is for getting all calendars
+
+            // Get current user's calendars
+            return View(await _context
+                .Calendar
+                .Include(c => c.Owner)
+                .Where(c => c.Owner.UserID == id)
+                .ToListAsync()
+                );
         }
 
         // GET: CalendarModels/Details/5
@@ -56,8 +70,13 @@ namespace Let_s_Meet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CalendarID,Name,Description,Color")] CalendarModel calendarModel)
+        public async Task<IActionResult> Create([Bind("CalendarID,Name,Description,Color,Owner")] CalendarModel calendarModel)
         {
+            // get current user and set it as owner
+            User user = await _um.GetUserAsync(User);
+            UserModel userModel = _context.Users.Find(user.UserID);
+            calendarModel.Owner = userModel;
+
             if (ModelState.IsValid)
             {
                 _context.Add(calendarModel);

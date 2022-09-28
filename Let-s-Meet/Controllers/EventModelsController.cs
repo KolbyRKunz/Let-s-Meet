@@ -36,7 +36,12 @@ namespace Let_s_Meet.Controllers
         {
             User user = await _um.GetUserAsync(User);
             int id = user.UserID;
-            return Ok(await _context.Events.Include(e => e.Users).Where(e => e.Users.Any(u => u.UserID == id)).ToListAsync());
+            return Ok(await _context
+                .Events
+                .Include(e => e.Users)
+                .Where(e => e.Users.Any(u => u.UserID == id))
+                .ToListAsync()
+                );
         }
 
 

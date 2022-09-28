@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>My Calendars</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -35,7 +35,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Color)
+                <div style=@Html.Raw("height:20px;width:20px;background:"+item.Color)></div>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.CalendarID">Edit</a> |
