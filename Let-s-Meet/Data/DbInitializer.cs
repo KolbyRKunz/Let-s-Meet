@@ -62,6 +62,23 @@ namespace Let_s_Meet.Data
 
             context.SaveChanges();
 
+            // Create calendar and privacy
+            List<CalendarModel> calendars = CreateCalendars(context, users);
+
+            context.SaveChanges();
+
+            // Create settings
+            List<SettingsModel> settings = CreateSettings(context, users);
+
+            context.SaveChanges();
+
+            // Create friends
+            List<FriendsModel> friends = CreateFriends(context, users);
+
+            context.SaveChanges();
+
+            
+
         }
 
         /// <summary>
@@ -93,8 +110,22 @@ namespace Let_s_Meet.Data
                 events.Add(eventModel);
             }
 
+            // Create privacy for events
+            List<EventPrivacyModel> privacy = new List<EventPrivacyModel>();
+            
+            foreach (EventModel e in events)
+            {
+                EventPrivacyModel eventPrivacyModel = new EventPrivacyModel
+                {
+                    Event = e,
+                };
+
+                privacy.Add(eventPrivacyModel);
+            }
+
             // Add events to DB
             context.Events.AddRange(events);
+            context.EventPrivacy.AddRange(privacy);
 
             return events;
         }
@@ -275,6 +306,99 @@ namespace Let_s_Meet.Data
             //Add the onboarding objects to the DB
             context.Attendance.AddRange(attendance);
             return attendance;
+        }
+
+        /// <summary>
+        /// Creates calendars and privacy for them and adds them to the DB
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <returns></returns>
+        public static List<CalendarModel> CreateCalendars(MeetContext context, List<UserModel> users)
+        {
+            List<CalendarModel> calendars = new List<CalendarModel>();
+
+
+            //For each user, create a calendar
+            foreach (UserModel u in users)
+            {
+                List<UserModel> members = new List<UserModel>();
+                members.Add(u);
+                calendars.Add(new CalendarModel
+                {
+                    Owner = u,
+                    Name = u.FirstName + "'s Calendar",
+                });
+            }
+
+            // Create privacy models
+            List<CalendarPrivacyModel> privacy = new List<CalendarPrivacyModel>();
+            foreach (CalendarModel c in calendars)
+            {
+                privacy.Add(new CalendarPrivacyModel
+                {
+                    CalendarID = c.CalendarID,
+                    Calendar = c
+                });
+            }
+
+            //Add the calendar objects to the DB
+            context.Calendars.AddRange(calendars);
+            context.CalendarPrivacy.AddRange(privacy);
+            return calendars;
+        }
+
+        /// <summary>
+        /// Creates settings for users
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <returns></returns>
+        public static List<SettingsModel> CreateSettings(MeetContext context, List<UserModel> users)
+        {
+            List<SettingsModel> settings = new List<SettingsModel>();
+
+            //For each user, create a calendar
+            foreach (UserModel u in users)
+            {
+                settings.Add(new SettingsModel
+                {
+                    UserID = u.UserID,
+                    User = u
+                });
+            }
+
+            //Add the onboarding objects to the DB
+            context.Settings.AddRange(settings);
+            return settings;
+        }
+
+        /// <summary>
+        /// Creates friends
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="users"></param>
+        /// <returns></returns>
+        public static List<FriendsModel> CreateFriends(MeetContext context, List<UserModel> users)
+        {
+            List<FriendsModel> friends = new List<FriendsModel>();
+
+            List<UserModel> usersNotFirst = users.Skip(1).ToList();
+
+            //For each user, create a calendar
+            foreach (UserModel u in usersNotFirst)
+            {
+                friends.Add(new FriendsModel
+                {
+                    RequestedBy = u,
+                    RequestedTo = users.First(),
+                    RequestStatus = FriendRequestStatus.Accepted
+                });
+            }
+
+            //Add the onboarding objects to the DB
+            context.Friends.AddRange(friends);
+            return friends;
         }
     }
 }

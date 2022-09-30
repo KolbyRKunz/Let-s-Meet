@@ -7,16 +7,22 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Let_s_Meet.Data;
 using Let_s_Meet.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Let_s_Meet.Areas.Identity.Data;
 
 namespace Let_s_Meet.Controllers
 {
+    [Authorize]
     public class EventModelsController : Controller
     {
         private readonly MeetContext _context;
+        private readonly UserManager<User> _um;
 
-        public EventModelsController(MeetContext context)
+        public EventModelsController(MeetContext context, UserManager<User> userManager)
         {
             _context = context;
+            _um = userManager;
         }
 
         // GET: EventModels
@@ -24,6 +30,33 @@ namespace Let_s_Meet.Controllers
         {
             return View(await _context.Events.ToListAsync());
         }
+
+        // GET: EventModels/Mine
+        public async Task<IActionResult> GetEvents()
+        {
+            User user = await _um.GetUserAsync(User);
+            int id = user.UserID;
+            var events = await _context
+                .Events
+                .Include(e => e.Users)
+                .Include(e => e.Calendar)
+                .Where(e => e.Users.Any(u => u.UserID == id))
+                .Select(e => new
+                {
+                    id = e.EventID,
+                    title = e.Title,
+                    start = e.StartTime.ToString("O"),
+                    end = e.EndTime.ToString("O"),
+                    location = e.Location,
+                    color = e.Calendar.Color,
+                    background = e.Calendar.Color,
+                    backgroundColor = e.Calendar.Color,
+                    // TODO users w/o infinite loop
+                })
+                .ToListAsync();
+            return Ok(events);
+        }
+        
 
         // GET: EventModels/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -53,16 +86,36 @@ namespace Let_s_Meet.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,startTime,endTime")] EventModel eventModel)
+        public async Task<IActionResult> Create(string title, string location, string startTime, string endTime, int calendarID)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(eventModel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(eventModel);
+
+            EventModel eventModel = new EventModel {
+                Title = title,
+                Location = location,
+                StartTime = DateTime.Parse(startTime),
+                EndTime = DateTime.Parse(endTime)
+            };
+
+            User user = await _um.GetUserAsync(User);
+            UserModel userModel = await _context.Users.FindAsync(user.UserID);
+            CalendarModel cal = await _context.Calendars.FindAsync(calendarID);
+
+            List<UserModel> users = new List<UserModel> { userModel };
+            
+            eventModel.Users = users;
+            eventModel.Calendar = cal;
+
+            // Add to database
+            _context.Events.Add(eventModel);
+            await _context.SaveChangesAsync();
+
+            return Ok(new {
+                StartTime = eventModel.StartTime,
+                EndTime = eventModel.EndTime,
+                Title = eventModel.Title,
+                Location = eventModel.Location,
+                //Users = users // TODO format for no infinite
+            });
         }
 
         // GET: EventModels/Edit/5
@@ -136,13 +189,12 @@ namespace Let_s_Meet.Controllers
 
         // POST: EventModels/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var eventModel = await _context.Events.FindAsync(id);
             _context.Events.Remove(eventModel);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Ok();//RedirectToAction(nameof(Index));
         }
 
         private bool EventModelExists(int id)

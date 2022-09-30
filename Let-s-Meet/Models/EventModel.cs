@@ -25,13 +25,16 @@ namespace Let_s_Meet.Models
         public string Location { get; set; }
 
         [JsonProperty(PropertyName = "privacy")]
-        public string Privacy { get; set; }
+        public EventPrivacyModel Privacy { get; set; }
 
         [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
 
         [JsonProperty(PropertyName = "group")]
         public GroupModel Group { get; set; }
+
+        [JsonProperty(PropertyName = "calendar")]
+        public CalendarModel Calendar { get; set; }
 
         //TODO: any other columns we would want an event to have
 
