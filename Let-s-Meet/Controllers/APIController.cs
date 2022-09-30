@@ -18,6 +18,7 @@ using System.Transactions;
 using Microsoft.AspNetCore.Identity;
 using Let_s_Meet.Areas.Identity.Data;
 using System.Xml.Linq;
+using System.Reflection.Metadata;
 
 namespace Let_s_Meet.Controllers
 {
@@ -26,6 +27,7 @@ namespace Let_s_Meet.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly MeetContext _context;
         private readonly IdentityContext _identity_context;
+        private readonly UserManager<User> _um;
 
         //public OpportunitiesController(URC_Context context)
         //{
@@ -39,11 +41,12 @@ namespace Let_s_Meet.Controllers
         //    return View(await _context.Opportunities.ToListAsync());
         //}
 
-        public APIController(ILogger<HomeController> logger, MeetContext context, IdentityContext identity_context)
+        public APIController(ILogger<HomeController> logger, MeetContext context, IdentityContext identity_context, UserManager<User> userManager)
         {
             _logger = logger;
             _context = context;
             _identity_context = identity_context;
+            _um = userManager;
         }
 
         public IActionResult Index()
@@ -90,11 +93,59 @@ namespace Let_s_Meet.Controllers
         {
             //TODO:The groupMembers is a string that has the members separated by a comma
             //I couldn't figure out how to pass in an array via http. I figure pass the entire array of group members and let the back end do it
+            //IMPORTANT: The groupMembers list from the frontend should include the person creating the group
+            //TODO: later on need to make sure that the user exists before adding to group?
+
+            var membersSplit = groupMembers.Split(",");
+
+            var members = new List<UserModel>();
+
+            for (int i = 0; i < membersSplit.Length; i++)//TODO: is there a better way
+            {
+                var IdentUser = _identity_context.Users
+                    .Where(u => u.Email == membersSplit[i])
+                    .Single(); //this should be fine, one email should have one account
+
+                UserModel user = _context.Users
+                    .Where(u => u.UserID == IdentUser.UserID)
+                    .Single();
+
+                members.Add(user);
+            }
+            
+            /*TODO: adding the group to the user model, Groups column?
+                Is this taken care of by GroupModelUserModel table
+                that is automatically created?*/
+
+            var groupModel = new GroupModel
+            {
+                GroupName = groupName,
+                Users = members
+            };
+
+            _context.Add(groupModel);
+            _context.SaveChanges();
 
             return Ok(new { 
                 groupName = groupName,
                 groupMembers = groupMembers
             });
+        }
+
+        [HttpGet]
+        public OkObjectResult getGroupMembers(int groupId)
+        {
+            var group = _context.Groups
+                .Include(g => g.Users)
+                .Where(g => g.GroupID == groupId)
+                .Single();
+
+            var members = group.Users.Select(m => new
+            {
+                member = m.FirstName //TODO: we might want to return email instead? or make it possible to add somebody as friend from group member list
+            });
+
+            return Ok(members);
         }
 
         /// <summary>
@@ -239,24 +290,24 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpGet]
-        public OkObjectResult getUserGroups(int userID)
+        public OkObjectResult getUserGroups(string name)
         {
-            var userGroups = new[] {
-                new {
-                    groupName = "Group 1"
-                },
-                new{
-                    groupName = "Group 2"
-                },
-                new{
-                    groupName = "Group 3"
-                },
-                new{
-                    groupName = "Group 4"
-                }
-            };
+            var userIDfromName = _identity_context.Users
+                .Where(u => u.UserName == name)
+                .Single(); //should be fine only one user account per email?
 
-            return Ok(userGroups);
+            var userGroups = _context.Users
+                .Include(g => g.Groups)
+                .Where(g => g.UserID == userIDfromName.UserID)
+                .Single();
+
+            var groups = userGroups.Groups
+                .Select(g => new { 
+                    groupName = g.GroupName,
+                    groupId = g.GroupID
+                });;
+
+            return Ok(groups);
         }
 
         /// <summary>
@@ -318,7 +369,7 @@ namespace Let_s_Meet.Controllers
         /// Restrict this to a single group for the moment for complexity sake
         /// </summary>
         /// <returns></returns>
-        public OkObjectResult findTime()
+        public OkObjectResult findTime(int groupID, string title)
         {
             return null;
         }
