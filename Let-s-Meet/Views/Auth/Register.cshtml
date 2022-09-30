@@ -21,6 +21,18 @@
                 <input placeholder="Username" id="Username" asp-for="Username" />
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input placeholder="FirstName" id="FirstName" asp-for="FirstName" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input placeholder="LastName" id="LastName" asp-for="LastName" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Email"></label>
                 <input placeholder="Email" id="Email" asp-for="Email" />
@@ -63,6 +75,8 @@
         let url = "CreateUser"
         const pass = $("#Password").val()
         const rePass = $("#RePassword").val()
+        const firstName = $("#FirstName").val()
+        const lastName = $("#LastName").val()
 
         if( pass != rePass){
             alert("Passwords do not match")
@@ -71,6 +85,8 @@
 
         let data = {
             "Username": $("#Username").val(),
+            "FirstName": firstName,
+            "LastName": lastName,
             "Email": $("#Email").val(),
             "Password": $("#Password").val()
         }

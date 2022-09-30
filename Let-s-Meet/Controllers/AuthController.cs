@@ -27,11 +27,13 @@ namespace Let_s_Meet.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly IConfiguration _configuration;
+        private readonly MeetContext _context;
 
-        public AuthController(UserManager<User> userManager, IConfiguration config)
+        public AuthController(UserManager<User> userManager, IConfiguration config, MeetContext context)
         {
             this.userManager = userManager;
             this._configuration = config;
+            this._context = context;
         }
 
         public IActionResult Index()
@@ -114,13 +116,13 @@ namespace Let_s_Meet.Controllers
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
 
-            User user = new User()
-            {
-                Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
-            };
-            var result = await userManager.CreateAsync(user, model.Password);
+            UserModel MeetUser = new UserModel { FirstName = model.FirstName, LastName = model.LastName  };
+            _context.Add(MeetUser);
+            _context.SaveChanges();
+
+            var IdentityUser = new User { UserName = model.Username, Email = model.Email, UserID = MeetUser.UserID };
+            var result = await userManager.CreateAsync(IdentityUser, model.Password);
+
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
