@@ -1,4 +1,4 @@
-﻿using Let_s_Meet.Areas.Identity.Data;
+using Let_s_Meet.Areas.Identity.Data;
 using Let_s_Meet.Data;
 using Let_s_Meet.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +30,10 @@ namespace Let_s_Meet.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
             // Put list of user's calendars as JSON in ViewBag
             User user = _um.GetUserAsync(User).Result;
             UserModel userModel = _context.Users.Find(user.UserID);
@@ -46,14 +50,24 @@ namespace Let_s_Meet.Controllers
 
             return View();
         }
-
+        
         public IActionResult Groups()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
+
             return View();
         }
 
         public IActionResult Friends()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
+
             return View();
         }
 

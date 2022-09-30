@@ -49,16 +49,7 @@ namespace Let_s_Meet.Controllers
             _um = userManager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
+        [Authorize]
         [HttpPost]
         public OkObjectResult Post(string data)
         {

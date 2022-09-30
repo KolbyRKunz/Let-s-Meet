@@ -1,0 +1,116 @@
+﻿@using Let_s_Meet.Models.JWTModels
+@model RegisterModel
+@{
+}
+
+<div id="welcomeContainer" class="centerClass">
+    <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold">Let's Meet!</span></h1>
+</div>
+
+<div>
+    <h1> Register here</h1>
+    <hr />
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <form id="account">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Username"></label>
+                <input placeholder="Username" id="Username" asp-for="Username" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input placeholder="FirstName" id="FirstName" asp-for="FirstName" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input placeholder="LastName" id="LastName" asp-for="LastName" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input placeholder="Email" id="Email" asp-for="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input placeholder="Password" id="Password" type="password" asp-for="Password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div class="form-group">
+                <label>Retype Password</label>
+                <input placeholder="Retype Password" id="RePassword" type="password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+        </form>
+        <div class="createButton">
+            <button onclick="register()" class="btn btn-danger">Create Account</button>
+        </div>
+        <div class="accountLink">
+            <a href="../Auth">Already have an account? Log in here</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    window.onload = function () {
+        document.getElementById("Username").focus();
+    };
+
+    document.getElementById('RePassword').onkeydown = function (e) {
+        if (e.keyCode == 13) {
+            register();
+        }
+    };
+
+    function register() {
+        let url = "CreateUser"
+        const pass = $("#Password").val()
+        const rePass = $("#RePassword").val()
+        const firstName = $("#FirstName").val()
+        const lastName = $("#LastName").val()
+
+        if( pass != rePass){
+            alert("Passwords do not match")
+            return
+        }
+
+        let data = {
+            "Username": $("#Username").val(),
+            "FirstName": firstName,
+            "LastName": lastName,
+            "Email": $("#Email").val(),
+            "Password": $("#Password").val()
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+               location.reload()
+               console.log(response)
+            },
+            error: function (response) {
+                console.log("something went wrong", response)
+            }
+        })
+    }
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

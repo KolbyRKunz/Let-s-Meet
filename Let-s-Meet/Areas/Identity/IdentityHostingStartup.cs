@@ -19,9 +19,6 @@ namespace Let_s_Meet.Areas.Identity
                 services.AddDbContext<IdentityContext>(options =>
                     options.UseSqlServer(
                         context.Configuration.GetConnectionString("IdentityContextConnection")));
-
-                services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
-                    .AddEntityFrameworkStores<IdentityContext>();
             });
         }
     }

@@ -1,0 +1,88 @@
+﻿@using Let_s_Meet.Models.JWTModels
+@model LoginModel
+@{
+}
+
+<link rel="stylesheet" type="text/css" href="~/css/site.css" />
+
+<div id="welcomeContainer" class="centerClass">
+    <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold">Let's Meet!</span></h1>
+    
+    @if (User.Identity.Name != null)
+    {
+        <h4 id="userWelcome">Hello @User.Identity.Name! </h4>
+    }
+</div>
+
+<div class="col-md-4">
+    <div>
+        <h1>Log in</h1>
+        <hr/>
+    </div>
+
+    <form id="account">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Username"></label>
+            <input class="inputBox" id="Username" placeholder="Username" asp-for="Username" />
+            <span asp-validation-for="Username" class="text-danger">
+            </span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input class="inputBox" id="Password" placeholder="Password" type="password" asp-for="Password" />
+            <span asp-validation-for="Password"></span>
+        </div>
+    </form>
+
+    <div class="createButton">
+        <button onclick="signIn()" class="btn btn-danger">Log in</button>
+    </div>
+    <div class="accountLink">
+        <a href="Auth/Register">No Account? Click here to register</a>
+    </div>
+</div>
+
+
+<script>
+
+    window.onload = function () {
+        document.getElementById("Username").focus();
+    };
+
+    document.getElementById('Password').onkeydown = function (e) {
+        if (e.keyCode == 13) {
+            signIn();
+        }
+    };
+
+    function signIn() {
+        let url = "Auth/Login"
+        let data = {
+            "Username": $("#Username").val(),
+            "Password": $("#Password").val()
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+               location.reload()
+               console.log("signed in")
+            },
+            error: function () {
+                console.log("something went wrong")
+            }
+        })
+    }
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
