@@ -16,6 +16,11 @@ namespace Let_s_Meet.Data
         public DbSet<EventPromptModel> EventPrompt { get; set; }
         public DbSet<CommentsModel> Comments { get; set; }
         public DbSet<AttendanceModel> Attendance { get; set; }
+        public DbSet<FriendsModel> Friends { get; set; }
+        public DbSet<CalendarModel> Calendars { get; set; }
+        public DbSet<SettingsModel> Settings { get; set; }
+        public DbSet<CalendarPrivacyModel> CalendarPrivacy { get; set; }
+        public DbSet<EventPrivacyModel> EventPrivacy { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +31,17 @@ namespace Let_s_Meet.Data
             modelBuilder.Entity<EventPromptModel>().ToTable("EventPrompt");
             modelBuilder.Entity<CommentsModel>().ToTable("Comments");
             modelBuilder.Entity<AttendanceModel>().ToTable("Attendance");
+            modelBuilder.Entity<CalendarModel>().ToTable("Calendar");
+
+            modelBuilder.Entity<FriendsModel>().ToTable("Friends")
+                .HasAlternateKey("RequestedByID", "RequestedToID");
+            modelBuilder.Entity<FriendsModel>().HasOne(f => f.RequestedBy).WithMany().HasForeignKey("RequestedByID").OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<FriendsModel>().HasOne(f => f.RequestedTo).WithMany().HasForeignKey("RequestedToID").OnDelete(DeleteBehavior.NoAction);
+
+            //.HasAlternateKey(c => new { c.RequestedBy, c.RequestedTo });
+            modelBuilder.Entity<SettingsModel>().ToTable("Settings");
+            modelBuilder.Entity<CalendarPrivacyModel>().ToTable("CalendarPrivacy");
+            modelBuilder.Entity<EventPrivacyModel>().ToTable("EventPrivacy");
         }
     }
 }

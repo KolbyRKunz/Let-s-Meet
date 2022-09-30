@@ -2,7 +2,7 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 :root {
-    /*DESIGN DOCUMENT VERSION 1*/ 
+    /*DESIGN DOCUMENT VERSION 1*/
     --DD_RED_1: '#6F2232';
     --DD_RED_2: '#950741';
     --DD_RED_3: '#C3083F';
@@ -10,12 +10,12 @@ for details on configuring this project to bundle and minify static web assets. 
     --DD_LIGHT_GRAY: '#979797';
     --DD_MEDIUM_GRAY: '#4E4E50';
     --DD_DARK_GRAY: '#1A1A1C';
-    
-    /*CAN'T MISS COLORS FOR TESTING*/ 
+    /*CAN'T MISS COLORS FOR TESTING*/
     --TEST_PURPLE: '#790097';
-    --TEST_GREEN: '#5FD66B'; 
-    --TEST_CREAM: '#F4F8ED'; /*not a greeny cream like DD_CREAM*/ 
+    --TEST_GREEN: '#5FD66B';
+    --TEST_CREAM: '#F4F8ED'; /*not a greeny cream like DD_CREAM*/
     --TEST_BLUE: '#05396B';
+    --color-magenta: '#950741';
 }
 
 body {
@@ -48,6 +48,8 @@ a {
     color: #EDF5E0; /*var(--DD_CREAM);*/
     background-color: #950741; /*var(--DD_RED_2);*/
     border-color: #6F2232; /*var(--DD_RED_1);*/
+    padding: 15px;
+    margin: 20px;
 }
 
     .btn-danger:hover {
@@ -150,4 +152,51 @@ html {
 
 .createButton {
     padding: 2%;
+}
+
+#groupList {
+    display:flex;
+    justify-content:flex-end;
+    flex-direction:column;
+}
+
+.description {
+    color: gray;
+}
+
+.groupLink {
+    color: #950741;
+    padding: 0.5%;
+    font-size: 115%;
+}
+
+#groupList a:hover {
+    color: darkslategray;
+}
+
+#groupCalendar {
+    float:left;
+}
+
+#groupMembers {
+    float: left;
+    margin: 5%;
+    color: #950741 /*var(--color-magenta); TODO: use variables, but for some reason they are not displaying correctly with variables*/
+}
+
+#groupInfo {
+    display:flex;
+}
+
+.members {
+    color: black;
+    font-size: 130%;
+}
+
+.calendarContainer { /*add if we want the calendar to be left to right, full page, will need more in other places also, calenar needs height: "100%", not auto*/
+    /*position: fixed;
+    top: 15%;
+    left: 0;
+    right: 0;
+    bottom: 5%;*/
 }

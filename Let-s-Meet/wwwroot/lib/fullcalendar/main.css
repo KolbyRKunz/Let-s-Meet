@@ -67,9 +67,11 @@
   }
 .fc a[data-navlink] {
     cursor: pointer;
+    color:#950741;
   }
 .fc a[data-navlink]:hover {
     text-decoration: underline;
+    color:#950741;
   }
 .fc-direction-ltr {
   direction: ltr;
@@ -460,7 +462,7 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
 .fc .fc-col-header-cell-cushion {
     display: inline-block;  /*x-browser for when sticky (when multi-tier header) */
     padding: 2px 4px;
-
+    color:#950741;
   }
 .fc .fc-bg-event,
   .fc .fc-non-business,
@@ -968,7 +970,7 @@ A VERTICAL event
   border: 1px solid #3788d8;
   border: 1px solid var(--fc-event-border-color, #3788d8);
   background-color: #3788d8;
-  background-color: var(--fc-event-bg-color, #3788d8)
+/*  background-color: var(--fc-event-bg-color, #3788d8)*/
 
 }
 
@@ -976,15 +978,15 @@ A VERTICAL event
         color: #fff;
         color: var(--fc-event-text-color, #fff);
         height: 100%;
-        background-color: #950741;
+/*        background-color: #950741;*/
     }
 
     .fc-v-event .fc-event-main-frame {
         height: 100%;
         display: flex;
         flex-direction: column;
-        background-color: #950741;
-        border: solid 10px #950741;
+/*        background-color: #950741;*/
+/*        border: solid 10px #950741;*/
     }
 
 .fc-v-event .fc-event-time {
@@ -998,7 +1000,7 @@ A VERTICAL event
         flex-grow: 1;
         flex-shrink: 1;
         min-height: 0; /* important for allowing to shrink all the way */
-        background-color: #950741;
+/*        background-color: #950741;*/
     }
 
 .fc-v-event .fc-event-title { /* will have fc-sticky on it */
@@ -1498,9 +1500,10 @@ A VERTICAL event
 
 
 
-  .fc-theme-bootstrap a:not([href]) {
-    color: inherit; /* natural color for navlinks */
-  }
+.fc-theme-bootstrap a:not([href]) {
+    //color: inherit; /* natural color for navlinks */
+    color: #950741;
+}
 
 
 

@@ -1,0 +1,45 @@
+﻿@model Let_s_Meet.Models.FriendsModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>FriendsModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="FriendsID" />
+            <div class="form-group">
+                <label asp-for="RequestedByID" class="control-label"></label>
+                <select asp-for="RequestedByID" class="form-control" asp-items="ViewBag.RequestedByID"></select>
+                <span asp-validation-for="RequestedByID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RequestedToID" class="control-label"></label>
+                <select asp-for="RequestedToID" class="form-control" asp-items="ViewBag.RequestedToID"></select>
+                <span asp-validation-for="RequestedToID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RequestStatus" class="control-label"></label>
+                <select asp-for="RequestStatus" class="form-control"></select>
+                <span asp-validation-for="RequestStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

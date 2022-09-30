@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
-//TODO: put in identity and make this more offical 
 
 namespace Let_s_Meet.Models
 {
@@ -32,6 +31,10 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "events")]
         public ICollection<EventModel> Events { get; set; }
 
+        [JsonProperty(PropertyName = "calendars")]
+        public ICollection<CalendarModel> Calendars { get; set; }
 
+        [JsonProperty(PropertyName = "settings")]
+        public SettingsModel settings { get; set; }
     }
 }

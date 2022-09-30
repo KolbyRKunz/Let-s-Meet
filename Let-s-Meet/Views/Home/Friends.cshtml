@@ -2,11 +2,70 @@
     ViewData["Title"] = "Home Page";
 }
 
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
+
 <div class="text-left">
-    <h2>Friends</h2>
+    <h2 class="description">Friends</h2>
     <hr />
 </div>
 
 <div>
-    <button id="button0" class="btn btn-danger">Add Friend</button>
+    <button onclick="addFriend()" id="freindButton" class="btn btn-danger">Add Friend</button>
 </div>
+
+<br />
+
+<div id="friendList" style="display:flex;justify-content:flex-end;flex-direction:column;"></div> <!--Figure out how to get the css into the site.css-->
+
+
+<script>
+    fetch('../api/getUserFriends')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            getFriendData(data);
+        })
+        .catch(function (e) {
+            console.log("error in groups: " + e);
+        })
+
+    //TODO: This will greatly change when it's not mock data
+    function getFriendData(data) { //will need to update what this does once we we know what the friend list will do in more depth, like what will clicking on a friend do
+        var groupContainer = document.getElementById("friendList");
+        for (var i = 0; i < data.length; i++) {
+            var div = document.createElement("a");
+            div.setAttribute('class', 'groupLink'); //Use this later for styling, once the site.css is connected better
+            div.innerHTML = data[i].firstName + " " + data[i].lastName;
+            groupContainer.appendChild(div);
+        }
+    }
+
+    async function addFriendPopUp() {
+        const { value: formValues } = await Swal.fire({
+            title: 'Add Friend',
+            html: //This does no input checking currently
+                '<label>Enter email address</label>' +
+                '<input type="text" id="friendEmail" class="swal2-input">' +
+                '<br/>',
+            focusConfirm: false,
+            position: 'center',
+            showCancelButton: true,
+            preConfirm: () => { //TODO: only need days here because the user is picking the time frame they want it to occur from
+                return {
+                    friendEmail: $('#friendEmail').val(),
+                }
+            }
+        });
+        return formValues;
+    }
+
+    function addFriend() {
+        addFriendPopUp().then((values) => {
+            console.log(values);
+        })
+            .catch(error => console.log(error));
+    }
+</script>

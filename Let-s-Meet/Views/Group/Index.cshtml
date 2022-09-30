@@ -1,0 +1,139 @@
+﻿<link rel="stylesheet" type="text/css" href="~/css/site.css" />
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
+
+
+<head>
+    <meta charset='utf-8' />
+    <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
+    <script src='~/lib/fullcalendar/main.js'></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next,title',
+                    center: '',
+                    right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
+                },
+
+                height: "auto",
+
+                events: '/api/getGroupEvents', //will need to add the groupId to the call for querys later
+                nowIndicator: true
+            });
+            calendar.render();
+        });
+
+    </script>
+</head>
+
+
+<div>
+    <h1 class="description" id="groupName">Group Calendar</h1>
+    <hr />
+</div>
+
+
+<div style="padding:1%">
+    <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
+    <button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>
+</div>
+
+<div id="groupInfo">
+    <div class="calendarContainer" id="groupCalendar">
+        <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
+    </div>
+
+    <div id="groupMembers">
+        <h3>Group Members</h3>
+    </div>
+</div>
+
+
+<script>
+    async function createMeetingPopUp() {
+        const { value: formValues } = await Swal.fire({
+            title: 'Meeting Reason',
+            html: //This does no input checking currently
+                //'<label>Event Reason</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/>' +
+                '<label>Start Date</label>' +
+                '<input type="date" id="startDate" class="swal2-input">' +
+                '<br/>' +
+                '<label>End Date</label>' +
+                '<input type="date" id="endDate" class="swal2-input">' +
+                '<br/>',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton: true,
+            preConfirm: () => { //TODO: only need days here because the user is picking the time frame they want it to occur from
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                }
+            }
+        });
+        return formValues;
+    }
+
+    function createMeeting() {
+        createMeetingPopUp().then((values) => {
+            console.log(values);
+        })
+        .catch(error => console.log(error));
+    }
+
+    function leaveGroup(){
+        Swal.fire({
+            title: 'Are you sure you wish to leave the group?',
+            text: "You won't be able to rejoin without an invite!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, leave group!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.replace("/Home/Groups")
+                /*TODO: More will need to be done, like doing a request to the server to leave the group 
+                For now it just brings a user to their list of groups*/
+            }
+        })
+    }
+    
+    document.body.onload = function() {
+        let params = new URLSearchParams(location.search);
+        var groupName = document.getElementById("groupName");
+        groupName.innerHTML = params.get('groupName') + " Group Calendar"
+    }
+
+    fetch('../api/getGroupMembers?groupId=' + new URLSearchParams(location.search).get('groupId'))
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            getGroupMembers(data);
+        })
+        .catch(function (e) {
+            console.log("error in groups: " + e);
+        })
+
+    function getGroupMembers(data) {
+        //console.log(data)
+        var groupContainer = document.getElementById("groupMembers");
+        for (var i = 0; i < data.length; i++) {
+            var div = document.createElement("li");
+            div.setAttribute('class', 'members'); //Use this later for styling
+            div.innerHTML = data[i].member;
+            groupContainer.appendChild(div);
+        }
+    }
+
+</script>

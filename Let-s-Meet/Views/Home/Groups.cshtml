@@ -2,14 +2,104 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-left">
-    <h2>Groups</h2>
-    <hr />
-</div>
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
 
-<div>
-    <button id="button0" class="btn btn-danger">Create Group</button>
-</div>
+<body>
+    <div class="text-left">
+        <h2 class="description">Groups</h2>
+        <hr />
+    </div>
+
+    <div>
+        <button onClick="createGroup()" id="createGroupBtn" class="btn btn-danger">Create Group</button>
+    </div>
+
+    <div id="groupList" style="display:flex;justify-content:flex-end;flex-direction:column;"></div> <!--Figure out how to get the css into the site.css-->
+</body>
 
 
+<script>
+    fetch('../api/getUserGroups?name=' + '@User.Identity.Name')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            getUserGroupData(data);
+        })
+        .catch(function (e) {
+            console.log("error in groups: " + e);
+        })
 
+    function getUserGroupData(data){
+        //console.log(data)
+        var groupContainer = document.getElementById("groupList");
+        for(var i = 0; i < data.length; i++){
+            var div = document.createElement("a");
+            div.setAttribute('href', '../Group/Index?groupId=' + data[i].groupId + '&groupName=' + data[i].groupName); //TODO: Make this more secure, only let people in the group access it, if we have time
+            div.setAttribute('class', 'groupLink'); //Use this later for styling
+            div.innerHTML = data[i].groupName;
+            groupContainer.appendChild(div);
+        }
+    }
+
+    async function createGroupPopUp() {
+        const { value: formValues } = await Swal.fire({
+            title: 'Create Group',
+            html: //This does no input checking currently
+                '<div style="display:grid"><label>Group Name</label>' +
+                '<input type="text" id="groupName" class="swal2-input">' +
+                '<br/></div>'+
+                '<label>Enter group members email (separate with a comma)</label>' +
+                '<input type="text" id="members" class="swal2-input">' +
+                '<br/></div>',
+            focusConfirm: false,
+            position: 'center',
+            showCancelButton: true,
+            preConfirm: () => {
+                return {
+                    groupName: $('#groupName').val(),
+                    members: $('#members').val()
+                }
+            }
+        });
+        return formValues;
+    }
+
+    function createGroup() {
+        createGroupPopUp().then((values) => {
+            let data = {
+                groupName: values.groupName.toString(),
+                /*IMPORTANT: The person creating the group is part of the group
+                    Need to include them in the groupMembers list that is passed to backend
+                    In the future, maybe pass back a groupLeader json and allow the leader to delete groups?*/
+                groupMembers: values.members + ',' + '@User.Identity.Name' //.split(",") //Change this if needed. Right now it's just passing the string to the api and letting c# separate the members by comma
+            }
+            console.log(data);
+
+            /*TODO: get user permission before adding them to a group
+                Right now it just assumes no one will add people to groups maliciously*/ 
+            
+            let url = "../Api/createGroup?groupName=" + data.groupName + "&groupMembers=" + data.groupMembers;
+
+            //TODO: get ajax working with api calls. For reason I can't access the data that is passed unless it's in the url like above
+            $.ajax({ 
+                url: url,
+                type: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json;carset=utf-8",
+                dataType: "json",
+                success: function(response){
+                    location.reload();
+                    console.log(response);
+                },
+                error: function (error){
+                    console.log(error)
+                }
+            })
+        })
+        .catch(error => console.log(error));
+    }   
+    
+</script>
