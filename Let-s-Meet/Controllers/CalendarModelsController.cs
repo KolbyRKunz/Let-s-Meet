@@ -28,6 +28,11 @@ namespace Let_s_Meet.Controllers
         // GET: CalendarModels
         public async Task<IActionResult> Index()
         {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
+
             User user = await _um.GetUserAsync(User);
             int id = user.UserID;
             //return View(await _context.Calendar.ToListAsync()); // This is for getting all calendars

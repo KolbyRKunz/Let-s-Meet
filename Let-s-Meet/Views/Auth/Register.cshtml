@@ -3,6 +3,10 @@
 @{
 }
 
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
+
 <div id="welcomeContainer" class="centerClass">
     <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold">Let's Meet!</span></h1>
 </div>
@@ -79,7 +83,12 @@
         const lastName = $("#LastName").val()
 
         if( pass != rePass){
-            alert("Passwords do not match")
+            Swal.fire({
+                icon: 'error',
+                title: "Passwords do not match",
+            }).then((result) => {
+                location.reload();
+            })
             return
         }
 
@@ -98,11 +107,23 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
-               location.reload()
-               console.log(response)
+                console.log(response)
+                Swal.fire({
+                    icon: 'success',
+                    title: response.message,
+                }).then((result) => {
+                    //location.reload(); //Reload the register page or redirect to log in on success?
+                    location.replace("../Auth");
+                })
             },
             error: function (response) {
                 console.log("something went wrong", response)
+                Swal.fire({
+                    icon: 'error',
+                    title: response.responseJSON.message,
+                }).then((result) => {
+                    location.reload();
+                })
             }
         })
     }

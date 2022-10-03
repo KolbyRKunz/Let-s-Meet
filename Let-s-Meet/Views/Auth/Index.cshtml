@@ -4,6 +4,9 @@
 }
 
 <link rel="stylesheet" type="text/css" href="~/css/site.css" />
+<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
 
 <div id="welcomeContainer" class="centerClass">
     <h1 class="display-4"><span style="color: #979797; font-weight: bold">Welcome To</span> <span style="color: #C3083F; font-weight: bold">Let's Meet!</span></h1>
@@ -75,6 +78,12 @@
             },
             error: function () {
                 console.log("something went wrong")
+                Swal.fire({
+                    icon: 'error',
+                    title: "something went wrong",
+                }).then((result) => {
+                    location.reload();
+                })
             }
         })
     }

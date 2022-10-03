@@ -23,7 +23,7 @@
 
                 height: "auto",
 
-                events: '/api/getGroupEvents', //will need to add the groupId to the call for querys later
+                events: '/api/getGroupEvents', //TODO: will need to call correct api controller to get group event, this is a hard coded data call
                 nowIndicator: true
             });
             calendar.render();
@@ -42,6 +42,7 @@
 <div style="padding:1%">
     <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
     <button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>
+    <button onClick="addMember()" class="btn btn-danger">Add Member</button>
 </div>
 
 <div id="groupInfo">
@@ -56,6 +57,7 @@
 
 
 <script>
+    //TODO: figure out more of what data needs to be passed to the back end for the Let's Meet button
     async function createMeetingPopUp() {
         const { value: formValues } = await Swal.fire({
             title: 'Meeting Reason',
@@ -86,6 +88,8 @@
     function createMeeting() {
         createMeetingPopUp().then((values) => {
             console.log(values);
+            //TODO: figure out more of what data needs to be passed to the back end for the Let's Meet button, B5 task, like is time zone needed?
+            //TODO: this will need the API call that finds the open meeting time to display on the calendar
         })
         .catch(error => console.log(error));
     }
@@ -102,8 +106,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 location.replace("/Home/Groups")
-                /*TODO: More will need to be done, like doing a request to the server to leave the group 
-                For now it just brings a user to their list of groups*/
+                //TODO: this will need the api controller call that has the user leave the group, can be done later once everything else is working also
             }
         })
     }
@@ -114,6 +117,7 @@
         groupName.innerHTML = params.get('groupName') + " Group Calendar"
     }
 
+    //TODO: this api call will need to change as well to the correct controller
     fetch('../api/getGroupMembers?groupId=' + new URLSearchParams(location.search).get('groupId'))
         .then(function (response) {
             return response.json();
@@ -134,6 +138,21 @@
             div.innerHTML = data[i].member;
             groupContainer.appendChild(div);
         }
+    }
+
+    function addMember() {
+        Swal.fire({
+            title: 'Enter email address of new member',
+            input: 'text',
+            icon: 'question',
+            confirmButtonText: 'Add Member',
+            showCancelButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //TODO: work of adding another group member to a already created group, if we have time, this can be commented out later for demo purposes
+                console.log(result)
+            }
+        })
     }
 
 </script>

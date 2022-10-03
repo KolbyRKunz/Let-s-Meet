@@ -80,13 +80,18 @@ namespace Let_s_Meet.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public OkObjectResult createGroup(string groupName, string groupMembers)
+        public async Task<OkObjectResult> createGroupAsync(string groupName, string groupMembers)
         {
             //TODO:The groupMembers is a string that has the members separated by a comma
             //I couldn't figure out how to pass in an array via http. I figure pass the entire array of group members and let the back end do it
             //IMPORTANT: The groupMembers list from the frontend should include the person creating the group
             //TODO: later on need to make sure that the user exists before adding to group?
 
+            //Add the user creating the group to the memberslist?
+
+            //TODO: Make this much cleaner, right now just doing it like this to get something on the frontend working to figure that out
+            User userI = await _um.GetUserAsync(User);
+            groupMembers += "," + userI.Email;
             var membersSplit = groupMembers.Split(",");
 
             var members = new List<UserModel>();
