@@ -24,6 +24,18 @@
                 height: "auto",
 
                 events: '/api/getGroupEvents', //TODO: will need to call correct api controller to get group event, this is a hard coded data call
+                
+                //IMPORTANT: this is doing the displaying of the location since it's not a default fullcalendar attribute
+                eventDidMount: function (info) {
+                    //Need to make sure it's not month view because this won't work there
+                    if (info.view.type != 'dayGridMonth') //This doesn't work on month view
+                    {
+                        let location = document.createElement('div');
+                        location.innerHTML = info.event.extendedProps.location;
+                        info.el.querySelector('.fc-event-title-container').append(location);
+                    }
+                },
+                
                 nowIndicator: true
             });
             calendar.render();
@@ -63,14 +75,20 @@
             title: 'Meeting Reason',
             html: //This does no input checking currently
                 //'<label>Event Reason</label>' +
-                '<input type="text" id="eventName" class="swal2-input">' +
-                '<br/>' +
-                '<label>Start Date</label>' +
+                '<div style="display:grid"><input type="text" id="eventName" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Location</label>' +
+                '<input type="text" id="location" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Start Date</label>' +
                 '<input type="date" id="startDate" class="swal2-input">' +
-                '<br/>' +
-                '<label>End Date</label>' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>End Date</label>' +
                 '<input type="date" id="endDate" class="swal2-input">' +
-                '<br/>',
+                '<br/></div>' +
+                '<div style="display:grid"><label>Meeting Length (in hours)</label>' + //TODO: how does the backend want this data to be sent, minutes or hours? Does it also need timezone info?
+                '<input type="text" id="meetingLength" class="swal2-input">' +
+                '<br/></div>',
             focusConfirm: false,
             position: 'top-end',
             showCancelButton: true,
@@ -79,6 +97,8 @@
                     eventName: $('#eventName').val(),
                     startDate: $('#startDate').val(),
                     endDate: $('#endDate').val(),
+                    meetingLength: $('#meetingLength').val(),
+                    location: $('#location').val()
                 }
             }
         });
@@ -90,6 +110,32 @@
             console.log(values);
             //TODO: figure out more of what data needs to be passed to the back end for the Let's Meet button, B5 task, like is time zone needed?
             //TODO: this will need the API call that finds the open meeting time to display on the calendar
+
+            let url = "" //TODO: add api call to meeting creation
+
+            var meetingData = {
+                meetingReason: values.eventName,
+                startDate: values.startDate,
+                endDate: values.endDate,
+                meetingLength: values.meetingLength, //IMPORTANT: this should be in hours, does it need to be in a different form?
+                location: values.location
+                //TODO: is there more data need from the front to back for this task?
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: meetingData
+            })
+            .done(function () {
+                location.reload() //This is so the calendar display will refresh with the new event on the calendar hopefully
+            })
+            .fail(function (error) {
+                console.log("something went wrong with meeting creation")
+                console.log(error)
+            });
+
         })
         .catch(error => console.log(error));
     }
@@ -105,8 +151,27 @@
             confirmButtonText: 'Yes, leave group!'
         }).then((result) => {
             if (result.isConfirmed) {
-                location.replace("/Home/Groups")
                 //TODO: this will need the api controller call that has the user leave the group, can be done later once everything else is working also
+                
+                let url = "" //TODO: add api call to leave group
+                let params = new URLSearchParams(location.search);
+                var groupData = {
+                    groupId: params.get('groupId')
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    data: groupData
+                })
+                .done(function () {
+                    location.replace("/Home/Groups")
+                })
+                .fail(function (error) {
+                    console.log("something went wrong with leaving the group")
+                    console.log(error)
+                });
             }
         })
     }
@@ -140,6 +205,7 @@
         }
     }
 
+    //IMPORTANT: this can be commented out for demo purposes later on
     function addMember() {
         Swal.fire({
             title: 'Enter email address of new member',
@@ -149,8 +215,27 @@
             showCancelButton: true,
         }).then((result) => {
             if (result.isConfirmed) {
-                //TODO: work of adding another group member to a already created group, if we have time, this can be commented out later for demo purposes
                 console.log(result)
+                //TODO: work of adding another group member to a already created group, if we have time, this can be commented out later for demo purposes
+                let url = "" //TODO: add api call to add member
+
+                var memberData = {
+                    memberEmail: result.value
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    data: memberData
+                })
+                .done(function () {
+                    location.reload() //This is so the calendar display will refresh with the new member on the page hopefully
+                })
+                .fail(function (error) {
+                    console.log("something went wrong with adding new member")
+                    console.log(error)
+                });
             }
         })
     }

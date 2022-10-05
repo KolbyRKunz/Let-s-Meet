@@ -54,7 +54,7 @@
                 '<div style="display:grid"><label>Group Name</label>' +
                 '<input type="text" id="groupName" class="swal2-input">' +
                 '<br/></div>'+
-                '<label>Enter group members email (separate with a comma)</label>' +
+                '<div style="display:grid"><label>Enter group members email (separate with a comma)</label>' +
                 '<input type="text" id="members" class="swal2-input">' +
                 '<br/></div>',
             focusConfirm: false,
@@ -93,11 +93,21 @@
                 contentType: "application/json;carset=utf-8",
                 dataType: "json",
                 success: function(response){
-                    location.reload();
-                    console.log(response);  //TODO: Popup to let users know group creation status
+                    console.log(response);
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Group Created!",
+                    }).then((result) => {
+                        location.reload();
+                    })
                 },
                 error: function (error){
-                    console.log(error)     //TODO: Popup to let users know group creation status
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Error with group creation",
+                    }).then((result) => {
+                        console.log(error)
+                    })
                 }
             })
         })
