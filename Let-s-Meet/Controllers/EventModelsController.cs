@@ -10,6 +10,7 @@ using Let_s_Meet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Let_s_Meet.Areas.Identity.Data;
+using System.Globalization;
 
 namespace Let_s_Meet.Controllers
 {
@@ -88,12 +89,13 @@ namespace Let_s_Meet.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string title, string location, string startTime, string endTime, int calendarID)
         {
-
+            var styles = DateTimeStyles.AdjustToUniversal;
+            var format = CultureInfo.InvariantCulture;
             EventModel eventModel = new EventModel {
                 Title = title,
                 Location = location,
-                StartTime = DateTime.Parse(startTime),
-                EndTime = DateTime.Parse(endTime)
+                StartTime = DateTime.Parse(startTime,format, styles),
+                EndTime = DateTime.Parse(endTime, format, styles)
             };
 
             User user = await _um.GetUserAsync(User);

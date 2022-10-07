@@ -32,7 +32,7 @@
                 selectable:true,
                 nowIndicator: true,
                 navLinks: true,
-                //timeZone:'UTC',
+                timeZone:'UTC',
                 //timeZone:'local',
 
                 eventClick: function(info){
@@ -65,7 +65,7 @@
                 select: function(data){
                     console.log(data); //this is the data given by the select callback, fullcalendar
                     var startDate = formatStartEndDate(data.start)//FIXED: Have to give it start/end and not startStr/endStr becuase it will leave out important data
-                    var endDate = formatStartEndDate(data.end)
+                    var endDate = formatStartEndDate(data.end) //TODO: convert to local time currently UTC
 
                     addEvent(startDate, endDate).then((values) => { //JS promise?
                         console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
@@ -127,7 +127,8 @@
                             dataType: 'json',
                             data: eventData
                         })
-                        .done(function() {
+                        .done(function(result) {
+                            console.log(result)
                             calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
                         });
                         
