@@ -32,8 +32,7 @@
                 selectable:true,
                 nowIndicator: true,
                 navLinks: true,
-                timeZone:'UTC',
-                //timeZone:'local',
+                timeZone:'local',
 
                 eventClick: function(info){
                     var eventID = info.event.id;
@@ -97,16 +96,11 @@
                             return
                         }
 
-                        //Need to convert to UTC for database
-                        startDate = startDate.toUTCString()
-                        endDate = endDate.toUTCString()
-
-                        var event = {
-                            title: eventName,
-                            start: startDate,
-                            end: endDate
-                        };
-                        calendar.addEvent(event);
+                        /*Need to convert to ISOstring for database
+                            it has a similar idea to UTC, but different formatting
+                            but I found the C# played nicer with this than .toUTCString()*/
+                        startDate = startDate.toISOString()
+                        endDate = endDate.toISOString()
 
                         //REMEMBER: Need dates/times to go to the backend in UTC format!
                         //TODO: need to update the database about this event

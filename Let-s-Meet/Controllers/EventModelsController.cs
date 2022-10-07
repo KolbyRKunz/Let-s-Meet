@@ -46,8 +46,8 @@ namespace Let_s_Meet.Controllers
                 {
                     id = e.EventID,
                     title = e.Title,
-                    start = e.StartTime.ToString("O"),
-                    end = e.EndTime.ToString("O"),
+                    start = DateTime.SpecifyKind(e.StartTime, DateTimeKind.Utc).ToString("O"), //IMPORTANT: This sets the Kind to UTC so full calendar won't interpret it as local and the times display incorrectly. The default Kind was orignally un specified
+                    end = DateTime.SpecifyKind(e.EndTime, DateTimeKind.Utc).ToString("O"), //TODO: Make EF core always return UTC for later actions in the database models
                     location = e.Location,
                     color = e.Calendar.Color,
                     background = e.Calendar.Color,
@@ -89,15 +89,15 @@ namespace Let_s_Meet.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string title, string location, string startTime, string endTime, int calendarID)
         {
-            var styles = DateTimeStyles.AdjustToUniversal;
-            var format = CultureInfo.InvariantCulture;
+            var styles = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
+            var culture = CultureInfo.InvariantCulture;
+            const string dateFormatString = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
             EventModel eventModel = new EventModel {
                 Title = title,
                 Location = location,
-                StartTime = DateTime.Parse(startTime,format, styles),
-                EndTime = DateTime.Parse(endTime, format, styles)
+                StartTime = DateTime.ParseExact(startTime, dateFormatString, culture, styles),
+                EndTime = DateTime.ParseExact(endTime, dateFormatString, culture, styles)
             };
-
             User user = await _um.GetUserAsync(User);
             UserModel userModel = await _context.Users.FindAsync(user.UserID);
             CalendarModel cal = await _context.Calendars.FindAsync(calendarID);
