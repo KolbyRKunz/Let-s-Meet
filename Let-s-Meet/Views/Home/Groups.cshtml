@@ -13,7 +13,32 @@
     </div>
 
     <div>
-        <button onClick="createGroup()" id="createGroupBtn" class="btn btn-danger">Create Group</button> <!--TODO: Do we want to do it by email? How does adding friends to a group work?-->
+        <button id="createGroupBtn" class="btn btn-danger">Create Group</button>
+    </div>
+
+    <!--TODO: Style this better-->
+    <div id="groupModal" class="modal"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Create Group</h1>
+                <span class="close">&times;</span>
+            </div>
+            <div id="modalBody">
+                <h4>Group Name</h4>
+                <input type="text" class="modalItem " id="groupName" placeholder="Group Name" />
+                <span>Add member from friends list</span>
+                <!--TODO: change this to grab the user's actual friends via api instead of hard coded data-->
+                <select name="friends" class="friends">
+                    <option value="Friend1">Friend1</option>
+                    <option value="Friend2">Friend2</option>
+                    <option value="Friend3">Friend3</option>
+                </select>
+            </div>
+            <span id="addMember" class="modalItem">+ Add Member</span>
+            <div class="modal-footer">
+                <span class="close">Create</span>
+            </div>
+        </div>
     </div>
 
     <h2 class="description">My groups</h2> <!--TODO: Figure out the layout of this page better-->
@@ -47,6 +72,111 @@
         }
     }
 
+
+
+    /*TODO: this modal stuff needs improvement, I'm just trying to get something out there and working
+        This should go in a function, but I'm having issues with the onclick and needing to click
+        things twice in order for it to appear when I don't put it in a function, it behaves as needed
+    */
+    var modal = document.getElementById('groupModal');
+    var btn = document.getElementById('createGroupBtn');
+    var close = document.getElementsByClassName('close')[0];
+    var submission = document.getElementsByClassName('close')[1];
+    var addMember = document.getElementById('addMember');
+
+    btn.onclick = function () {
+        modal.style.display = "block";
+    }
+    close.onclick = function () {
+        modal.style.display = "none";
+        document.getElementById("groupName").value = ""; 
+        location.reload(); //TODO: figure out better way to clear user input
+    }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            document.getElementById("groupName").value = ""; 
+            location.reload(); //TODO: figure out better way to clear user input
+        }
+    }
+
+    addMember.onclick = function() {
+        /*This is where the work of adding another select tag goes, adding another member*/
+        /*https://stackoverflow.com/questions/17001961/how-to-add-drop-down-list-select-programmatically
+        What I followed for hard coded data, it should hopefully translate somewhat for the actual data*/
+        var selector = document.getElementById("modalBody");
+        //TODO: change this to grab the user's actual friends via api instead of hard coded data
+        var array = ["Friend1", "Friend2", "Friend3"];
+        var selectList = document.createElement("select");
+        selectList.className = "friends";
+        selector.appendChild(selectList);
+        for (var i = 0; i < array.length; i++) {
+            var option = document.createElement("option");
+            option.value = array[i];
+            option.text = array[i];
+            selectList.appendChild(option);
+        }
+    }
+
+    submission.onclick = function(){
+        modal.style.display = "none";
+        var groupName = document.getElementById("groupName").value;
+        document.getElementById("groupName").value = ""; //Clear the user inputs, saved in variable already
+        var select = document.getElementsByClassName('friends');
+        var members = "" //TODO: figure out a better way, right now just making a comma separated list to pass back to the c# code of the members to add to the group. C# needs to add the person creating the group to the group
+        for (var i = 0; i < select.length; i++)
+        {
+            var text = select[i].options[select[i].selectedIndex].text;
+            //TODO: Find a better fix for the trailing comma removal if possible
+            if(i == (select.length - 1)){
+                members += text;
+            }
+            else {
+                members += text + ",";
+            }
+        }
+        console.log(groupName);
+        console.log(members);
+        
+        /*IMPORTANT TODO: C# needs to add the person creating the group to the group or I can append it here to the members with @User.Identity.Name
+            groupMembers is a comma separated list at the moment*/
+        let data = {
+            groupName: groupName,
+            groupMembers: members,
+        }
+        //TODO: this is the create group API call
+        let url = ""; //"../Api/createGroup?groupName=" + data.groupName + "&groupMembers=" + data.groupMembers;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json;carset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: "Group Created!",
+                }).then((result) => {
+                    location.reload();
+                })
+            },
+            error: function (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Error with group creation",
+                }).then((result) => {
+                    console.log(error);
+                    location.reload();
+                })
+            }
+        })
+    }
+    
+
+
+    //TODO: Delete the createGroupPopUp and createGroup once the new way is created with modal and working
     async function createGroupPopUp() {
         const { value: formValues } = await Swal.fire({
             title: 'Create Group',

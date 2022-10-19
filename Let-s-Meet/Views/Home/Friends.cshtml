@@ -12,7 +12,7 @@
 </div>
 
 <div>
-    <button onclick="addFriend()" id="freindButton" class="btn btn-danger">Add Friend</button>
+    <button onclick="addFriend()" id="friendButton" class="btn btn-danger">Add Friend</button>
 </div>
 
 <h2 class="description">My friends</h2> <!--TODO: Figure out the layout of this page better-->
@@ -24,7 +24,7 @@
 
 
 <script>
-    fetch('../api/getUserFriends')
+    fetch('../api/getUserFriends') //TODO: Needs to change to the actual API call
         .then(function (response) {
             return response.json();
         })
@@ -55,6 +55,7 @@
                 '<br/>',
             focusConfirm: false,
             position: 'center',
+            confirmButtonText: 'Add as friend',
             showCancelButton: true,
             preConfirm: () => { //TODO: only need days here because the user is picking the time frame they want it to occur from
                 return {
@@ -67,8 +68,38 @@
 
     function addFriend() {
         addFriendPopUp().then((values) => {
-            console.log(values);
+            let url = ""; //TODO: this is where the api call to add a friend goes
+            
+            let data = {
+                friendEmail: values.friendEmail
+            };
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    console.log(response)
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Friend Added!',
+                    }).then((result) => {
+                        location.reload();
+                    })
+                },
+                error: function (response) {
+                    console.log("something went wrong in friend creation ", response)
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Can't add as friend",
+                    }).then((result) => {
+                        location.reload();
+                    })
+                }
+            })
         })
-            .catch(error => console.log(error));
+        .catch(error => console.log(error));
     }
 </script>
