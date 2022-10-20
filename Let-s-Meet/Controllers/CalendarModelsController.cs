@@ -41,6 +41,22 @@ namespace Let_s_Meet.Controllers
                 );
         }
 
+        // GET: CalendarModels/GetCalendars
+        public async Task<IActionResult> GetCalendars()
+        {
+            User user = await _um.GetUserAsync(User);
+            int id = user.UserID;
+            //return Ok(await _context.Calendar.ToListAsync()); // This is for getting all calendars
+
+            // Get current user's calendars
+            return Ok(await _context
+                .Calendars
+                .Include(c => c.Owner)
+                .Where(c => c.Owner.UserID == id)
+                .ToListAsync()
+                );
+        }
+
         // GET: CalendarModels/Details/5
         public async Task<IActionResult> Details(int? id)
         {

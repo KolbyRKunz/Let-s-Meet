@@ -52,6 +52,7 @@ namespace Let_s_Meet.Controllers
                     color = e.Calendar.Color,
                     background = e.Calendar.Color,
                     backgroundColor = e.Calendar.Color,
+                    calendarId = e.Calendar.CalendarID
                     // TODO users w/o infinite loop
                 })
                 .ToListAsync();
