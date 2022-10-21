@@ -15,16 +15,63 @@
     <button onclick="addFriend()" id="friendButton" class="btn btn-danger">Add Friend</button>
 </div>
 
-<h2 class="description">My friends</h2> <!--TODO: Figure out the layout of this page better-->
+<br />
+<h2 class="description">Pending Friend Requests</h2>
 <hr />
-
+<div id="pending"></div>
 <br />
 
-<div id="friendList" style="display:flex;justify-content:flex-end;flex-direction:column;"></div> <!--Figure out how to get the css into the site.css-->
+<h2 class="description">My friends</h2>
+<hr />
+<div id="friendList" style="display:flex;justify-content:flex-end;flex-direction:column;"></div> <!--Figure out how to get the css into the site.css since it won't display correctly from there right now-->
 
 
 <script>
-    fetch('../api/getUserFriends') //TODO: Needs to change to the actual API call
+    //TODO: This is the work of displaying users current friend requests to the div
+    fetch('../api/getUserFriends') //TODO: Needs to change to the actual API call to display users's frends requests
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            getFrientRequest(data);
+        })
+        .catch(function (e) {
+            console.log("error in friend requests: " + e);
+        })
+
+    /*TODO: this is all hard coded
+        The main thing that needs to change is how the accept/decline button will work with real data*/
+    function getFrientRequest(data) {
+        var pendingContainer = document.getElementById("pending");
+        for (var i = 0; i < data.length; i++) {
+            var pendingFriend = document.createElement("div");
+            pendingFriend.setAttribute('class', 'pendingFriends');
+            var pName = document.createElement('p');
+            pName.innerHTML = data[i].firstName;
+            var pEmail = document.createElement('p');
+            pEmail.innerHTML = data[i].lastName;
+            /*TODO: How to tell what Accept/Decline was hit for different friend requests?
+                I'm thinking it's a different another api call? or the button saves data somehow? I'm unsure*/
+            var accept = document.createElement("button");
+            accept.innerHTML = "Accept";
+            var decline = document.createElement("button");
+            decline.innerHTML = "Decline";
+            pName.setAttribute('class', 'alignFriendRequest');
+            pEmail.setAttribute('class', 'alignFriendRequest');
+            accept.setAttribute('class', 'alignFriendRequest');
+            decline.setAttribute('class', 'alignFriendRequest');
+            accept.classList.add('alignFriendRequest', 'btn-danger');
+            decline.classList.add('alignFriendRequest', 'btn-danger');
+            pendingFriend.appendChild(pName);
+            pendingFriend.appendChild(pEmail);
+            pendingFriend.appendChild(accept);
+            pendingFriend.appendChild(decline);
+            pendingContainer.appendChild(pendingFriend);
+        }
+    }
+  
+    //TODO: This is the work of display people that are already friends with each other
+    fetch('../api/getUserFriends') //TODO: Needs to change to the actual API call to display users's friends
         .then(function (response) {
             return response.json();
         })
@@ -32,17 +79,17 @@
             getFriendData(data);
         })
         .catch(function (e) {
-            console.log("error in groups: " + e);
+            console.log("error in friends list: " + e);
         })
 
     //TODO: This will greatly change when it's not mock data
     function getFriendData(data) { //will need to update what this does once we we know what the friend list will do in more depth, like what will clicking on a friend do
-        var groupContainer = document.getElementById("friendList");
+        var friendListContainer = document.getElementById("friendList");
         for (var i = 0; i < data.length; i++) {
             var div = document.createElement("a");
-            div.setAttribute('class', 'groupLink'); //Use this later for styling, once the site.css is connected better
+            div.setAttribute('class', 'friendLink'); //Use this later for styling, once the site.css is connected better
             div.innerHTML = data[i].firstName + " " + data[i].lastName;
-            groupContainer.appendChild(div);
+            friendListContainer.appendChild(div);
         }
     }
 
@@ -57,7 +104,7 @@
             position: 'center',
             confirmButtonText: 'Add as friend',
             showCancelButton: true,
-            preConfirm: () => { //TODO: only need days here because the user is picking the time frame they want it to occur from
+            preConfirm: () => {
                 return {
                     friendEmail: $('#friendEmail').val(),
                 }

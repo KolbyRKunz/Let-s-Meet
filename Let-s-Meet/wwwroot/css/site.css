@@ -301,3 +301,17 @@ html {
     padding: 1%;
     margin: 1%;
 }
+
+
+/* Aligning the friend request work */
+.pendingFriends {
+    display: flex;
+    color: black;
+    margin: 2%;
+    font-size: 110%;
+}
+
+.alignFriendRequest {
+    margin: 1%;
+    padding: 1%;
+}
