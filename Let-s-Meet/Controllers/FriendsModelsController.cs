@@ -171,6 +171,128 @@ namespace Let_s_Meet.Controllers
             return _context.Friends.Any(e => e.FriendsID == id);
         }
 
+        public async Task<IActionResult> GetFriends()
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get all friends of the user
+            var friendsModels = await _context
+                .Friends
+                .Include(f => f.RequestedBy)
+                .Include(f => f.RequestedTo)
+                .Where(r =>
+                    (r.RequestedByID == userId || r.RequestedToID == userId)
+                    &&
+                    r.RequestStatus == FriendRequestStatus.Accepted
+                )
+                .ToListAsync();
+
+            // Get list of friend users
+            List<UserModel> friends = new List<UserModel>();
+            foreach (var fm in friendsModels)
+            {
+                if (fm.RequestedByID == userId)
+                {
+                    friends.Add(fm.RequestedTo);
+                }
+                else
+                {
+                    friends.Add(fm.RequestedBy);
+                }
+            }
+
+            return Ok(friends);
+        }
+
+        public async Task<IActionResult> GetSentRequests()
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get all sent requests
+            var friendsModels = await _context
+                .Friends
+                .Include(f => f.RequestedTo)
+                .Where(r =>
+                    r.RequestedByID == userId
+                    &&
+                    r.RequestStatus == FriendRequestStatus.Sent
+                )
+                .ToListAsync();
+
+            return Ok(friendsModels);
+        }
+
+        public async Task<IActionResult> GetReceivedRequests()
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get all received requests
+            var friendsModels = await _context
+                .Friends
+                .Include(f => f.RequestedBy)
+                .Where(r =>
+                    r.RequestedToID == userId
+                    &&
+                    r.RequestStatus == FriendRequestStatus.Sent
+                )
+                .ToListAsync();
+
+            return Ok(friendsModels);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptRequest(int id)
+        {
+            FriendsModel fm = await _context.Friends.FindAsync(id);
+            if (fm == null)
+            {
+                return NotFound();
+            }
+            else if (fm.RequestStatus == FriendRequestStatus.Accepted)
+            {
+                return Ok(new { status = "error", message = "Request already accepted" });
+            }
+            else if (fm.RequestStatus == FriendRequestStatus.Rejected)
+            {
+                return Ok(new { status = "error", message = "Request already rejected" });
+            }
+
+            // Accept Request
+            fm.RequestStatus = FriendRequestStatus.Accepted;
+            _context.Update(fm);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { status = "ok", message = "Request accepted" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectRequest(int id)
+        {
+            FriendsModel fm = await _context.Friends.FindAsync(id);
+            if (fm == null)
+            {
+                return NotFound();
+            }
+            else if (fm.RequestStatus == FriendRequestStatus.Accepted)
+            {
+                return Ok(new { status = "error", message = "Request already accepted" });
+            }
+            else if (fm.RequestStatus == FriendRequestStatus.Rejected)
+            {
+                return Ok(new { status = "error", message = "Request already rejected" });
+            }
+
+            // Accept Request
+            fm.RequestStatus = FriendRequestStatus.Accepted;
+            _context.Update(fm);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { status = "ok", message = "Request rejected" });
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateFriendRequestById(int friendId)
         {
