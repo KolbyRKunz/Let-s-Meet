@@ -18,6 +18,9 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "lastName")]
         public string LastName { get; set; }
 
+        [JsonProperty(PropertyName = "email")]
+        public string Email { get; set; }   
+
         //TODO: add more columns that we want a user to have
 
 
