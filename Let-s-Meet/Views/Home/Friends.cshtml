@@ -28,7 +28,7 @@
 
 <script>
     //TODO: This is the work of displaying users current friend requests to the div
-    fetch('../api/getUserFriends') //TODO: Needs to change to the actual API call to display users's frends requests
+    fetch('/FriendsModels/GetReceivedRequests') //TODO: Needs to change to the actual API call to display users's frends requests
         .then(function (response) {
             return response.json();
         })
@@ -42,20 +42,78 @@
     /*TODO: this is all hard coded
         The main thing that needs to change is how the accept/decline button will work with real data*/
     function getFrientRequest(data) {
+        console.log(data);
+
         var pendingContainer = document.getElementById("pending");
         for (var i = 0; i < data.length; i++) {
             var pendingFriend = document.createElement("div");
             pendingFriend.setAttribute('class', 'pendingFriends');
             var pName = document.createElement('p');
-            pName.innerHTML = data[i].firstName;
+            pName.innerHTML = data[i].requestedBy.firstName;
             var pEmail = document.createElement('p');
-            pEmail.innerHTML = data[i].lastName;
+            pEmail.innerHTML = data[i].requestedBy.lastName; //TODO: change to email
             /*TODO: How to tell what Accept/Decline was hit for different friend requests?
                 I'm thinking it's a different another api call? or the button saves data somehow? I'm unsure*/
             var accept = document.createElement("button");
             accept.innerHTML = "Accept";
+            accept.setAttribute("id", data[i].friendsID);
+            accept.onclick = (e) => {
+                console.log(e.target.id);
+                $.ajax({
+                    url: "/FriendsModels/AcceptRequest",
+                    type: "POST",
+                    data: { id: parseInt(e.target.id) },
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Friend Request Accepted!',
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    },
+                    error: function (response) {
+                        console.log("something went wrong in friend accepting ", response)
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Can't Accept as Friend",
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    }
+                })
+            }
             var decline = document.createElement("button");
             decline.innerHTML = "Decline";
+            decline.setAttribute("id", data[i].friendsID);
+            decline.onclick = (e) => {
+                console.log(e.target.id);
+                $.ajax({
+                    url: "/FriendsModels/RejectRequest",
+                    type: "POST",
+                    data: { id: parseInt(e.target.id) },
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Friend Request Rejected!',
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    },
+                    error: function (response) {
+                        console.log("something went wrong in friend accepting ", response)
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Can't Reject as Friend",
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    }
+                })
+            }
             pName.setAttribute('class', 'alignFriendRequest');
             pEmail.setAttribute('class', 'alignFriendRequest');
             accept.setAttribute('class', 'alignFriendRequest');
@@ -71,7 +129,7 @@
     }
   
     //TODO: This is the work of display people that are already friends with each other
-    fetch('../api/getUserFriends') //TODO: Needs to change to the actual API call to display users's friends
+    fetch('/FriendsModels/GetFriends') //TODO: Needs to change to the actual API call to display users's friends
         .then(function (response) {
             return response.json();
         })
@@ -84,6 +142,7 @@
 
     //TODO: This will greatly change when it's not mock data
     function getFriendData(data) { //will need to update what this does once we we know what the friend list will do in more depth, like what will clicking on a friend do
+        console.log(data);
         var friendListContainer = document.getElementById("friendList");
         for (var i = 0; i < data.length; i++) {
             var div = document.createElement("a");
@@ -115,17 +174,17 @@
 
     function addFriend() {
         addFriendPopUp().then((values) => {
-            let url = ""; //TODO: this is where the api call to add a friend goes
+            let url = "/FriendsModels/CreateFriendRequestById"; //TODO: change to email
             
             let data = {
-                friendEmail: values.friendEmail
+                //friendEmail: values.friendEmail
+                friendId: parseInt(values.friendEmail)
             };
 
             $.ajax({
                 url: url,
                 type: "POST",
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8",
+                data: data,
                 dataType: "json",
                 success: function (response) {
                     console.log(response)

@@ -53,8 +53,8 @@
 
 <div style="padding:1%">
     <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
-    <button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>
-    <button onClick="addMember()" class="btn btn-danger">Add Member</button>
+    <!--<button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>-->
+    <!--<button onClick="addMember()" class="btn btn-danger">Add Member</button>-->
 </div>
 
 <div id="groupInfo">
@@ -183,7 +183,7 @@
     }
 
     //TODO: this api call will need to change as well to the correct controller
-    fetch('../api/getGroupMembers?groupId=' + new URLSearchParams(location.search).get('groupId'))
+   fetch('../api/getGroupMembers?groupId=' + new URLSearchParams(location.search).get('groupId'))
         .then(function (response) {
             return response.json();
         })

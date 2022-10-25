@@ -190,7 +190,7 @@ namespace Let_s_Meet.Controllers
                 )
                 .ToListAsync();
 
-            if (friends.Count != friendIds.Count)
+            if (friends.Count != new HashSet<int>(friendIds).Count)
             {
                 return BadRequest("Not all ids are friends");
             }

@@ -285,8 +285,8 @@ namespace Let_s_Meet.Controllers
                 return Ok(new { status = "error", message = "Request already rejected" });
             }
 
-            // Accept Request
-            fm.RequestStatus = FriendRequestStatus.Accepted;
+            // Reject Request
+            fm.RequestStatus = FriendRequestStatus.Rejected;
             _context.Update(fm);
             await _context.SaveChangesAsync();
 
