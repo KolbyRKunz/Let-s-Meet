@@ -116,17 +116,25 @@ namespace Let_s_Meet.Controllers
             var userExists = await userManager.FindByNameAsync(model.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+            var userEmail = await userManager.FindByEmailAsync(model.Email);
+            if (userEmail != null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User with that Email already exists" });
 
-            UserModel MeetUser = new UserModel { FirstName = model.FirstName, LastName = model.LastName  };
+            UserModel MeetUser = new UserModel { FirstName = model.FirstName, LastName = model.LastName, Email = model.Email};
             _context.Add(MeetUser);
             _context.SaveChanges();
 
             var IdentityUser = new User { UserName = model.Username, Email = model.Email, UserID = MeetUser.UserID };
             var result = await userManager.CreateAsync(IdentityUser, model.Password);
-
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-
+            {
+                var message = new StringBuilder();
+                foreach(var error in result.Errors)
+                {
+                    message.Append(error.Description + ' ');
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = message.ToString() });
+            }
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 

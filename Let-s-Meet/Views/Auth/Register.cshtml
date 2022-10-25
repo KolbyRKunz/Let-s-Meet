@@ -1,4 +1,5 @@
 ﻿@using Let_s_Meet.Models.JWTModels
+@Html.Hidden("RedirectTo", Url.Action("Index", "Home"))
 @model RegisterModel
 @{
 }
@@ -98,11 +99,16 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
+               location.href = $('#RedirectTo').val()
                location.reload()
                console.log(response)
             },
             error: function (response) {
-                console.log("something went wrong", response)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: response.responseJSON['message']
+                })
             }
         })
     }
