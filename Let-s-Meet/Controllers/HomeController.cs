@@ -71,6 +71,16 @@ namespace Let_s_Meet.Controllers
             return View();
         }
 
+        public IActionResult GroupJoin()
+        {
+            if (User.Identity.Name == null)
+            {
+                return new RedirectResult("/Auth");
+            }
+
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

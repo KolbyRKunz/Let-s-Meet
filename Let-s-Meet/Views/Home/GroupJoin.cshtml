@@ -1,0 +1,47 @@
+﻿<!--Sweet Alert 2-->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--<script src="sweetalert2.all.min.js"></script>-->
+
+<body>
+    <h2 class="description">Join Group</h2>
+    <hr />
+
+    <div>
+        <button onclick="joinGroup()" class="btn btn-danger">Join Group</button>
+    </div>
+</body>
+
+<script>
+    function joinGroup(){
+        let data = {
+            
+        }
+
+        let url = "";
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: "Joined Group!",
+                }).then((result) => {
+                    location.replace("/Home/Groups");
+                })
+            },
+            error: function (error) {
+                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: "Error with group joining",
+                }).then((result) => {
+                    location.reload();
+                })
+            }
+        })
+    }
+</script>
