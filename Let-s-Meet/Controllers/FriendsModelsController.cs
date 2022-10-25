@@ -306,12 +306,17 @@ namespace Let_s_Meet.Controllers
         }
 
         // TODO get UserModels to have emails
-        //[HttpPost]
-        //public async Task<IActionResult> CreateFriendRequestByEmail(string email)
-        //{
-        //    // Check if user exists with friend email
-        //    UserModel friend = await _context.Users.Where(u => u.email)
-        //}
+        [HttpPost]
+        public async Task<IActionResult> CreateFriendRequestByEmail(string email)
+        {
+            // Check if user exists with friend email
+            UserModel friend = await _context.Users.Where(u => u.Email == email).FirstAsync();
+
+            if (friend == null)
+                return Ok(new { status = "error", messsage = "User does not exist" });
+
+            return await CreateFriendRequest(friend);
+        }
 
         private async Task<IActionResult> CreateFriendRequest(UserModel friend)
         {

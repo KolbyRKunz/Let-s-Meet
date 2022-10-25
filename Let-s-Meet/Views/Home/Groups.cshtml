@@ -58,9 +58,8 @@
         var groupContainer = document.getElementById("groupList");
         for(var i = 0; i < data.length; i++){
             var div = document.createElement("a");
-            //TODO: this API call will end up changing later?
             div.setAttribute('href', '../Group/Index?groupId=' + data[i].groupID + '&groupName=' + data[i].groupName); //TODO: Make this more secure, only let people in the group access the url, if we have time
-            div.setAttribute('class', 'groupLink'); //Use this later for styling
+            div.setAttribute('class', 'groupLink');
             div.innerHTML = data[i].groupName;
             groupContainer.appendChild(div);
         }
@@ -99,7 +98,6 @@
         /*https://stackoverflow.com/questions/17001961/how-to-add-drop-down-list-select-programmatically
         What I followed for hard coded data, it should hopefully translate somewhat for the actual data*/
         var selector = document.getElementById("modalBody");
-        //TODO: change this to grab the user's actual friends via api instead of hard coded data
         fetch('/FriendsModels/GetFriends')
         .then(function (response) {
             return response.json();
@@ -126,7 +124,7 @@
         var groupName = document.getElementById("groupName").value;
         document.getElementById("groupName").value = ""; //Clear the user inputs, saved in variable already
         var select = document.getElementsByClassName('friends');
-        var members = [] //TODO: figure out a better way, right now just making a comma separated list to pass back to the c# code of the members to add to the group. C# needs to add the person creating the group to the group
+        var members = []; 
         for (var i = 0; i < select.length; i++)
         {
             var text = select[i].options[select[i].selectedIndex].value;
@@ -135,14 +133,12 @@
         console.log(groupName);
         console.log(members);
         
-        /*IMPORTANT TODO: C# needs to add the person creating the group to the group or I can append it here to the members with @User.Identity.Name
-            groupMembers is a comma separated list at the moment*/
         let data = {
             name: groupName,
             friendIds: members,
         }
-        //TODO: this is the create group API call
-        let url = "/GroupModels/CreateGroup"; //"../Api/createGroup?groupName=" + data.groupName + "&groupMembers=" + data.groupMembers;
+        
+        let url = "/GroupModels/CreateGroup";
 
         $.ajax({
             url: url,
@@ -169,75 +165,5 @@
             }
         })
     }
-    
-
-
-    //TODO: Delete the createGroupPopUp and createGroup once the new way is created with modal and working
-    async function createGroupPopUp() {
-        const { value: formValues } = await Swal.fire({
-            title: 'Create Group',
-            html: //This does no input checking currently
-                '<div style="display:grid"><label>Group Name</label>' +
-                '<input type="text" id="groupName" class="swal2-input">' +
-                '<br/></div>'+
-                '<div style="display:grid"><label>Enter group members email (separate with a comma)</label>' +
-                '<input type="text" id="members" class="swal2-input">' +
-                '<br/></div>',
-            focusConfirm: false,
-            position: 'center',
-            showCancelButton: true,
-            preConfirm: () => {
-                return {
-                    groupName: $('#groupName').val(),
-                    members: $('#members').val()
-                }
-            }
-        });
-        return formValues;
-    }
-
-    function createGroup() {
-        createGroupPopUp().then((values) => {
-            let data = {
-                groupName: values.groupName.toString(),
-                /*IMPORTANT: The person creating the group is part of the group
-                    C# code needs to include them in the group? Or should we do that here? Right now I let C# do it
-                    In the future, maybe pass back a groupLeader json and allow the leader to delete groups?*/
-                groupMembers: values.members //TODO: this doesn't pass back the person creating the group, C# API is currently doing that in this version.
-            }
-            console.log(data);
-
-            /*TODO: get user permission before adding them to a group, this should be a later task also after things are working
-                Right now it just assumes no one will add people to groups maliciously*/ 
-            /*TODO: this api call will need to change to go to the correct controller api call*/ 
-            let url = "../Api/createGroup?groupName=" + data.groupName + "&groupMembers=" + data.groupMembers;
-
-            $.ajax({ 
-                url: url,
-                type: "POST",
-                data: JSON.stringify(data),
-                contentType: "application/json;carset=utf-8",
-                dataType: "json",
-                success: function(response){
-                    console.log(response);
-                    Swal.fire({
-                        icon: 'success',
-                        title: "Group Created!",
-                    }).then((result) => {
-                        location.reload();
-                    })
-                },
-                error: function (error){
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Error with group creation",
-                    }).then((result) => {
-                        console.log(error)
-                    })
-                }
-            })
-        })
-        .catch(error => console.log(error));
-    }   
     
 </script>

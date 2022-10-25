@@ -27,8 +27,7 @@
 
 
 <script>
-    //TODO: This is the work of displaying users current friend requests to the div
-    fetch('/FriendsModels/GetReceivedRequests') //TODO: Needs to change to the actual API call to display users's frends requests
+    fetch('/FriendsModels/GetReceivedRequests')
         .then(function (response) {
             return response.json();
         })
@@ -39,11 +38,8 @@
             console.log("error in friend requests: " + e);
         })
 
-    /*TODO: this is all hard coded
-        The main thing that needs to change is how the accept/decline button will work with real data*/
     function getFrientRequest(data) {
         console.log(data);
-
         var pendingContainer = document.getElementById("pending");
         for (var i = 0; i < data.length; i++) {
             var pendingFriend = document.createElement("div");
@@ -51,9 +47,7 @@
             var pName = document.createElement('p');
             pName.innerHTML = data[i].requestedBy.firstName;
             var pEmail = document.createElement('p');
-            pEmail.innerHTML = data[i].requestedBy.lastName; //TODO: change to email
-            /*TODO: How to tell what Accept/Decline was hit for different friend requests?
-                I'm thinking it's a different another api call? or the button saves data somehow? I'm unsure*/
+            pEmail.innerHTML = data[i].requestedBy.email;
             var accept = document.createElement("button");
             accept.innerHTML = "Accept";
             accept.setAttribute("id", data[i].friendsID);
@@ -128,8 +122,7 @@
         }
     }
   
-    //TODO: This is the work of display people that are already friends with each other
-    fetch('/FriendsModels/GetFriends') //TODO: Needs to change to the actual API call to display users's friends
+    fetch('/FriendsModels/GetFriends')
         .then(function (response) {
             return response.json();
         })
@@ -140,14 +133,13 @@
             console.log("error in friends list: " + e);
         })
 
-    //TODO: This will greatly change when it's not mock data
-    function getFriendData(data) { //will need to update what this does once we we know what the friend list will do in more depth, like what will clicking on a friend do
+    function getFriendData(data) { 
         console.log(data);
         var friendListContainer = document.getElementById("friendList");
         for (var i = 0; i < data.length; i++) {
             var div = document.createElement("a");
-            div.setAttribute('class', 'friendLink'); //Use this later for styling, once the site.css is connected better
-            div.innerHTML = data[i].firstName + " " + data[i].lastName;
+            div.setAttribute('class', 'friendLink');
+            div.innerHTML = data[i].firstName + " " + data[i].email;
             friendListContainer.appendChild(div);
         }
     }
@@ -174,11 +166,10 @@
 
     function addFriend() {
         addFriendPopUp().then((values) => {
-            let url = "/FriendsModels/CreateFriendRequestById"; //TODO: change to email
-            
+            let url = "/FriendsModels/CreateFriendRequestByEmail";
+
             let data = {
-                //friendEmail: values.friendEmail
-                friendId: parseInt(values.friendEmail)
+                email: values.friendEmail
             };
 
             $.ajax({
@@ -190,7 +181,7 @@
                     console.log(response)
                     Swal.fire({
                         icon: 'success',
-                        title: 'Friend Added!',
+                        title: 'Friend Request Sent!',
                     }).then((result) => {
                         location.reload();
                     })
@@ -199,7 +190,7 @@
                     console.log("something went wrong in friend creation ", response)
                     Swal.fire({
                         icon: 'error',
-                        title: "Can't add as friend",
+                        title: "Can't send Friend Request",
                     }).then((result) => {
                         location.reload();
                     })
