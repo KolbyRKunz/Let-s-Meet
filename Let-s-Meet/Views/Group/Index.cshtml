@@ -53,6 +53,7 @@
 
 <div style="padding:1%">
     <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
+    <button onClick="groupLink()" class="btn btn-danger">Get Group Join Link</button>
     <!--<button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>-->
     <!--<button onClick="addMember()" class="btn btn-danger">Add Member</button>-->
 </div>
@@ -240,4 +241,20 @@
         })
     }
 
+    /*IMPORTANT TODO: This code could potentially break on AWS because of the JS location it hopefully shouldn't
+        But this is to remind that this area could be the problem*/
+    function groupLink(){
+        console.log(location);
+        var origin = location.origin;
+        var url = origin + "/GroupModels/JoinGroupRedirect?joinCode="
+        var params = new URLSearchParams(location.search);
+        var joinCode = params.get('joinCode');
+        url += joinCode;
+        console.log(url);
+        Swal.fire({
+            icon: 'success',
+            title: url,
+            text: "Copy the link above to give to someone to join the group"
+        })
+    }
 </script>

@@ -60,12 +60,24 @@
                     dataType: "json",
                     success: function (response) {
                         console.log(response)
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Friend Request Accepted!',
-                        }).then((result) => {
-                            location.reload();
-                        })
+                        if(response.status == 'error')
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                            }).then((result) => {
+                                location.reload();
+                            })
+                        }
+                        else
+                        {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Friend Request Accepted!',
+                            }).then((result) => {
+                                location.reload();
+                            })
+                        }
                     },
                     error: function (response) {
                         console.log("something went wrong in friend accepting ", response)
@@ -179,12 +191,22 @@
                 dataType: "json",
                 success: function (response) {
                     console.log(response)
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Friend Request Sent!',
-                    }).then((result) => {
-                        location.reload();
-                    })
+                    if (response.status == 'error') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Request sent',
+                        }).then((result) => {
+                            location.reload();
+                        })
+                    }
                 },
                 error: function (response) {
                     console.log("something went wrong in friend creation ", response)

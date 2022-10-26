@@ -13,11 +13,12 @@
 
 <script>
     function joinGroup(){
+        let params = new URLSearchParams(location.search);
         let data = {
-            
+            joinCode: params.get('joinCode')
         }
 
-        let url = "";
+        let url = "/GroupModels/JoinGroup";
 
         $.ajax({
             url: url,
