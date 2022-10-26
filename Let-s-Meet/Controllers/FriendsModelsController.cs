@@ -310,7 +310,7 @@ namespace Let_s_Meet.Controllers
         public async Task<IActionResult> CreateFriendRequestByEmail(string email)
         {
             // Check if user exists with friend email
-            UserModel friend = await _context.Users.Where(u => u.Email == email).FirstAsync();
+            UserModel friend = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
 
             if (friend == null)
                 return Ok(new { status = "error", messsage = "User does not exist" });

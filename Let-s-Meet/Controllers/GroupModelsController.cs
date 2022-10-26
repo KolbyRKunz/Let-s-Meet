@@ -202,7 +202,8 @@ namespace Let_s_Meet.Controllers
                 .ToListAsync();
             UserModel userModel = await _context.Users.FindAsync(userId);
             users.Add(userModel);
-
+            
+            
             // Create group
             GroupModel group = new GroupModel
             {
@@ -212,7 +213,67 @@ namespace Let_s_Meet.Controllers
             _context.Add(group);
             await _context.SaveChangesAsync();
 
+            // Generate random join code with format <group id>-<random alphanumeric string with length 12>
+            string joinCode = group.GroupID + "-" + Guid.NewGuid().ToString().Substring(0, 8);
+
+            // Update group with join code
+            group.JoinCode = joinCode;
+            _context.Update(group);
+            await _context.SaveChangesAsync();
+
             return Ok(new { status = "ok", message = "Group created" });
+        }
+        
+        public async Task<IActionResult> JoinGroupRedirect(string joinCode)
+        {
+            var result = await JoinGroup(joinCode);
+            if (result is OkObjectResult ok)
+            {
+                return RedirectToAction("Groups", "Home");
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> JoinGroup(string joinCode)
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get group from join code
+            string[] split = joinCode.Split('-');
+            if (split.Length != 2)
+            {
+                return BadRequest("Invalid join code");
+            }
+
+            int groupId = int.Parse(split[0]);
+            GroupModel group = await _context
+                .Groups
+                .Include(g => g.Users)
+                .Where(g => g.GroupID == groupId && g.JoinCode == joinCode)
+                .FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return BadRequest("Invalid join code");
+            }
+
+            // Ensure user is not already in group
+            if (group.Users.Any(u => u.UserID == userId))
+            {
+                return Ok(new { status = "ok", message = "User already in group" });
+            }
+
+            // Add user to group
+            UserModel userModel = await _context.Users.FindAsync(userId);
+            group.Users.Add(userModel);
+            _context.Update(group);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { status = "ok", message = "User joined group" });
         }
     }
 }

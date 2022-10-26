@@ -15,6 +15,9 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "groupName")]
         public string GroupName { get; set; }
 
+        [JsonProperty(PropertyName = "groupJoinCode")]
+        public string JoinCode { get; set; }
+
         [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
 
