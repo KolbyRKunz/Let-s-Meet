@@ -300,7 +300,7 @@ namespace Let_s_Meet.Controllers
             UserModel friend = await _context.Users.FindAsync(friendId);
 
             if (friend == null)
-                return Ok(new { status = "error", messsage = "User does not exist" });
+                return Ok(new { status = "error", message = "User does not exist" });
 
             return await CreateFriendRequest(friend);
         }
@@ -313,7 +313,7 @@ namespace Let_s_Meet.Controllers
             UserModel friend = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
 
             if (friend == null)
-                return Ok(new { status = "error", messsage = "User does not exist" });
+                return Ok(new { status = "error", message = "User does not exist" });
 
             return await CreateFriendRequest(friend);
         }
