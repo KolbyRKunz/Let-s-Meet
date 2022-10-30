@@ -23,6 +23,7 @@ namespace Let_s_Meet.Controllers
             ViewBag.GroupId = groupID;
             ViewBag.fullUrlRedirect = fullUrlRedirect;
             //TODO: retreive group name and put it in the viewbag
+            ViewBag.GroupName = "fix me I need the real group name!";
             QRCodeGenerator qrGen = new QRCodeGenerator();
             var qr = qrGen.CreateQrCode(fullUrl, QRCodeGenerator.ECCLevel.L);
             var qrCode = new QRCode(qr);

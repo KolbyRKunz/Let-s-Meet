@@ -184,7 +184,7 @@
     document.body.onload = function() {
         let params = new URLSearchParams(location.search);
         var groupName = document.getElementById("groupName");
-        groupName.innerHTML = params.get('groupName') + " Group Calendar"
+        groupName.innerHTML = "@ViewBag.GroupName" + " Group Calendar";
 
     }
 
