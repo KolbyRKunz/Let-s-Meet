@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using QRCoder;
-using System.Drawing;
-using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
-using Microsoft.CodeAnalysis.Diagnostics;
-using System;
-using System.Security.Cryptography;
-using Image = SixLabors.ImageSharp.Image;
 
 namespace Let_s_Meet.Controllers
 {
@@ -28,7 +22,7 @@ namespace Let_s_Meet.Controllers
             }
             ViewBag.GroupId = groupID;
             ViewBag.fullUrlRedirect = fullUrlRedirect;
-            //retreive group name and put it in the viewbag
+            //TODO: retreive group name and put it in the viewbag
             QRCodeGenerator qrGen = new QRCodeGenerator();
             var qr = qrGen.CreateQrCode(fullUrl, QRCodeGenerator.ECCLevel.L);
             var qrCode = new QRCode(qr);
@@ -37,10 +31,5 @@ namespace Let_s_Meet.Controllers
             ViewBag.image = temp;
             return View();
         }
-
-   
-
-
     }
-
 }
