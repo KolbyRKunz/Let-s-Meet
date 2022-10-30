@@ -1,15 +1,9 @@
 ﻿using Let_s_Meet.Data;
 using Let_s_Meet.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
 using Let_s_Meet.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;

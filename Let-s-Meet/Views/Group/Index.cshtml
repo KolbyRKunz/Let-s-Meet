@@ -62,6 +62,10 @@
     <div class="calendarContainer" id="groupCalendar">
         <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
     </div>
+    
+    <div>
+        <img src = @ViewBag.image />
+    </div>
 
     <div id="groupMembers">
         <h3>Group Members</h3>
@@ -181,10 +185,11 @@
         let params = new URLSearchParams(location.search);
         var groupName = document.getElementById("groupName");
         groupName.innerHTML = params.get('groupName') + " Group Calendar"
+
     }
 
     //TODO: this api call will need to change as well to the correct controller
-   fetch('../api/getGroupMembers?groupId=' + new URLSearchParams(location.search).get('groupId'))
+   fetch('../api/getGroupMembers?groupId=' + @ViewBag.groupID)
         .then(function (response) {
             return response.json();
         })
@@ -246,10 +251,7 @@
     function groupLink(){
         console.log(location);
         var origin = location.origin;
-        var url = origin + "/GroupModels/JoinGroupRedirect?joinCode="
-        var params = new URLSearchParams(location.search);
-        var joinCode = params.get('joinCode');
-        url += joinCode;
+        var url = "@ViewBag.fullUrlRedirect";
         console.log(url);
         Swal.fire({
             icon: 'success',

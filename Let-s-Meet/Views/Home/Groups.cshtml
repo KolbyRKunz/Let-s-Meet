@@ -58,7 +58,7 @@
         var groupContainer = document.getElementById("groupList");
         for(var i = 0; i < data.length; i++){
             var div = document.createElement("a");
-            div.setAttribute('href', '../Group/Index?groupId=' + data[i].groupID + '&groupName=' + data[i].groupName + '&joinCode=' + data[i].joinCode);
+            div.setAttribute('href', '../Group/Index?joinCode=' + data[i].joinCode);
             div.setAttribute('class', 'groupLink');
             div.innerHTML = data[i].groupName;
             groupContainer.appendChild(div);
