@@ -50,12 +50,11 @@
     <hr />
 </div>
 
-
 <div style="padding:1%">
-    <button onClick="createMeeting()" id="letsMeetButton" class="btn btn-danger">Let's Meet!</button>
+    <button id="createMeetingBtn" class="btn btn-danger">Let's Meet!</button>
     <button onClick="groupLink()" class="btn btn-danger">Get Group Join Link</button>
     <!--<button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>-->
-    <!--<button onClick="addMember()" class="btn btn-danger">Add Member</button>-->
+    <!--<button onClick="addMemberViaEmail()" class="btn btn-danger">Add Member with Email</button>-->
 </div>
 
 <div id="groupInfo">
@@ -75,117 +74,84 @@
     </div>
 </div>
 
+ <!--TODO: Style this better-->
+    <div id="meetingCreationModal" class="modal"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Let's Meet!</h1>
+                <span class="close">&times;</span>
+            </div>
+            <div id="modalBody">
+                <h4>Reason for meeting</h4>
+                <input type="text" class="modalItem " id="meetingReason" placeholder="Reason" />
+                <h4>Location</h4>
+                <input type="text" class="modalItem " id="meetingLocation" placeholder="Location" />
+                <h4>How soon do you want to hold the meeting?</h4>
+                <select id="meetingDaysOut">
+                    <option value="1">Within 1 day from now</option>
+                    <option value="2">Within 2 days from now</option>
+                    <option value="3">Within 3 days from now</option>
+                    <option value="4">Within 4 days from now</option>
+                    <option value="5">Within 5 days from now</option>
+                    <option value="6">Within 6 days from now</option>
+                    <option value="7">Within 7 days from now</option>
+                </select>
+                <!--TODO: this can be removed if we don't want the select, I can just note that it's only hour long meetings for now-->
+                <h4>Length of the meeting</h4>
+                <select id="meetingLength">
+                    <option value="1">1 hour</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <span class="close" data-bs-toggle="modal" data-bs-target="#selectTimeModal" data-bs-dismiss="modal">Let's Meet!</span>
+            </div>
+        </div>
+    </div>
 
 <script>
-    //TODO: figure out more of what data needs to be passed to the back end for the Let's Meet button
-    async function createMeetingPopUp() {
-        const { value: formValues } = await Swal.fire({
-            title: 'Meeting Reason',
-            html: //This does no input checking currently
-                //'<label>Event Reason</label>' +
-                '<div style="display:grid"><input type="text" id="eventName" class="swal2-input">' +
-                '<br/></div>' +
-                '<div style="display:grid"><label>Location</label>' +
-                '<input type="text" id="location" class="swal2-input">' +
-                '<br/></div>' +
-                '<div style="display:grid"><label>Start Date</label>' +
-                '<input type="date" id="startDate" class="swal2-input">' +
-                '<br/></div>' +
-                '<div style="display:grid"><label>End Date</label>' +
-                '<input type="date" id="endDate" class="swal2-input">' +
-                '<br/></div>' +
-                '<div style="display:grid"><label>Meeting Length (in hours)</label>' + //TODO: how does the backend want this data to be sent, minutes or hours? Does it also need timezone info?
-                '<input type="text" id="meetingLength" class="swal2-input">' +
-                '<br/></div>',
-            focusConfirm: false,
-            position: 'top-end',
-            showCancelButton: true,
-            preConfirm: () => { //TODO: only need days here because the user is picking the time frame they want it to occur from
-                return {
-                    eventName: $('#eventName').val(),
-                    startDate: $('#startDate').val(),
-                    endDate: $('#endDate').val(),
-                    meetingLength: $('#meetingLength').val(),
-                    location: $('#location').val()
-                }
-            }
-        });
-        return formValues;
+    /*NOTE: I decided to use a modal here instead of swal2 since a modal has better support for multiple inputs
+        I wanted to avoid the select calendar problems from the Home/Index.cshtml swal in addEvent */
+    var createMeetingModal = document.getElementById('meetingCreationModal');
+    var createMeetingBtn = document.getElementById('createMeetingBtn');
+    var close = document.getElementsByClassName('close')[0];
+    var submission = document.getElementsByClassName('close')[1];
+
+    createMeetingBtn.onclick = function () {
+        createMeetingModal.style.display = "block";
+    }
+    close.onclick = function () {
+        createMeetingModal.style.display = "none";
+        document.getElementById("meetingReason").value = ""; //Clear the user inputs, saved in variable already
+        document.getElementById("meetingLocation").value = "";
+        location.reload(); //TODO: figure out better way to clear user input
+    }
+    window.onclick = function (event) {
+        if (event.target == createMeetingModal) {
+            createMeetingModal.style.display = "none";
+            document.getElementById("meetingReason").value = ""; //Clear the user inputs, saved in variable already
+            document.getElementById("meetingLocation").value = "";
+            location.reload(); //TODO: figure out better way to clear user input
+        }
     }
 
-    function createMeeting() {
-        createMeetingPopUp().then((values) => {
-            console.log(values);
-            //TODO: figure out more of what data needs to be passed to the back end for the Let's Meet button, B5 task, like is time zone needed?
-            //TODO: this will need the API call that finds the open meeting time to display on the calendar
-
-            let url = "" //TODO: add api call to meeting creation
-
-            var meetingData = {
-                meetingReason: values.eventName,
-                startDate: values.startDate,
-                endDate: values.endDate,
-                meetingLength: values.meetingLength, //IMPORTANT: this should be in hours, does it need to be in a different form?
-                location: values.location
-                //TODO: is there more data need from the front to back for this task?
-            }
-
-            $.ajax({
-                type: 'POST',
-                url: url,
-                dataType: 'json',
-                data: meetingData
-            })
-            .done(function () {
-                location.reload() //This is so the calendar display will refresh with the new event on the calendar hopefully
-            })
-            .fail(function (error) {
-                console.log("something went wrong with meeting creation")
-                console.log(error)
-            });
-
-        })
-        .catch(error => console.log(error));
+    submission.onclick = function () {
+        createMeetingModal.style.display = "none";
+        var reason = document.getElementById("meetingReason").value;
+        var location = document.getElementById("meetingLocation").value;
+        document.getElementById("meetingReason").value = ""; //Clear the user inputs, saved in variable already
+        document.getElementById("meetingLocation").value = "";
+        var daysSelect = document.getElementById('meetingDaysOut');
+        var days = daysSelect.options[daysSelect.selectedIndex].value;
+        var lengthSelect = document.getElementById('meetingLength');
+        var length = lengthSelect.options[lengthSelect.selectedIndex].value;
+        console.log(reason);
+        console.log(location);
+        console.log(days);
+        console.log(length);
     }
 
-    function leaveGroup(){
-        Swal.fire({
-            title: 'Are you sure you wish to leave the group?',
-            text: "You won't be able to rejoin without an invite!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, leave group!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                //TODO: this will need the api controller call that has the user leave the group, can be done later once everything else is working also
-                
-                let url = "" //TODO: add api call to leave group
-                let params = new URLSearchParams(location.search);
-                var groupData = {
-                    groupId: params.get('groupId')
-                }
 
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    dataType: 'json',
-                    data: groupData
-                })
-                .done(function () {
-                    location.replace("/Home/Groups")
-                })
-                .fail(function (error) {
-                    console.log("something went wrong with leaving the group")
-                    console.log(error)
-                });
-            }
-        })
-    }
-    
     document.body.onload = function() {
-        //let params = new URLSearchParams(location.search);
         var groupName = document.getElementById("groupName");
         groupName.innerHTML = "@ViewBag.GroupName" + " Group Calendar";
     }
@@ -213,8 +179,22 @@
         }
     }
 
+    /*IMPORTANT TODO: This code could potentially break on AWS because of the JS location it hopefully shouldn't
+        But this is to remind that this area could be the problem*/
+    function groupLink() {
+        /*console.log(location);
+        var origin = location.origin;*/
+        var url = "@ViewBag.fullUrlRedirect";
+        console.log(url);
+        Swal.fire({
+            icon: 'success',
+            title: url,
+            text: "Copy the link above to give to someone to join the group"
+        })
+    }
+
     //IMPORTANT: this can be commented out for demo purposes later on
-    function addMember() {
+    /*function addMemberViaEmail() {
         Swal.fire({
             title: 'Enter email address of new member',
             input: 'text',
@@ -246,19 +226,42 @@
                 });
             }
         })
-    }
+    }*/
 
-    /*IMPORTANT TODO: This code could potentially break on AWS because of the JS location it hopefully shouldn't
-        But this is to remind that this area could be the problem*/
-    function groupLink(){
-        /*console.log(location);
-        var origin = location.origin;*/
-        var url = "@ViewBag.fullUrlRedirect";
-        console.log(url);
+    /*function leaveGroup() {
         Swal.fire({
-            icon: 'success',
-            title: url,
-            text: "Copy the link above to give to someone to join the group"
+            title: 'Are you sure you wish to leave the group?',
+            text: "You won't be able to rejoin without an invite!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, leave group!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //TODO: this will need the api controller call that has the user leave the group, can be done later once everything else is working also
+
+                let url = "" //TODO: add api call to leave group
+                let params = new URLSearchParams(location.search);
+                var groupData = {
+                    groupId: params.get('groupId')
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    dataType: 'json',
+                    data: groupData
+                })
+                    .done(function () {
+                        location.replace("/Home/Groups")
+                    })
+                    .fail(function (error) {
+                        console.log("something went wrong with leaving the group")
+                        console.log(error)
+                    });
+            }
         })
-    }
+    }*/
+
 </script>
