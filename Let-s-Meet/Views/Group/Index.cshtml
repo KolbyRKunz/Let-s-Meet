@@ -64,11 +64,14 @@
     </div>
     
     <div>
-        <img id="QrCode" src = @ViewBag.image />
-    </div>
+        <div class="groupItems">
+            <h5 class="qrCapton">QRcode to join group from mobile</h5>
+            <img id="QrCode" src = @ViewBag.image />
+        </div>
 
-    <div id="groupMembers">
-        <h3>Group Members</h3>
+        <div class="groupItems"  id="groupMembers">
+            <h3>Group Members</h3>
+        </div>
     </div>
 </div>
 
@@ -182,10 +185,9 @@
     }
     
     document.body.onload = function() {
-        let params = new URLSearchParams(location.search);
+        //let params = new URLSearchParams(location.search);
         var groupName = document.getElementById("groupName");
         groupName.innerHTML = "@ViewBag.GroupName" + " Group Calendar";
-
     }
 
     //TODO: this api call will need to change as well to the correct controller
@@ -249,8 +251,8 @@
     /*IMPORTANT TODO: This code could potentially break on AWS because of the JS location it hopefully shouldn't
         But this is to remind that this area could be the problem*/
     function groupLink(){
-        console.log(location);
-        var origin = location.origin;
+        /*console.log(location);
+        var origin = location.origin;*/
         var url = "@ViewBag.fullUrlRedirect";
         console.log(url);
         Swal.fire({

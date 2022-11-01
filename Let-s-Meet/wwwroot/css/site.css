@@ -193,6 +193,11 @@ html {
     font-size: 130%;
 }
 
+.groupItems {
+    margin: 10%;
+    padding: 5%;
+}
+
 .calendarContainer { /*add if we want the calendar to be left to right, full page, will need more in other places also, calenar needs height: "100%", not auto*/
     /*position: fixed;
     top: 15%;
@@ -314,4 +319,8 @@ html {
 .alignFriendRequest {
     margin: 1%;
     padding: 1%;
+}
+
+.qrCapton {
+    color: #950741; /*TODO: get these #950741 into a variable sometime and figure out how to get it to work */
 }
