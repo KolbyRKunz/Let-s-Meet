@@ -122,6 +122,15 @@
     submission.onclick = function(){
         modal.style.display = "none";
         var groupName = document.getElementById("groupName").value;
+        //Don't allow a group with no name
+        if(groupName == "")
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Enter Group name'
+            })
+            return;
+        }
         document.getElementById("groupName").value = ""; //Clear the user inputs, saved in variable already
         var select = document.getElementsByClassName('friends');
         var members = []; 

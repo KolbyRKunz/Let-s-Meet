@@ -9,8 +9,8 @@
     <link href='~/lib/fullcalendar/main.css' rel='stylesheet' />
     <link rel="stylesheet" type="text/css" href="~/css/site.css" />
     <script src='~/lib/fullcalendar/main.js'></script>
+    
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -40,7 +40,6 @@
             });
             calendar.render();
         });
-
     </script>
 </head>
 
@@ -49,25 +48,20 @@
     <h1 class="description" id="groupName">Group Calendar</h1>
     <hr />
 </div>
-
 <div style="padding:1%">
-    <button id="createMeetingBtn" class="btn btn-danger">Let's Meet!</button>
+    <button id="createMeetingBtn" class="btn btn-danger" data-target="#meetingCreationModal" data-toggle="modal">Let's Meet!</button>
     <button onClick="groupLink()" class="btn btn-danger">Get Group Join Link</button>
-    <!--<button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>-->
-    <!--<button onClick="addMemberViaEmail()" class="btn btn-danger">Add Member with Email</button>-->
 </div>
 
 <div id="groupInfo">
     <div class="calendarContainer" id="groupCalendar">
         <div id='calendar' style="padding: 15px; background-color: #950741; border-radius: 30px"></div>
-    </div>
-    
+    </div>  
     <div>
         <div class="groupItems">
             <h5 class="qrCapton">QRcode to join group from mobile</h5>
             <img id="QrCode" src = @ViewBag.image />
         </div>
-
         <div class="groupItems"  id="groupMembers">
             <h3>Group Members</h3>
         </div>
@@ -75,63 +69,101 @@
 </div>
 
  <!--TODO: Style this better-->
-    <div id="meetingCreationModal" class="modal"> 
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1>Let's Meet!</h1>
-                <span class="close">&times;</span>
-            </div>
-            <div id="modalBody">
-                <h4>Reason for meeting</h4>
-                <input type="text" class="modalItem " id="meetingReason" placeholder="Reason" />
-                <h4>Location</h4>
-                <input type="text" class="modalItem " id="meetingLocation" placeholder="Location" />
-                <h4>How soon do you want to hold the meeting?</h4>
-                <select id="meetingDaysOut">
-                    <option value="1">Within 1 day from now</option>
-                    <option value="2">Within 2 days from now</option>
-                    <option value="3">Within 3 days from now</option>
-                    <option value="4">Within 4 days from now</option>
-                    <option value="5">Within 5 days from now</option>
-                    <option value="6">Within 6 days from now</option>
-                    <option value="7">Within 7 days from now</option>
-                </select>
-                <!--TODO: this can be removed if we don't want the select, I can just note that it's only hour long meetings for now-->
-                <h4>Length of the meeting</h4>
-                <select id="meetingLength">
-                    <option value="1">1 hour</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <span class="close" data-bs-toggle="modal" data-bs-target="#selectTimeModal" data-bs-dismiss="modal">Let's Meet!</span>
-            </div>
+<div id="meetingCreationModal" class="modal"> 
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1>Let's Meet!</h1>
+            <span class="close" data-dismiss="modal">Cancel</span>
+        </div>
+        <div id="modalBody">
+            <h4>Reason for meeting</h4>
+            <input type="text" class="modalItem " id="meetingReason" placeholder="Reason" />
+            <h4>Location</h4>
+            <input type="text" class="modalItem " id="meetingLocation" placeholder="Location" />
+            <h4>How soon do you want to hold the meeting?</h4>
+            <select id="meetingDaysOut">
+                <option value="1">Within 1 day from now</option>
+                <option value="2">Within 2 days from now</option>
+                <option value="3">Within 3 days from now</option>
+                <option value="4">Within 4 days from now</option>
+                <option value="5">Within 5 days from now</option>
+                <option value="6">Within 6 days from now</option>
+                <option value="7">Within 7 days from now</option>
+            </select>
+            <!--TODO: this can be removed if we don't want the select, I can just note that it's only hour long meetings for now-->
+            <h4>Length of the meeting</h4>
+            <select id="meetingLength">
+                <option value="1">1 hour</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <span class="close" data-toggle="modal" data-target="#meetingConfirmationModal" data-dismiss="modal">Let's Meet!</span>
         </div>
     </div>
+</div>
+
+<div id="meetingConfirmationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1>Let's Meet!</h1>
+            <span class="close" data-dismiss="modal">Cancel</span>
+        </div>
+        <div id="modalBody">
+            <div>
+                <h4>Select a time from the ones below for a meeting</h4>
+                <!--TODO: is this how we want to solve the issue or something else?-->
+                <h5>If none of these work, hit cancel and start a new search with different days</h5>
+            </div>
+            <div id="meetingTimesList">
+                <!--TODO: Remove these later, it's hardcoded just for displaying an idea of what it looks like-->
+                <div class="potentialTime">
+                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
+                    <button class="alignTime btn-danger">Accept</button>
+                </div>
+                <div class="potentialTime">
+                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
+                    <button class="alignTime btn-danger">Accept</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+        </div>
+    </div>
+</div>
 
 <script>
     /*NOTE: I decided to use a modal here instead of swal2 since a modal has better support for multiple inputs
         I wanted to avoid the select calendar problems from the Home/Index.cshtml swal in addEvent */
     var createMeetingModal = document.getElementById('meetingCreationModal');
     var createMeetingBtn = document.getElementById('createMeetingBtn');
-    var close = document.getElementsByClassName('close')[0];
+    var closeCreateMeeting = document.getElementsByClassName('close')[0];
     var submission = document.getElementsByClassName('close')[1];
+    var closeTimeSelect = document.getElementsByClassName('close')[2];
+    var meetingConfirmationModal = document.getElementById('meetingConfirmationModal');
 
     createMeetingBtn.onclick = function () {
         createMeetingModal.style.display = "block";
     }
-    close.onclick = function () {
+    closeCreateMeeting.onclick = function () {
         createMeetingModal.style.display = "none";
-        document.getElementById("meetingReason").value = ""; //Clear the user inputs, saved in variable already
-        document.getElementById("meetingLocation").value = "";
+        location.reload(); //TODO: figure out better way to clear user input
+    }
+    closeTimeSelect.onclick = function(){
+        meetingConfirmationModal.style.display = "none";
         location.reload(); //TODO: figure out better way to clear user input
     }
     window.onclick = function (event) {
         if (event.target == createMeetingModal) {
             createMeetingModal.style.display = "none";
-            document.getElementById("meetingReason").value = ""; //Clear the user inputs, saved in variable already
-            document.getElementById("meetingLocation").value = "";
             location.reload(); //TODO: figure out better way to clear user input
         }
+        else if (event.target == meetingConfirmationModal) {
+            meetingConfirmationModal.style.display = "none";
+            location.reload(); //TODO: figure out better way to clear user input
+        }
+    }
+    meetingConfirmationModal.onclick = function () {
+        meetingConfirmationModal.style.display = "block";
     }
 
     submission.onclick = function () {
@@ -148,9 +180,93 @@
         console.log(location);
         console.log(days);
         console.log(length);
+        
+        /*TODO: this is where the API call for the finding meeting time will go
+            I put the friends request one here for now since it does something similar-ish
+            to what I think will happen here with meeting times, but let me know if it needs to change. */
+        var url = '/FriendsModels/GetReceivedRequests'; //TODO: this will be actual meeting creation api call
+        var meetingData = {
+            reason: reason,
+            location: location,
+            days: days,
+            length: length
+        }
+        $.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            data: meetingData,
+            //async: false //Is this needed to make sure ajax doesn't return early, but it should be solved by .done
+        })
+        .done(function (data) {
+            //TODO: error checking
+            console.log(data)
+            getMeetingTimes(data)
+        })
+        .fail(function (error) {
+            console.log(error);
+        });
+
+        function getMeetingTimes(data) {
+            console.log(data);
+            for (var i = 0; i < data.length; i++) {
+                var potentialTime = document.createElement("div");
+                potentialTime.setAttribute('class', 'potentialTime');
+                var time = document.createElement('p');
+                time.innerHTML = data[i].requestedBy.firstName; //TODO: change this to time from meeting api call
+                var accept = document.createElement("button");
+                accept.innerHTML = "Accept";
+                accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
+                accept.onclick = (e) => {
+                    console.log(e.target.id);
+                    $.ajax({
+                        url: "/FriendsModels/AcceptRequest", //TODO: change this to the meeting time accept method
+                        type: "POST",
+                        data: { id: parseInt(e.target.id) }, //TODO: will this need to change also?
+                        dataType: "json",
+                        success: function (response) {
+                            console.log(response)
+                            if (response.status == 'error') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                }).then((result) => {
+                                    window.location.reload();
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Meeting added to group calendar',
+                                }).then((result) => {
+                                    window.location.reload();
+                                })
+                            }
+                        },
+                        //TODO: can this error function be deleted? since it was handled above
+                        error: function (response) {
+                            console.log("something went wrong in group events ", response)
+                            Swal.fire({
+                                icon: 'error',
+                                title: "Meeting can't be added to group events",
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        }
+                    })
+                }
+                time.setAttribute('class', 'alignTime');
+                accept.setAttribute('class', 'alignTime');
+                accept.classList.add('btn-danger');
+                potentialTime.appendChild(time);
+                potentialTime.appendChild(accept);
+                var meetingTimesList = document.getElementById("meetingTimesList");
+                meetingTimesList.appendChild(potentialTime);
+            }
+        }
     }
 
-
+    
     document.body.onload = function() {
         var groupName = document.getElementById("groupName");
         groupName.innerHTML = "@ViewBag.GroupName" + " Group Calendar";
@@ -169,7 +285,6 @@
         })
 
     function getGroupMembers(data) {
-        //console.log(data)
         var groupContainer = document.getElementById("groupMembers");
         for (var i = 0; i < data.length; i++) {
             var div = document.createElement("li");
@@ -192,76 +307,5 @@
             text: "Copy the link above to give to someone to join the group"
         })
     }
-
-    //IMPORTANT: this can be commented out for demo purposes later on
-    /*function addMemberViaEmail() {
-        Swal.fire({
-            title: 'Enter email address of new member',
-            input: 'text',
-            icon: 'question',
-            confirmButtonText: 'Add Member',
-            showCancelButton: true,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                console.log(result)
-                //TODO: work of adding another group member to a already created group, if we have time, this can be commented out later for demo purposes
-                let url = "" //TODO: add api call to add member
-
-                var memberData = {
-                    memberEmail: result.value
-                }
-
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    dataType: 'json',
-                    data: memberData
-                })
-                .done(function () {
-                    location.reload() //This is so the calendar display will refresh with the new member on the page hopefully
-                })
-                .fail(function (error) {
-                    console.log("something went wrong with adding new member")
-                    console.log(error)
-                });
-            }
-        })
-    }*/
-
-    /*function leaveGroup() {
-        Swal.fire({
-            title: 'Are you sure you wish to leave the group?',
-            text: "You won't be able to rejoin without an invite!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, leave group!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                //TODO: this will need the api controller call that has the user leave the group, can be done later once everything else is working also
-
-                let url = "" //TODO: add api call to leave group
-                let params = new URLSearchParams(location.search);
-                var groupData = {
-                    groupId: params.get('groupId')
-                }
-
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    dataType: 'json',
-                    data: groupData
-                })
-                    .done(function () {
-                        location.replace("/Home/Groups")
-                    })
-                    .fail(function (error) {
-                        console.log("something went wrong with leaving the group")
-                        console.log(error)
-                    });
-            }
-        })
-    }*/
 
 </script>
