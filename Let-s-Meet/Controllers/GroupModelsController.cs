@@ -170,6 +170,31 @@ namespace Let_s_Meet.Controllers
             return Ok(groups);
         }
 
+        public async Task<IActionResult> GetGroup(int id)
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get group
+            var group = await _context.Groups
+                .Include(g => g.Users)
+                .FirstOrDefaultAsync(g => g.GroupID == id && g.Users.Any(m => m.UserID == userId));
+
+            // If no group or user is not a member of group
+            if (group == null) return Ok(null);
+
+            // Format user objects
+            var users = group.Users.Select(u => new UserModel{ 
+                UserID = u.UserID, 
+                FirstName = u.FirstName, 
+                LastName = u.LastName, 
+                Email = u.Email 
+            });
+            group.Users = users.ToList();
+
+            return Ok(group);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateGroup(string name, List<int> friendIds)
         {
