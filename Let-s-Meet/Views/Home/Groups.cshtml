@@ -136,6 +136,12 @@
         var members = []; 
         for (var i = 0; i < select.length; i++)
         {
+            /*IMPORTANT: This is to allow users to create a group even if they don't have friends, but click add member 
+                This will still let them create the group, but with no friend members after clicking add member*/
+            if(select[i].options[select[i].selectedIndex] == undefined)
+            {
+                break;
+            }
             var text = select[i].options[select[i].selectedIndex].value;
             members.push(parseInt(text));
         }
