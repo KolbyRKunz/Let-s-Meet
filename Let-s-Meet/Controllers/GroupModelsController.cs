@@ -246,6 +246,23 @@ namespace Let_s_Meet.Controllers
             _context.Update(group);
             await _context.SaveChangesAsync();
 
+            /*IMPORTANT: change this if needed
+                this should assign each group a calendar upon creation*/
+            CalendarModel cal = new CalendarModel
+            {
+                Name = group.GroupName + " Group Calendar",
+                Description = group.GroupName + " Group Calendar",
+                Color = "#950741",
+                Group = group,
+            };
+
+            _context.Add(cal);
+            await _context.SaveChangesAsync();
+
+            group.CalendarID = cal.CalendarID;
+            _context.Update(group);
+            await _context.SaveChangesAsync();
+
             return Ok(new { status = "ok", message = "Group created" });
         }
         
