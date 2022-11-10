@@ -21,8 +21,8 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
 
-        [JsonProperty(PropertyName = "events")]
-        public ICollection<EventModel> Events { get; set; }
+        [JsonProperty(PropertyName = "calendars")]
+        public ICollection<CalendarModel> Calendars { get; set; }
 
         //TODO: any other columns we would want an event to have
 

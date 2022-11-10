@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Let_s_Meet.Areas.Identity.Data;
 using System.Globalization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.AspNetCore.Http;
 
 namespace Let_s_Meet.Controllers
 {
@@ -41,6 +43,7 @@ namespace Let_s_Meet.Controllers
                 .Events
                 .Include(e => e.Users)
                 .Include(e => e.Calendar)
+                .Include(e => e.Calendar.Group)
                 .Where(e => e.Users.Any(u => u.UserID == id))
                 .Select(e => new
                 {
@@ -52,13 +55,52 @@ namespace Let_s_Meet.Controllers
                     color = e.Calendar.Color,
                     background = e.Calendar.Color,
                     backgroundColor = e.Calendar.Color,
-                    calendarId = e.Calendar.CalendarID
+                    calendarId = e.Calendar.CalendarID,
+                    groupId = e.Calendar.Group.GroupID,
+
                     // TODO users w/o infinite loop
                 })
                 .ToListAsync();
             return Ok(events);
         }
-        
+
+        // GET: EventModels
+        public async Task<IActionResult> GetCalendarEvents(int[] calendarIDs)
+        {
+            User user = await _um.GetUserAsync(User);
+            int id = user.UserID;
+            
+            var events = await _context
+                .Events
+                .Include(e => e.Users)
+                .Include(e => e.Calendar)
+                .Include(e => e.Calendar.Group)
+                .Where(e => calendarIDs.Contains(e.Calendar.CalendarID) && e.Users.Any(u => u.UserID == id))
+                .Select(e => new
+                {
+                    id = e.EventID,
+                    title = e.Title,
+                    start = DateTime.SpecifyKind(e.StartTime, DateTimeKind.Utc).ToString("O"), //IMPORTANT: This sets the Kind to UTC so full calendar won't interpret it as local and the times display incorrectly. The default Kind was orignally un specified
+                    end = DateTime.SpecifyKind(e.EndTime, DateTimeKind.Utc).ToString("O"), //TODO: Make EF core always return UTC for later actions in the database models
+                    location = e.Location,
+                    color = e.Calendar.Color,
+                    background = e.Calendar.Color,
+                    backgroundColor = e.Calendar.Color,
+                    calendarId = e.Calendar.CalendarID,
+                    groupId = e.Calendar.Group.GroupID,
+
+                    // TODO users w/o infinite loop
+                })
+                .ToListAsync();
+            return Ok(events);
+        }
+
+        // GET: EventModels/SuggestEvent
+        public async Task<IActionResult> SuggestEvent(int calendarID, string duration, int withinDays, string title, string location)
+        {
+            return StatusCode(StatusCodes.Status501NotImplemented);
+        }
+
 
         // GET: EventModels/Details/5
         public async Task<IActionResult> Details(int? id)

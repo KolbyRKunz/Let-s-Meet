@@ -30,9 +30,6 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
 
-        [JsonProperty(PropertyName = "group")]
-        public GroupModel Group { get; set; }
-
         [JsonProperty(PropertyName = "calendar")]
         public CalendarModel Calendar { get; set; }
 
