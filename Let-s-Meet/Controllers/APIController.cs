@@ -148,26 +148,26 @@ namespace Let_s_Meet.Controllers
         /// Given the groupID this will return all groups associated with them
         /// </summary>
         /// <returns>Json result of every group event</returns>
-        [HttpGet]
-        public OkObjectResult getGroupEventsQueryVersion(int groupID)
-        {
-            var group = _context.Groups
-                .Include(g => g.Events)
-                .Include(g => g.Users)
-                .Where(g => g.GroupID == groupID)
-                .Single();
+        //[HttpGet]
+        //public OkObjectResult getGroupEventsQueryVersion(int groupID)
+        //{
+        //    var group = _context.Groups
+        //        .Include(g => g.Events)
+        //        .Include(g => g.Users)
+        //        .Where(g => g.GroupID == groupID)
+        //        .Single();
 
-            var events = group.Events.Select(e => new 
-            { 
-                StartTime = e.StartTime,
-                Members = group.Users.Select(u => new 
-                { 
-                    firstName = u.FirstName
-                })
-            });
+        //    var events = group.Events.Select(e => new 
+        //    { 
+        //        StartTime = e.StartTime,
+        //        Members = group.Users.Select(u => new 
+        //        { 
+        //            firstName = u.FirstName
+        //        })
+        //    });
 
-            return Ok(JsonConvert.SerializeObject(events));
-        }
+        //    return Ok(JsonConvert.SerializeObject(events));
+        //}
 
         /// <summary>
         /// 

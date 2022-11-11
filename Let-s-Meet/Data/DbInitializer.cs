@@ -98,7 +98,6 @@ namespace Let_s_Meet.Data
                 // Create event
                 EventModel eventModel = new EventModel
                 {
-                    Group = groups[i],
                     //Title = "Event " + i,
                     //Description = "Description " + i,
                     StartTime = DateTime.Now.AddDays(i),
@@ -287,25 +286,25 @@ namespace Let_s_Meet.Data
         /// <returns></returns>
         public static List<AttendanceModel> CreateAttendance(MeetContext context, List<EventModel> events)
         {
-            List<AttendanceModel> attendance = new List<AttendanceModel>();
+            //List<AttendanceModel> attendance = new List<AttendanceModel>();
 
-            //For the first event in db, mark the whole group as attending
-            GroupModel eventGroup = events.First().Group;
-            int eventId = events.First().EventID;
+            ////For the first event in db, mark the whole group as attending
+            //GroupModel eventGroup = events.First().Group;
+            //int eventId = events.First().EventID;
 
-            foreach (UserModel u in eventGroup.Users)
-            {
+            //foreach (UserModel u in eventGroup.Users)
+            //{
                 
-                attendance.Add(new AttendanceModel
-                {
-                    UserID = u.UserID,
-                    EventID = eventId
-                });
-            }
+            //    attendance.Add(new AttendanceModel
+            //    {
+            //        UserID = u.UserID,
+            //        EventID = eventId
+            //    });
+            //}
 
-            //Add the onboarding objects to the DB
-            context.Attendance.AddRange(attendance);
-            return attendance;
+            ////Add the onboarding objects to the DB
+            //context.Attendance.AddRange(attendance);
+            return new List<AttendanceModel>();
         }
 
         /// <summary>
