@@ -24,6 +24,9 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "calendars")]
         public ICollection<CalendarModel> Calendars { get; set; }
 
+        [JsonProperty(PropertyName = "calendarID")]
+        public int CalendarID { get; set; }
+
         //TODO: any other columns we would want an event to have
 
     }
