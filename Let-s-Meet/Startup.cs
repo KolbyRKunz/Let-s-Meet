@@ -16,6 +16,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Let_s_Meet.Areas.Identity.Data;
 using Microsoft.AspNetCore.Http;
+using System.Text.Json.Serialization;
 
 namespace Let_s_Meet
 {
@@ -44,6 +45,12 @@ namespace Let_s_Meet
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();
+            /*
+            services.AddMvc().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
+            */
 
             services.AddAuthentication(options =>
             {

@@ -37,7 +37,10 @@ namespace Let_s_Meet.Controllers
             // Put list of user's calendars as JSON in ViewBag
             User user = _um.GetUserAsync(User).Result;
             UserModel userModel = _context.Users.Find(user.UserID);
-            List<CalendarModel> cals = _context.Calendars.Where(c => c.Owner == userModel).ToList();
+            List<CalendarModel> cals = _context
+                .Calendars
+                .Where(c => c.Owner == userModel || c.Group.Users.Any(u => u.UserID == user.UserID))
+                .ToList();
 
             // TODO fix infinite loop properly
             // Remove Owners from cals
