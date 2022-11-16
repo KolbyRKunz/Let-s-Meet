@@ -187,7 +187,8 @@
             $.ajax({
                 url: url,
                 type: "POST",
-                data: data,
+                contentType: "application/json",
+                data: JSON.stringify(data),
                 dataType: "json",
                 success: function (response) {
                     console.log(response)

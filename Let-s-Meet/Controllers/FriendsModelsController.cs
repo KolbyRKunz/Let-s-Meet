@@ -12,6 +12,7 @@ using Let_s_Meet.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.InteropServices;
 using Let_s_Meet.Migrations;
+using Let_s_Meet.Models.JWTModels;
 
 namespace Let_s_Meet.Controllers
 {
@@ -307,15 +308,17 @@ namespace Let_s_Meet.Controllers
 
         // TODO get UserModels to have emails
         [HttpPost]
-        public async Task<IActionResult> CreateFriendRequestByEmail(string email)
+        public async Task<IActionResult> CreateFriendRequestByEmail([FromBody] EmailModel email)
         {
             // Check if user exists with friend email
-            UserModel friend = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+            var friend = await _context.Users.Where(u => u.Email != null && u.Email == email.email).ToListAsync();
 
+            if (friend.Count == 0)
+                return Ok(new { status = "error", message = "User does not exist", email});
             if (friend == null)
-                return Ok(new { status = "error", message = "User does not exist" });
+                return Ok(new { status = "error", message = "User is null", email });
 
-            return await CreateFriendRequest(friend);
+            return await CreateFriendRequest(friend[0]);
         }
 
         private async Task<IActionResult> CreateFriendRequest(UserModel friend)
