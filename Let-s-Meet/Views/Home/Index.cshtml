@@ -48,7 +48,6 @@
 
                 eventClick: function(info){
                     var eventID = info.event.id;
-
                     Swal.fire({
                         title: 'Are you sure you want to delete this event?',
                         text: "You won't be able to revert this!",
@@ -60,11 +59,20 @@
                     }).then((result) => {
                         if(result.isConfirmed)
                         {
-                            info.event.remove();
-                            $.ajax({  ///now we need to update the backend
-                                url: '/EventModels/Delete/' + eventID, 
-                                type: 'POST'
-                            });
+                            info.event.remove(); 
+                            var url = '/EventModels/Delete';
+
+                            var eventData = {
+                                id: parseInt(eventID)
+                            }
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify(eventData)
+                            })
                         }
                     })
                 },
@@ -135,7 +143,8 @@
                             type: 'POST',
                             url: url,
                             dataType: 'json',
-                            data: eventData
+                            contentType: 'application/json',
+                            data: JSON.stringify(eventData)
                         })
                         .done(function(result) {
                             console.log(result)

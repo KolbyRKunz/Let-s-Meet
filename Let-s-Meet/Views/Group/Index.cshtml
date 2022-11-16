@@ -186,16 +186,18 @@
             to what I think will happen here with meeting times, but let me know if it needs to change. */
         var url = '/FriendsModels/GetReceivedRequests'; //TODO: this will be actual meeting creation api call
         var meetingData = {
-            reason: reason,
+            title: reason,
             location: location,
-            days: days,
-            length: length
+            withinDays: days,
+            duration: length,
+            //calendarID: 1 //TODO: How to get calendarID here
         }
         $.ajax({
             type: 'POST',
             url: url,
             dataType: 'json',
-            data: meetingData,
+            contentType: 'application/json',
+            data: JSON.stringify(meetingData),
             //async: false //Is this needed to make sure ajax doesn't return early, but it should be solved by .done
         })
         .done(function (data) {
@@ -222,7 +224,8 @@
                     $.ajax({
                         url: "/FriendsModels/AcceptRequest", //TODO: change this to the meeting time accept method
                         type: "POST",
-                        data: { id: parseInt(e.target.id) }, //TODO: will this need to change also?
+                        data: JSON.stringify({ id: parseInt(e.target.id) }), //TODO: will this need to change also?
+                        contentType: 'application/json',
                         dataType: "json",
                         success: function (response) {
                             console.log(response)

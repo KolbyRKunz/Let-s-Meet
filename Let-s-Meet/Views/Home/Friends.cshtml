@@ -32,13 +32,13 @@
             return response.json();
         })
         .then(function (data) {
-            getFrientRequest(data);
+            getFriendRequest(data);
         })
         .catch(function (e) {
             console.log("error in friend requests: " + e);
         })
 
-    function getFrientRequest(data) {
+    function getFriendRequest(data) {
         console.log(data);
         var pendingContainer = document.getElementById("pending");
         for (var i = 0; i < data.length; i++) {
@@ -56,12 +56,12 @@
                 $.ajax({
                     url: "/FriendsModels/AcceptRequest",
                     type: "POST",
-                    data: { id: parseInt(e.target.id) },
+                    contentType: "application/json",
+                    data: JSON.stringify({ id: parseInt(e.target.id) }),
                     dataType: "json",
                     success: function (response) {
                         console.log(response)
-                        if(response.status == 'error')
-                        {
+                        if (response.status == 'error') {
                             Swal.fire({
                                 icon: 'error',
                                 title: response.message,
@@ -69,8 +69,7 @@
                                 location.reload();
                             })
                         }
-                        else
-                        {
+                        else {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Friend Request Accepted!',
@@ -98,7 +97,8 @@
                 $.ajax({
                     url: "/FriendsModels/RejectRequest",
                     type: "POST",
-                    data: { id: parseInt(e.target.id) },
+                    contentType: "application/json",
+                    data: JSON.stringify({ id: parseInt(e.target.id) }),
                     dataType: "json",
                     success: function (response) {
                         console.log(response)
@@ -133,7 +133,7 @@
             pendingContainer.appendChild(pendingFriend);
         }
     }
-  
+
     fetch('/FriendsModels/GetFriends')
         .then(function (response) {
             return response.json();
@@ -145,7 +145,7 @@
             console.log("error in friends list: " + e);
         })
 
-    function getFriendData(data) { 
+    function getFriendData(data) {
         console.log(data);
         var friendListContainer = document.getElementById("friendList");
         for (var i = 0; i < data.length; i++) {
@@ -220,6 +220,6 @@
                 }
             })
         })
-        .catch(error => console.log(error));
+            .catch(error => console.log(error));
     }
 </script>
