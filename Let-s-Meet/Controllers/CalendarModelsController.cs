@@ -41,7 +41,7 @@ namespace Let_s_Meet.Controllers
             return View(await _context
                 .Calendars
                 .Include(c => c.Owner)
-                .Where(c => c.Owner.UserID == id)
+                .Where(c => c.Owner.UserID == id || c.Group.Users.Any(m => m.UserID == id))
                 .ToListAsync()
                 );
         }
@@ -53,12 +53,64 @@ namespace Let_s_Meet.Controllers
             int id = user.UserID;
             //return Ok(await _context.Calendar.ToListAsync()); // This is for getting all calendars
 
+            // Get user model
+            UserModel userModel = await _context.Users.Where(u => u.UserID == id).FirstOrDefaultAsync();
+
+            // If no user model
+            if (userModel == null)
+            {
+                return NotFound();
+            }
+
             // Get current user's calendars
             return Ok(await _context
                 .Calendars
                 .Include(c => c.Owner)
-                .Where(c => c.Owner.UserID == id)
+                .Where(c => c.Owner.UserID == id || c.Group.Users.Any(m => m.UserID == id))
+                .Select(c => new
+                    {
+                        c.CalendarID,
+                        c.Name,
+                        c.Description,
+                        c.Color,
+                        c.Group,
+                        c.Group.Users
+                    })
                 .ToListAsync()
+                );
+        }
+
+        // GET: CalendarModels/GetCalendar
+        public async Task<IActionResult> GetCalendar(int id)
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+            //return Ok(await _context.Calendar.ToListAsync()); // This is for getting all calendars
+
+            // Get user model
+            UserModel userModel = await _context.Users.Where(u => u.UserID == userId).FirstOrDefaultAsync();
+
+            // If no user model
+            if (userModel == null)
+            {
+                return NotFound();
+            }
+
+            // Get current user's calendars
+            return Ok(await _context
+                .Calendars
+                .Include(c => c.Owner)
+                .Where(c => c.CalendarID == userId && (c.Owner.UserID == userId || c.Group.Users.Any(m => m.UserID == userId)))
+                .Select(c => new
+                {
+                    c.CalendarID,
+                    c.Name,
+                    c.Description,
+                    c.Color,
+                    c.Group,
+                    c.Group.Users
+                })
+                .FirstOrDefaultAsync()
                 );
         }
 
@@ -106,6 +158,25 @@ namespace Let_s_Meet.Controllers
             }
             return View(calendarModel);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCalendar([Bind("CalendarID,Name,Description,Color,Owner")] CalendarModel calendarModel)
+        {
+            // get current user and set it as owner
+            User user = await _um.GetUserAsync(User);
+            UserModel userModel = _context.Users.Find(user.UserID);
+            calendarModel.Owner = userModel;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(calendarModel);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return Ok(calendarModel);
+        }
+
 
         // GET: CalendarModels/Edit/5
         public async Task<IActionResult> Edit(int? id)

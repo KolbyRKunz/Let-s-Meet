@@ -21,9 +21,6 @@ namespace Let_s_Meet.Models
         [JsonProperty(PropertyName = "users")]
         public ICollection<UserModel> Users { get; set; }
 
-        [JsonProperty(PropertyName = "calendars")]
-        public ICollection<CalendarModel> Calendars { get; set; }
-
         [JsonProperty(PropertyName = "calendarID")]
         public int CalendarID { get; set; }
 

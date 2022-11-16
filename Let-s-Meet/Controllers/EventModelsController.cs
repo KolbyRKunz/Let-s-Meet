@@ -43,7 +43,7 @@ namespace Let_s_Meet.Controllers
                 .Events
                 .Include(e => e.Users)
                 .Include(e => e.Calendar)
-                .Include(e => e.Calendar.Group)
+                .Include("Calendar.Group")
                 .Where(e => e.Users.Any(u => u.UserID == id))
                 .Select(e => new
                 {
@@ -56,9 +56,9 @@ namespace Let_s_Meet.Controllers
                     background = e.Calendar.Color,
                     backgroundColor = e.Calendar.Color,
                     calendarId = e.Calendar.CalendarID,
-                    groupId = e.Calendar.Group.GroupID,
-
-                    // TODO users w/o infinite loop
+                    groupId = e.Calendar.Group != null ? e.Calendar.Group.GroupID : -1,
+                    groupName = e.Calendar.Group != null ? e.Calendar.Group.GroupName : null,
+                    groupUsers = e.Calendar.Group != null ? e.Calendar.Group.Users.Select(u => new { u.UserID, u.FirstName, u.LastName, u.Email }) : null
                 })
                 .ToListAsync();
             return Ok(events);
@@ -74,7 +74,7 @@ namespace Let_s_Meet.Controllers
                 .Events
                 .Include(e => e.Users)
                 .Include(e => e.Calendar)
-                .Include(e => e.Calendar.Group)
+                .Include("Calendar.Group")
                 .Where(e => calendarIDs.Contains(e.Calendar.CalendarID) && e.Users.Any(u => u.UserID == id))
                 .Select(e => new
                 {
@@ -85,11 +85,11 @@ namespace Let_s_Meet.Controllers
                     location = e.Location,
                     color = e.Calendar.Color,
                     background = e.Calendar.Color,
-                    backgroundColor = e.Calendar.Color,
+                    backgroundColor = e.Calendar.Color,     
                     calendarId = e.Calendar.CalendarID,
-                    groupId = e.Calendar.Group.GroupID,
-
-                    // TODO users w/o infinite loop
+                    groupId = e.Calendar.Group != null ? e.Calendar.Group.GroupID : -1,
+                    groupName = e.Calendar.Group != null ? e.Calendar.Group.GroupName : null,
+                    groupUsers = e.Calendar.Group != null ? e.Calendar.Group.Users.Select(u => new { u.UserID, u.FirstName, u.LastName, u.Email }) : null
                 })
                 .ToListAsync();
             return Ok(events);
@@ -146,6 +146,8 @@ namespace Let_s_Meet.Controllers
             CalendarModel cal = await _context.Calendars.FindAsync(calendarID);
 
             List<UserModel> users = new List<UserModel> { userModel };
+
+            // TODO if calendar has group add group users to users
             
             eventModel.Users = users;
             eventModel.Calendar = cal;

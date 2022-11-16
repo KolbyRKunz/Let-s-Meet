@@ -317,5 +317,33 @@ namespace Let_s_Meet.Controllers
 
             return Ok(new { status = "ok", message = "User joined group" });
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> LeaveGroup(int id)
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get user model
+            UserModel userModel = await _context.Users.FindAsync(userId);
+
+            // Get group with id
+            GroupModel group = await _context
+                .Groups
+                .Include("Users")
+                .Where(g => g.GroupID == id)
+                .FirstOrDefaultAsync();
+
+            if (group == null) return NotFound();
+
+            group.Users.Remove(userModel);
+            _context.Update(group);
+
+            // TODO delete group if empty?
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
