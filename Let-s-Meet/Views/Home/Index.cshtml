@@ -11,132 +11,130 @@
     <!--Sweet Alert 2-->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--<script src="sweetalert2.all.min.js"></script>-->
+</head>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridWeek',
-                headerToolbar: {
-                    left: 'prev,next,title',
-                    center: '',
-                    right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
-                },
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            headerToolbar: {
+                left: 'prev,next,title',
+                center: '',
+                right: 'today,dayGridMonth,timeGridWeek,timeGridDay'
+            },
 
-                height: "auto",
+            height: "auto",
 
-                events: '/EventModels/GetEvents',
+            events: function (fetchInfo, successCallback, failureCallback) {
+               if (document.readyState === 'complete') { 
+                    var potentialChecks = document.getElementsByClassName('checkbox');
 
-                //editable:true, //TODO: Try to add this back later, the clicking and dragging of events doesn't update on the database correctly yet
-                selectable:true,
-                nowIndicator: true,
-                navLinks: true,
-                //timeZone:'UTC',
-                //timeZone:'local',
-                
-                //IMPORTANT: this is doing the displaying of the location since it's not a default fullcalendar attribute
-                eventDidMount: function (info) {
-                    //Need to make sure it's not month view because this won't work there
-                    if (info.view.type != 'dayGridMonth') //This doesn't work on month view
+                    const ids = []
+                    for(var i = 0; i < potentialChecks.length; i++)
                     {
-                        let location = document.createElement('div');
-                        location.innerHTML = info.event.extendedProps.location;
-                        info.el.querySelector('.fc-event-title-container').append(location);
-                    }
-                },
-                timeZone:'local',
+                        var calId = potentialChecks[i].id;
 
-                eventClick: function(info){
-                    var eventID = info.event.id;
-                    Swal.fire({
-                        title: 'Are you sure you want to delete this event?',
-                        text: "You won't be able to revert this!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete event!'
-                    }).then((result) => {
-                        if(result.isConfirmed)
+                        var cal = document.getElementById(calId);
+                        if(cal.checked == true)
                         {
-                            info.event.remove(); 
-                            var url = '/EventModels/Delete';
+                            ids.push(parseInt(calId))
+                        }
+                    }
 
-                            var eventData = {
-                                id: parseInt(eventID)
+                    /*Since it's a get, there is no body, only query string parameters
+                    https://stackoverflow.com/questions/10298899/how-to-send-data-in-request-body-with-a-get-when-using-jquery-ajax */
+                    var url = '/EventModels/GetCalendarEvents?calendarIds='
+
+                    for(var i = 0; i < ids.length; i++)
+                    {
+                        if(i == ids.length-1){
+                            url += ids[i]
+                        }
+                        else {
+                            url += ids[i] + "&calendarIds="
+                        }
+                    }
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (result) {
+                            //console.log(result);
+                            var events = [];
+
+                            for(var i=0; i < result.length; i++)
+                            {
+                                events.push({
+                                    id: result[i].id,
+                                    title: result[i].title,
+                                    start: result[i]. start,
+                                    end: result[i].end,
+                                    location: result[i].location,
+                                    color: result[i].color,
+                                    background: result[i].background,
+                                    backgroundColor: result[i].backgroundColor,
+                                    calendarId: result[i].calendarId,
+                                    groupId: result[i].groupId,
+                                    groupName: result[i].groupName,
+                                    groupUsers: result[i].groupUsers,
+                                });
                             }
 
-                            $.ajax({
-                                type: 'POST',
-                                url: url,
-                                dataType: 'json',
-                                contentType: 'application/json',
-                                data: JSON.stringify(eventData)
-                            })
+                            successCallback(events) //This is what does the placing of events on calendar
+                            //calendar.refetchEvents();
+                        },
+                        error: function (error) {
+                            console.log("error in retrieving events")
                         }
-                    })
-                },
-
-                select: function(data){
-                    console.log(data); //this is the data given by the select callback, fullcalendar
-                    var startDate = formatStartEndDate(data.start)//FIXED: Have to give it start/end and not startStr/endStr becuase it will leave out important data
-                    var endDate = formatStartEndDate(data.end) //TODO: convert to local time currently UTC
-
-                    addEvent(startDate, endDate).then((values) => { //JS promise?
-                        console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
-                        var eventName = values.eventName
-                        var calendarID = values.calendarID
-                        var location = values.location
-
-                        var startDate = $('#startDate').val()
-                        var endDate = $('#endDate').val()
-
-                        startDate = new Date(startDate)
-                        endDate = new Date(endDate)
-
-                        if(endDate.getTime() < startDate.getTime()) //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
-                        {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'The End Date can\'t be before Start Date',
-                            })
-                            return
+                    });
+                }
+                else
+                {
+                    document.onreadystatechange = () => {
+                        if (document.readyState === "complete") {
+                            calendar.refetchEvents();
                         }
-                        if (eventName == "") //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
-                        {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'Please enter Event Name',
-                            })
-                            return
-                        }
-                        if(calendarID == null) //TODO: Do we want to make so we require users to select a calendar?
-                        {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'Please select a calendar',
-                            })
-                            return
-                        }
+                    };
+                }
+            },
 
-                        /*Need to convert to ISOstring for database
-                            it has a similar idea to UTC, but different formatting
-                            but I found the C# played nicer with this than .toUTCString()*/
-                        startDate = startDate.toISOString()
-                        endDate = endDate.toISOString()
+            //editable:true, //TODO: Try to add this back later, the clicking and dragging of events doesn't update on the database correctly yet
+            selectable:true,
+            nowIndicator: true,
+            navLinks: true,
+            timeZone:'local',
+                
+            //IMPORTANT: this is doing the displaying of the location since it's not a default fullcalendar attribute
+            eventDidMount: function (info) {
+                //Need to make sure it's not month view because this won't work there
+                if (info.view.type != 'dayGridMonth') //This doesn't work on month view
+                {
+                    let location = document.createElement('div');
+                    location.innerHTML = info.event.extendedProps.location;
+                    info.el.querySelector('.fc-event-title-container').append(location);
+                }
+            },
 
-                        //REMEMBER: Need dates/times to go to the backend in UTC format!
-                        var url = 'EventModels/Create';
+            eventClick: function(info){
+                var eventID = info.event.id;
+                Swal.fire({
+                    title: 'Are you sure you want to delete this event?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete event!'
+                }).then((result) => {
+                    if(result.isConfirmed)
+                    {
+                        info.event.remove(); 
+                        var url = '/EventModels/Delete';
 
                         var eventData = {
-                            title: eventName,
-                            startTime: startDate,
-                            endTime: endDate,
-                            calendarID: calendarID,
-                            location: location
+                            id: parseInt(eventID)
                         }
 
                         $.ajax({
@@ -146,32 +144,153 @@
                             contentType: 'application/json',
                             data: JSON.stringify(eventData)
                         })
-                        .done(function(result) {
-                            console.log(result)
-                            calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
-                        });
-                        
+                    }
+                })
+            },
+
+            select: function(data){
+                console.log(data); //this is the data given by the select callback, fullcalendar
+                var startDate = formatStartEndDate(data.start)//FIXED: Have to give it start/end and not startStr/endStr becuase it will leave out important data
+                var endDate = formatStartEndDate(data.end) //TODO: convert to local time currently UTC
+
+                addEvent(startDate, endDate).then((values) => { //JS promise?
+                    console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
+                    var eventName = values.eventName
+                    var calendarID = values.calendarID
+                    var location = values.location
+
+                    var startDate = $('#startDate').val()
+                    var endDate = $('#endDate').val()
+
+                    startDate = new Date(startDate)
+                    endDate = new Date(endDate)
+
+                    if(endDate.getTime() < startDate.getTime()) //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'The End Date can\'t be before Start Date',
+                        })
+                        return
+                    }
+                    if (eventName == "") //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Please enter Event Name',
+                        })
+                        return
+                    }
+                    if(calendarID == null) //TODO: Do we want to make so we require users to select a calendar?
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Please select a calendar',
+                        })
+                        return
+                    }
+
+                    /*Need to convert to ISOstring for database
+                        it has a similar idea to UTC, but different formatting
+                        but I found the C# played nicer with this than .toUTCString()*/
+                    startDate = startDate.toISOString()
+                    endDate = endDate.toISOString()
+
+                    //REMEMBER: Need dates/times to go to the backend in UTC format!
+                    var url = 'EventModels/Create';
+
+                    var eventData = {
+                        title: eventName,
+                        startTime: startDate,
+                        endTime: endDate,
+                        calendarID: calendarID,
+                        location: location
+                    }
+
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        data: JSON.stringify(eventData)
                     })
-                    .catch(error => console.log(error));
-                },
+                    .done(function(result) {
+                        console.log(result)
+                        calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
+                    });
+                        
+                })
+                .catch(error => console.log(error));
+            },
                 
-            });
-            calendar.render();
         });
 
-    </script>
-</head>
+        calendar.render();
+
+
+        /*Need to put this here since the getElementsByClassName gets a live list
+            So this needs to happen when the DOM is done loading*/
+        fetch('/CalendarModels/GetCalendars')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                displayCalendars(data);
+            })
+            .catch(function (e) {
+                console.log("error in getting calendars: " + e);
+            })
+
+        function displayCalendars(data) {
+            var calendarFilter = document.getElementById("checkboxFilter");
+            for (var i = 0; i < data.length; i++) {
+                var div = document.createElement('div');
+                div.setAttribute('class', 'check');
+
+                var inputTag = document.createElement('input');
+                inputTag.setAttribute('type', 'checkbox');
+                inputTag.setAttribute('id', data[i].calendarID);
+                inputTag.setAttribute('name', 'checkbox');
+                inputTag.setAttribute('value', data[i].name);
+                inputTag.setAttribute('class', 'checkbox');
+                //inputTag.setAttribute('checked', true);
+                inputTag.onclick = (e) => {
+                    calendar.refetchEvents();
+                }
+                div.appendChild(inputTag);
+
+                var labelTag = document.createElement('label');
+                labelTag.setAttribute('for', data[i].calendarID);
+                labelTag.innerHTML = data[i].name;
+                div.appendChild(labelTag);
+                calendarFilter.appendChild(div);
+            }
+        }
+
+    });
+
+</script>
+
+
 
 <h1 class="description">My Schedule</h1>
-
-<div class="calendarContainer">
-    <div id='calendar' style=" padding: 15px; background-color: #950741; border-radius: 30px"></div>
+<div id="mySchedule">
+    <div class="calendarContainer filterDisplay">
+        <div id='calendar' style=" padding: 15px; background-color: #950741; border-radius: 30px"></div>
+    </div>
+    <div class="filterDisplay" id="filter">
+        <h3 class="description">Filter Calendars</h3>
+        <div id="checkboxFilter">
+        </div>
+    </div>
 </div>
 
 <script>
 
     async function addEvent(startDate, endDate){
-
         
         // Generate html string for calendar select input using calendars in ViewBag
         var calendars = JSON.parse('@Html.Raw(@ViewBag.Calendars)');
@@ -180,8 +299,6 @@
             calendarInput += '<option value="' + calendars[i].calendarID + '">' + calendars[i].name + '</option>';
         }
         calendarInput += '</select>';
-
-        
 
         const { value: formValues } = await Swal.fire({
             title: 'Event Info',

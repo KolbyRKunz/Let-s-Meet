@@ -344,3 +344,26 @@ body.modal-open div.modal-backdrop {
     margin: 1%;
     padding: 1%;
 }
+
+.filterDisplay {
+    display: block;
+    width:fit-content;
+    margin: 10px;
+}
+
+#mySchedule {
+    display:flex;
+}
+
+#checkboxFilter {
+    display: inline;
+}
+
+.check {
+    display: block;
+    padding: 5px;
+}
+
+#filter {
+    width: 25%;
+}
