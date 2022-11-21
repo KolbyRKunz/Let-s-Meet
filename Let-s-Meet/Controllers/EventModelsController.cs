@@ -13,6 +13,7 @@ using Let_s_Meet.Areas.Identity.Data;
 using System.Globalization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.AspNetCore.Http;
+using Let_s_Meet.Processes;
 
 namespace Let_s_Meet.Controllers
 {
@@ -96,9 +97,19 @@ namespace Let_s_Meet.Controllers
         }
 
         // GET: EventModels/SuggestEvent
-        public async Task<IActionResult> SuggestEvent(int calendarID, string duration, int withinDays, string title, string location)
+        public async Task<IActionResult> SuggestEvent(int groupID, string duration, int withinDays, string title, string location)
         {
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            User user = await _um.GetUserAsync(User);
+            
+            DateTime start = DateTime.Now;
+            DateTime end = DateTime.Now.AddDays(withinDays);
+
+            TimeSpan timeSpan = TimeSpan.Parse(duration);
+
+            List<EventModel> suggested = await EventSuggestion.SuggestEventsAsync(_context, groupID, timeSpan, start, end, title, location);
+
+            
+            return Ok(suggested);
         }
 
 
@@ -147,8 +158,12 @@ namespace Let_s_Meet.Controllers
 
             List<UserModel> users = new List<UserModel> { userModel };
 
-            // TODO if calendar has group add group users to users
-            
+            // If calendar has group add group users to users
+            if (cal.Group != null)
+            {
+                users.AddRange(cal.Group.Users);
+            }
+
             eventModel.Users = users;
             eventModel.Calendar = cal;
 
