@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home Page, My Schedule";
 }
 
 <head>
@@ -265,6 +265,7 @@
                 var labelTag = document.createElement('label');
                 labelTag.setAttribute('for', data[i].calendarID);
                 labelTag.innerHTML = data[i].name;
+                labelTag.classList.add("checkLabel")
                 div.appendChild(labelTag);
                 calendarFilter.appendChild(div);
             }

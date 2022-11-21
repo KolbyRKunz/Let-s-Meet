@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Groups";
 }
 
 <!--Sweet Alert 2-->
@@ -104,8 +104,12 @@
         })
         .then(function (data) {
             console.log(data)
+
+            var div = document.createElement("div");
+            div.classList.add("memberContainer");
+
             var selectList = document.createElement("select");
-            selectList.className = "friends";
+            selectList.classList.add("friends");
             selector.appendChild(selectList);
             for (var i = 0; i < data.length; i++) {
                 var option = document.createElement("option");
@@ -113,6 +117,18 @@
                 option.text = data[i].firstName;
                 selectList.appendChild(option);
             }
+            var remove = document.createElement("span");
+            remove.classList.add("remove");
+            remove.innerHTML = "&times Remove";
+            remove.onclick = (e) => {
+                e.currentTarget.parentNode.remove()
+            }
+            selector.appendChild(remove);
+
+            div.appendChild(selectList)
+            div.appendChild(remove)
+            selector.appendChild(div)
+
         })
         .catch(function (e) {
             console.log("error in group creation: " + e);

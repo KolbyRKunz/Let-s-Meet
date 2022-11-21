@@ -343,7 +343,8 @@ namespace Let_s_Meet.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            //Had to put something in the ok because it was always giving error without it on the web frontend
+            return Ok(new { status = "ok", message = "Left group" });
         }
     }
 }

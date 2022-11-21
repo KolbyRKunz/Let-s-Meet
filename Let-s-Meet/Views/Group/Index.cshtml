@@ -51,6 +51,7 @@
 <div style="padding:1%">
     <button id="createMeetingBtn" class="btn btn-danger" data-target="#meetingCreationModal" data-toggle="modal">Let's Meet!</button>
     <button onClick="groupLink()" class="btn btn-danger">Get Group Join Link</button>
+    <button onClick="leaveGroup()" class="btn btn-danger">Leave Group</button>
 </div>
 
 <div id="groupInfo">
@@ -275,8 +276,7 @@
         groupName.innerHTML = "@ViewBag.GroupName" + " Group Calendar";
     }
 
-    //TODO: this api call will need to change as well to the correct controller
-   fetch('../api/getGroupMembers?groupId=' + @ViewBag.groupID)
+   fetch('/GroupModels/GetGroup?id=' + @ViewBag.groupID)
         .then(function (response) {
             return response.json();
         })
@@ -288,11 +288,12 @@
         })
 
     function getGroupMembers(data) {
+        var members = data.users;
         var groupContainer = document.getElementById("groupMembers");
-        for (var i = 0; i < data.length; i++) {
+        for (var i = 0; i < members.length; i++) {
             var div = document.createElement("li");
             div.setAttribute('class', 'members'); //Use this later for styling
-            div.innerHTML = data[i].member;
+            div.innerHTML = members[i].firstName + " " + members[i].email;
             groupContainer.appendChild(div);
         }
     }
@@ -308,6 +309,41 @@
             icon: 'success',
             title: url,
             text: "Copy the link above to give to someone to join the group"
+        })
+    }
+
+    function leaveGroup() {
+        /*Since it's a get, there is no body, only query string parameters
+        https://stackoverflow.com/questions/10298899/how-to-send-data-in-request-body-with-a-get-when-using-jquery-ajax */
+        Swal.fire({
+            title: 'Are you sure you want to leave the group?',
+            text: "You won't be able to rejoin without an invite!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, leave group!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var url = `/GroupModels/LeaveGroup?id=${@ViewBag.GroupId}`;
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function (result) {
+                        console.log(result)
+                        Swal.fire({
+                            title: 'You have left the group',
+                            icon: 'success',
+                        }).then((result) => {
+                            location.replace("../Home/Groups");
+                        })
+                    },
+                    error: function (error) {
+                        console.log("error in leaving group")
+                    }
+                })
+            }
         })
     }
 
