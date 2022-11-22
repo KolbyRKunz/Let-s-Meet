@@ -168,6 +168,7 @@ html {
     color: #950741;
     padding: 0.5%;
     font-size: 115%;
+    margin: 1%;
 }
 
 #groupList a:hover {
@@ -191,6 +192,8 @@ html {
 .members {
     color: black;
     font-size: 130%;
+    list-style-type: none;
+    padding: 5%;
 }
 
 .groupItems {
@@ -296,6 +299,7 @@ html {
 
 .modalItem {
     padding: 1%;
+    margin: 1%;
 }
 
 /*This seemed to fix the graying out of the modal and making it uninteractable
@@ -314,6 +318,10 @@ body.modal-open div.modal-backdrop {
     margin: 1%;
 }
 
+.remove {
+    color: #950741
+}
+
 
 /* Aligning the friend request work */
 .pendingFriends {
@@ -326,6 +334,14 @@ body.modal-open div.modal-backdrop {
 .alignFriendRequest {
     margin: 1%;
     padding: 1%;
+}
+
+#pending {
+    font-size: 110%;
+}
+
+.friendLink {
+    font-size: 125%;
 }
 
 .qrCapton {
@@ -343,4 +359,31 @@ body.modal-open div.modal-backdrop {
     display: inline-block;
     margin: 1%;
     padding: 1%;
+}
+
+.filterDisplay {
+    display: block;
+    width:fit-content;
+    margin: 10px;
+}
+
+#mySchedule {
+    display:flex;
+}
+
+#checkboxFilter {
+    display: inline;
+}
+
+.check {
+    display: block;
+    padding: 3%;
+}
+
+.checkLabel {
+    margin-left:2%;
+}
+
+#filter {
+    width: 25%;
 }

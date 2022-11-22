@@ -13,6 +13,7 @@ using Let_s_Meet.Areas.Identity.Data;
 using System.Globalization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.AspNetCore.Http;
+using Let_s_Meet.Models.FromBodyDataModels;
 
 namespace Let_s_Meet.Controllers
 {
@@ -43,7 +44,7 @@ namespace Let_s_Meet.Controllers
                 .Events
                 .Include(e => e.Users)
                 .Include(e => e.Calendar)
-                .Include(e => e.Calendar.Group)
+                .Include("Calendar.Group")
                 .Where(e => e.Users.Any(u => u.UserID == id))
                 .Select(e => new
                 {
@@ -56,9 +57,9 @@ namespace Let_s_Meet.Controllers
                     background = e.Calendar.Color,
                     backgroundColor = e.Calendar.Color,
                     calendarId = e.Calendar.CalendarID,
-                    groupId = e.Calendar.Group.GroupID,
-
-                    // TODO users w/o infinite loop
+                    groupId = e.Calendar.Group != null ? e.Calendar.Group.GroupID : -1,
+                    groupName = e.Calendar.Group != null ? e.Calendar.Group.GroupName : null,
+                    groupUsers = e.Calendar.Group != null ? e.Calendar.Group.Users.Select(u => new { u.UserID, u.FirstName, u.LastName, u.Email }) : null
                 })
                 .ToListAsync();
             return Ok(events);
@@ -74,7 +75,7 @@ namespace Let_s_Meet.Controllers
                 .Events
                 .Include(e => e.Users)
                 .Include(e => e.Calendar)
-                .Include(e => e.Calendar.Group)
+                .Include("Calendar.Group")
                 .Where(e => calendarIDs.Contains(e.Calendar.CalendarID) && e.Users.Any(u => u.UserID == id))
                 .Select(e => new
                 {
@@ -85,18 +86,18 @@ namespace Let_s_Meet.Controllers
                     location = e.Location,
                     color = e.Calendar.Color,
                     background = e.Calendar.Color,
-                    backgroundColor = e.Calendar.Color,
+                    backgroundColor = e.Calendar.Color,     
                     calendarId = e.Calendar.CalendarID,
-                    groupId = e.Calendar.Group.GroupID,
-
-                    // TODO users w/o infinite loop
+                    groupId = e.Calendar.Group != null ? e.Calendar.Group.GroupID : -1,
+                    groupName = e.Calendar.Group != null ? e.Calendar.Group.GroupName : null,
+                    groupUsers = e.Calendar.Group != null ? e.Calendar.Group.Users.Select(u => new { u.UserID, u.FirstName, u.LastName, u.Email }) : null
                 })
                 .ToListAsync();
             return Ok(events);
         }
 
         // GET: EventModels/SuggestEvent
-        public async Task<IActionResult> SuggestEvent(int calendarID, string duration, int withinDays, string title, string location)
+        public async Task<IActionResult> SuggestEvent([FromBody] SuggestEventModel eventData)
         {
             return StatusCode(StatusCodes.Status501NotImplemented);
         }
@@ -130,22 +131,24 @@ namespace Let_s_Meet.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create(string title, string location, string startTime, string endTime, int calendarID)
+        public async Task<IActionResult> Create([FromBody] CreateEventModel eventData)
         {
             var styles = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
             var culture = CultureInfo.InvariantCulture;
             const string dateFormatString = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
             EventModel eventModel = new EventModel {
-                Title = title,
-                Location = location,
-                StartTime = DateTime.ParseExact(startTime, dateFormatString, culture, styles),
-                EndTime = DateTime.ParseExact(endTime, dateFormatString, culture, styles)
+                Title = eventData.title,
+                Location = eventData.location,
+                StartTime = DateTime.ParseExact(eventData.startTime, dateFormatString, culture, styles),
+                EndTime = DateTime.ParseExact(eventData.endTime, dateFormatString, culture, styles)
             };
             User user = await _um.GetUserAsync(User);
             UserModel userModel = await _context.Users.FindAsync(user.UserID);
-            CalendarModel cal = await _context.Calendars.FindAsync(calendarID);
+            CalendarModel cal = await _context.Calendars.FindAsync(eventData.calendarID);
 
             List<UserModel> users = new List<UserModel> { userModel };
+
+            // TODO if calendar has group add group users to users
             
             eventModel.Users = users;
             eventModel.Calendar = cal;
@@ -234,9 +237,9 @@ namespace Let_s_Meet.Controllers
 
         // POST: EventModels/Delete/5
         [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed([FromBody] IdModel id)
         {
-            var eventModel = await _context.Events.FindAsync(id);
+            var eventModel = await _context.Events.FindAsync(id.id);
             _context.Events.Remove(eventModel);
             await _context.SaveChangesAsync();
             return Ok();//RedirectToAction(nameof(Index));

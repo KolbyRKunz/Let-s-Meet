@@ -10,6 +10,7 @@ using Let_s_Meet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Let_s_Meet.Areas.Identity.Data;
+using Let_s_Meet.Models.FromBodyDataModels;
 
 namespace Let_s_Meet.Controllers
 {
@@ -196,7 +197,7 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGroup(string name, List<int> friendIds)
+        public async Task<IActionResult> CreateGroup([FromBody] GroupCreationModel groupInfo)
         {
             User user = await _um.GetUserAsync(User);
             int userId = user.UserID;
@@ -206,16 +207,16 @@ namespace Let_s_Meet.Controllers
                 .Friends
                 .Where(f =>
                     (
-                        (f.RequestedByID == userId && friendIds.Contains(f.RequestedToID))
+                        (f.RequestedByID == userId && groupInfo.friendIds.Contains(f.RequestedToID))
                         ||
-                        (f.RequestedToID == userId && friendIds.Contains(f.RequestedByID))
+                        (f.RequestedToID == userId && groupInfo.friendIds.Contains(f.RequestedByID))
                     )
                     &&
                     f.RequestStatus == FriendRequestStatus.Accepted
                 )
                 .ToListAsync();
 
-            if (friends.Count != new HashSet<int>(friendIds).Count)
+            if (friends.Count != new HashSet<int>(groupInfo.friendIds).Count)
             {
                 return BadRequest("Not all ids are friends");
             }
@@ -223,7 +224,7 @@ namespace Let_s_Meet.Controllers
             // Get list of UserModels for friends
             List<UserModel> users = await _context
                 .Users
-                .Where(u => friendIds.Contains(u.UserID))
+                .Where(u => groupInfo.friendIds.Contains(u.UserID))
                 .ToListAsync();
             UserModel userModel = await _context.Users.FindAsync(userId);
             users.Add(userModel);
@@ -232,7 +233,7 @@ namespace Let_s_Meet.Controllers
             // Create group
             GroupModel group = new GroupModel
             {
-                GroupName = name,
+                GroupName = groupInfo.name,
                 Users = users
             };
             _context.Add(group);
@@ -265,7 +266,6 @@ namespace Let_s_Meet.Controllers
 
             return Ok(new { status = "ok", message = "Group created" });
         }
-        
         public async Task<IActionResult> JoinGroupRedirect(string joinCode)
         {
             var result = await JoinGroup(joinCode);
@@ -316,6 +316,35 @@ namespace Let_s_Meet.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { status = "ok", message = "User joined group" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> LeaveGroup(int id)
+        {
+            User user = await _um.GetUserAsync(User);
+            int userId = user.UserID;
+
+            // Get user model
+            UserModel userModel = await _context.Users.FindAsync(userId);
+
+            // Get group with id
+            GroupModel group = await _context
+                .Groups
+                .Include("Users")
+                .Where(g => g.GroupID == id)
+                .FirstOrDefaultAsync();
+
+            if (group == null) return NotFound();
+
+            group.Users.Remove(userModel);
+            _context.Update(group);
+
+            // TODO delete group if empty?
+
+            await _context.SaveChangesAsync();
+
+            //Had to put something in the ok because it was always giving error without it on the web frontend
+            return Ok(new { status = "ok", message = "Left group" });
         }
     }
 }

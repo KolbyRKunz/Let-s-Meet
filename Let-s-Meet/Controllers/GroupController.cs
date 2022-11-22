@@ -25,6 +25,7 @@ namespace Let_s_Meet.Controllers
 
         public IActionResult Index(string joinCode)
         {
+            ViewBag.joinCode = joinCode;
             var fullUrl = this.Url.Action("JoinGroup", "GroupModels", new { joinCode = joinCode }, "https");
             var fullUrlRedirect = this.Url.Action("JoinGroupRedirect", "GroupModels", new { joinCode = joinCode }, "https");
             /*Regex r = new Regex(@"^*\d");
