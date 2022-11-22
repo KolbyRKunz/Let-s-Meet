@@ -1,4 +1,6 @@
 ﻿<link rel="stylesheet" type="text/css" href="~/css/site.css" />
+<!--moment.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!--Sweet Alert 2-->
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--<script src="sweetalert2.all.min.js"></script>-->
@@ -115,15 +117,6 @@
                 <h5>If none of these work, hit cancel and start a new search with different days</h5>
             </div>
             <div id="meetingTimesList">
-                <!--TODO: Remove these later, it's hardcoded just for displaying an idea of what it looks like-->
-                <div class="potentialTime">
-                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
-                    <button class="alignTime btn-danger">Accept</button>
-                </div>
-                <div class="potentialTime">
-                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
-                    <button class="alignTime btn-danger">Accept</button>
-                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -176,23 +169,21 @@
         var days = daysSelect.options[daysSelect.selectedIndex].value;
         var lengthSelect = document.getElementById('meetingLength');
         var length = lengthSelect.options[lengthSelect.selectedIndex].value;
-        console.log(reason);
-        console.log(location);
-        console.log(days);
-        console.log(length);
         
         /*TODO: this is where the API call for the finding meeting time will go
             I put the friends request one here for now since it does something similar-ish
             to what I think will happen here with meeting times, but let me know if it needs to change. */
-        var url = '/FriendsModels/GetReceivedRequests'; //TODO: this will be actual meeting creation api call
+        //var url = '/FriendsModels/GetReceivedRequests'; //TODO: this will be actual meeting creation api call
+        var url = '/EventModels/SuggestEvent';
         var meetingData = {
-            reason: reason,
+            groupID: @ViewBag.groupID,
+            duration: length,
+            withinDays: days,
+            title: reason,
             location: location,
-            days: days,
-            length: length
         }
         $.ajax({
-            type: 'POST',
+            type: 'POST', //TODO: Should this be get or post?
             url: url,
             dataType: 'json',
             data: meetingData,
@@ -200,7 +191,6 @@
         })
         .done(function (data) {
             //TODO: error checking
-            console.log(data)
             getMeetingTimes(data)
         })
         .fail(function (error) {
@@ -213,16 +203,16 @@
                 var potentialTime = document.createElement("div");
                 potentialTime.setAttribute('class', 'potentialTime');
                 var time = document.createElement('p');
-                time.innerHTML = data[i].requestedBy.firstName; //TODO: change this to time from meeting api call
+                time.innerHTML = convertToHumanReadable(data[i].startTime) + " to " + convertToHumanReadable(data[i].endTime); //TODO: change this to time from meeting api call
                 var accept = document.createElement("button");
                 accept.innerHTML = "Accept";
-                accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
+                accept.setAttribute("id", data[i].eventID); //TODO: Change this id
                 accept.onclick = (e) => {
                     console.log(e.target.id);
                     $.ajax({
-                        url: "/FriendsModels/AcceptRequest", //TODO: change this to the meeting time accept method
+                        //url: "/FriendsModels/AcceptRequest", //TODO: change this to the meeting time accept method
                         type: "POST",
-                        data: { id: parseInt(e.target.id) }, //TODO: will this need to change also?
+                        //data: { id: parseInt(e.target.id) }, //TODO: will this need to change also?
                         dataType: "json",
                         success: function (response) {
                             console.log(response)
@@ -306,6 +296,15 @@
             title: url,
             text: "Copy the link above to give to someone to join the group"
         })
+    }
+    
+    function convertToHumanReadable(dateToConvert) {
+        console.log(dateToConvert)
+        var dateObj = new Date(dateToConvert)
+        var momentObj = moment(dateObj)
+        var momentString = momentObj.format('MMMM Do YYYY, h:mm a')
+        console.log(momentString)
+        return momentString
     }
 
 </script>
