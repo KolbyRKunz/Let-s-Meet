@@ -33,6 +33,7 @@ namespace Let_s_Meet.Controllers
 
             int groupID = 0;
             string groupName = "";
+            int groupCalendarID = 0;
             try
             {
                 //groupID = int.Parse(r.Match(joinCode).Value);
@@ -44,12 +45,14 @@ namespace Let_s_Meet.Controllers
                     .Single();
                 groupID = group.GroupID;
                 groupName = group.GroupName;
+                groupCalendarID = group.CalendarID;
             } catch {
                 return Ok(new { status = "error", message = "Failed to Idenitify Group" });
             }
             ViewBag.GroupId = groupID;
             ViewBag.fullUrlRedirect = fullUrlRedirect;
             ViewBag.GroupName = groupName;
+            ViewBag.GroupCalendarID = groupCalendarID;
             QRCodeGenerator qrGen = new QRCodeGenerator();
             var qr = qrGen.CreateQrCode(fullUrl, QRCodeGenerator.ECCLevel.L);
             var qrCode = new QRCode(qr);

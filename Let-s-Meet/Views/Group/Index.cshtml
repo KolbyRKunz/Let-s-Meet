@@ -23,8 +23,14 @@
 
                 height: "auto",
 
-                events: '/api/getGroupEvents', //TODO: will need to call correct api controller to get group event, this is a hard coded data call
+                events: `/EventModels/GetCalendarEvents?calendarIds=${"@ViewBag.GroupCalendarID"}`, //TODO: is this the correct call
                 
+                selectable:true,
+                nowIndicator: true,
+                navLinks: true,
+                nowIndicator: true,
+                timeZone:'local',
+
                 //IMPORTANT: this is doing the displaying of the location since it's not a default fullcalendar attribute
                 eventDidMount: function (info) {
                     //Need to make sure it's not month view because this won't work there
@@ -36,7 +42,103 @@
                     }
                 },
                 
-                nowIndicator: true
+                eventClick: function (info) {
+                    var eventID = info.event.id;
+                    Swal.fire({
+                        title: 'Are you sure you want to delete this event?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete event!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            info.event.remove();
+                            var url = '/EventModels/Delete';
+
+                            var eventData = {
+                                id: parseInt(eventID)
+                            }
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify(eventData)
+                            })
+                        }
+                    })
+                },
+
+                select: function (data) {
+                    console.log(data); //this is the data given by the select callback, fullcalendar
+                    var startDate = formatStartEndDate(data.start)//FIXED: Have to give it start/end and not startStr/endStr becuase it will leave out important data
+                    var endDate = formatStartEndDate(data.end) //TODO: convert to local time currently UTC
+
+                    addEvent(startDate, endDate).then((values) => { //JS promise?
+                        console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
+                        var eventName = values.eventName
+                        var calendarID = "@ViewBag.GroupCalendarID"
+                        var location = values.location
+                        var startDate = $('#startDate').val()
+                        var endDate = $('#endDate').val()
+
+                        startDate = new Date(startDate)
+                        endDate = new Date(endDate)
+
+                        if (endDate.getTime() < startDate.getTime()) //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'The End Date can\'t be before Start Date',
+                            })
+                            return
+                        }
+                        if (eventName == "") //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Please enter Event Name',
+                            })
+                            return
+                        }
+
+                        /*Need to convert to ISOstring for database
+                            it has a similar idea to UTC, but different formatting
+                            but I found the C# played nicer with this than .toUTCString()*/
+                        startDate = startDate.toISOString()
+                        endDate = endDate.toISOString()
+
+                        //REMEMBER: Need dates/times to go to the backend in UTC format!
+                        var url = '/EventModels/Create';
+
+                        var eventData = {
+                            title: eventName,
+                            startTime: startDate,
+                            endTime: endDate,
+                            calendarID: calendarID,
+                            location: location
+                        }
+                        console.log(eventData)
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            contentType: 'application/json',
+                            data: JSON.stringify(eventData)
+                        })
+                        .done(function (result) {
+                            console.log(result)
+                            calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
+                        });
+
+                    })
+                    .catch(error => console.log(error));
+                },
+            
             });
             calendar.render();
         });
@@ -116,15 +218,6 @@
                 <h5>If none of these work, hit cancel and start a new search with different days</h5>
             </div>
             <div id="meetingTimesList">
-                <!--TODO: Remove these later, it's hardcoded just for displaying an idea of what it looks like-->
-                <div class="potentialTime">
-                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
-                    <button class="alignTime btn-danger">Accept</button>
-                </div>
-                <div class="potentialTime">
-                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
-                    <button class="alignTime btn-danger">Accept</button>
-                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -177,33 +270,29 @@
         var days = daysSelect.options[daysSelect.selectedIndex].value;
         var lengthSelect = document.getElementById('meetingLength');
         var length = lengthSelect.options[lengthSelect.selectedIndex].value;
-        console.log(reason);
-        console.log(location);
-        console.log(days);
-        console.log(length);
         
         /*TODO: this is where the API call for the finding meeting time will go
             I put the friends request one here for now since it does something similar-ish
             to what I think will happen here with meeting times, but let me know if it needs to change. */
-        var url = '/FriendsModels/GetReceivedRequests'; //TODO: this will be actual meeting creation api call
+        var url = '/EventModels/SuggestEvent'; //TODO: this will be actual meeting creation api call
+        
         var meetingData = {
+            groupID: @ViewBag.groupID,
+            duration: length,
+            withinDays: days,
             title: reason,
             location: location,
-            withinDays: days,
-            duration: length,
-            //calendarID: 1 //TODO: How to get calendarID here
         }
+        
         $.ajax({
             type: 'POST',
             url: url,
-            dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify(meetingData),
             //async: false //Is this needed to make sure ajax doesn't return early, but it should be solved by .done
         })
         .done(function (data) {
             //TODO: error checking
-            console.log(data)
             getMeetingTimes(data)
         })
         .fail(function (error) {
@@ -219,13 +308,22 @@
                 time.innerHTML = data[i].requestedBy.firstName; //TODO: change this to time from meeting api call
                 var accept = document.createElement("button");
                 accept.innerHTML = "Accept";
-                accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
+                //accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
                 accept.onclick = (e) => {
                     console.log(e.target.id);
+
+                    var meetingData = { 
+                        title: data[i], //TODO: fill in with actual data when merged
+                        location: data[i], //TODO: fill in with actual data when merged
+                        startTime: data[i], //TODO: fill in with actual data when merged
+                        endTime: data[i], //TODO: fill in with actual data when merged
+                        calendarID: @ViewBag.GroupCalendarID,
+                    }
+
                     $.ajax({
-                        url: "/FriendsModels/AcceptRequest", //TODO: change this to the meeting time accept method
+                        url: "/EventModels/Create", //TODO: change this to the meeting time accept method
                         type: "POST",
-                        data: JSON.stringify({ id: parseInt(e.target.id) }), //TODO: will this need to change also?
+                        data: JSON.stringify(meetingData), //TODO: will this need to change also?
                         contentType: 'application/json',
                         dataType: "json",
                         success: function (response) {
@@ -345,6 +443,52 @@
                 })
             }
         })
+    }
+
+    async function addEvent(startDate, endDate) {
+
+        const { value: formValues } = await Swal.fire({
+            title: 'Add an event that isn\'t created with the Let\'s Meet button',
+            html: //This does no input checking currently
+                //TODO: Figure out how to style in css not inline like this.
+                //Was struggling to get site.css to acess parts of the popup
+                '<div style="display:grid"><label>Event Name</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Event Location</label>' +
+                '<input type="text" id="location" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Start Date</label>' +
+                `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
+                '<br/></div>' +
+                '<div style="display:grid"><label>End Date</label>' +
+                `<input type="datetime-local" id="endDate" class="swal2-input" value="${endDate}">` +
+                '<br/></div>',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton: true,
+            confirmButtonText: 'Create Event',
+            preConfirm: () => {
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                    location: $('#location').val()
+                }
+            }
+        });
+        return formValues;
+    }
+
+    function formatStartEndDate(date) {
+        var formattedDate = new Date(date)
+        var d = String(formattedDate.getDate()).padStart(2, '0')
+        var m = String(formattedDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var y = formattedDate.getFullYear();
+        var h = String(formattedDate.getHours()).padStart(2, '0');
+        var mi = String(formattedDate.getMinutes()).padStart(2, '0')
+        formattedDate = y + "-" + m + "-" + d + "T" + h + ":" + mi
+        return formattedDate
     }
 
 </script>

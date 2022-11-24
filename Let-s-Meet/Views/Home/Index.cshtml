@@ -200,7 +200,7 @@
                     endDate = endDate.toISOString()
 
                     //REMEMBER: Need dates/times to go to the backend in UTC format!
-                    var url = 'EventModels/Create';
+                    var url = '/EventModels/Create';
 
                     var eventData = {
                         title: eventName,
@@ -292,9 +292,21 @@
 <script>
 
     async function addEvent(startDate, endDate){
+
+        //make it so only User calendars can be added to, not groups
+        let response = await fetch('/CalendarModels/GetCalendars')
+        let data = await response.json();
         
+        var calendars = [];
+        for(var i = 0; i < data.length; i++){
+            if(data[i].group === null){
+                calendars.push(data[i]);
+            }
+        }
+
         // Generate html string for calendar select input using calendars in ViewBag
-        var calendars = JSON.parse('@Html.Raw(@ViewBag.Calendars)');
+        //var calendars = JSON.parse('@Html.Raw(@ViewBag.Calendars)');
+
         var calendarInput = '<select class="swal2-input" name="calendars">';
         for (var i = 0; i < calendars.length; i++) {
             calendarInput += '<option value="' + calendars[i].calendarID + '">' + calendars[i].name + '</option>';
