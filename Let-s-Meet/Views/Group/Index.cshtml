@@ -1,4 +1,6 @@
 ﻿<link rel="stylesheet" type="text/css" href="~/css/site.css" />
+<!--moment.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!--Sweet Alert 2-->
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--<script src="sweetalert2.all.min.js"></script>-->
@@ -285,7 +287,7 @@
         }
         
         $.ajax({
-            type: 'POST',
+            type: 'POST', //TODO: Should this be get or post?
             url: url,
             contentType: 'application/json',
             data: JSON.stringify(meetingData),
@@ -305,7 +307,7 @@
                 var potentialTime = document.createElement("div");
                 potentialTime.setAttribute('class', 'potentialTime');
                 var time = document.createElement('p');
-                time.innerHTML = data[i].requestedBy.firstName; //TODO: change this to time from meeting api call
+                time.innerHTML = convertToHumanReadable(data[i].startTime) + " to " + convertToHumanReadable(data[i].endTime); //TODO: change this to time from meeting api call
                 var accept = document.createElement("button");
                 accept.innerHTML = "Accept";
                 //accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
@@ -408,6 +410,15 @@
             title: url,
             text: "Copy the link above to give to someone to join the group"
         })
+    }
+    
+    function convertToHumanReadable(dateToConvert) {
+        console.log(dateToConvert)
+        var dateObj = new Date(dateToConvert)
+        var momentObj = moment(dateObj)
+        var momentString = momentObj.format('MMMM Do YYYY, h:mm a')
+        console.log(momentString)
+        return momentString
     }
 
     function leaveGroup() {
