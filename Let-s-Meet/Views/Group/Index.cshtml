@@ -292,10 +292,18 @@
             contentType: 'application/json',
             data: JSON.stringify(meetingData),
             //async: false //Is this needed to make sure ajax doesn't return early, but it should be solved by .done
+            success: function(data) {
+                //Put the loop outside the function so variables are assigned correctly because closures
+                //Also I should be using let more than var in the future
+                for(let i = 0; i < data.length; i++){
+                    getMeetingTimes(data[i]);
+                }
+            }
         })
         .done(function (data) {
             //TODO: error checking
-            getMeetingTimes(data)
+            //Do in success function instead?
+            //getMeetingTimes(data)
         })
         .fail(function (error) {
             console.log(error);
@@ -303,70 +311,66 @@
 
         function getMeetingTimes(data) {
             console.log(data);
-            for (var i = 0; i < data.length; i++) {
-                var potentialTime = document.createElement("div");
-                potentialTime.setAttribute('class', 'potentialTime');
-                var time = document.createElement('p');
-                time.innerHTML = convertToHumanReadable(data[i].startTime) + " to " + convertToHumanReadable(data[i].endTime); //TODO: change this to time from meeting api call
-                var accept = document.createElement("button");
-                accept.innerHTML = "Accept";
-                //accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
-                accept.onclick = (e) => {
-                    console.log(e.target.id);
+            var potentialTime = document.createElement("div");
+            potentialTime.setAttribute('class', 'potentialTime');
+            var time = document.createElement('p');
+            time.innerHTML = convertToHumanReadable(data.startTime) + " to " + convertToHumanReadable(data.endTime); //TODO: change this to time from meeting api call
+            var accept = document.createElement("button");
+            accept.innerHTML = "Accept";
+                
+            accept.onclick = (e) => {
+                let timeData = {
+                    title: data.title,
+                    location: data.location,
+                    startTime: new Date (data.startTime).toISOString(), //TODO: is this needed? .toISOString()
+                    endTime: new Date(data.endTime).toISOString(),  //TODO: is this needed? .toISOString()
+                    calendarID: @ViewBag.GroupCalendarID,
+                };
 
-                    var meetingData = { 
-                        title: data[i], //TODO: fill in with actual data when merged
-                        location: data[i], //TODO: fill in with actual data when merged
-                        startTime: data[i], //TODO: fill in with actual data when merged
-                        endTime: data[i], //TODO: fill in with actual data when merged
-                        calendarID: @ViewBag.GroupCalendarID,
-                    }
-
-                    $.ajax({
-                        url: "/EventModels/Create", //TODO: change this to the meeting time accept method
-                        type: "POST",
-                        data: JSON.stringify(meetingData), //TODO: will this need to change also?
-                        contentType: 'application/json',
-                        dataType: "json",
-                        success: function (response) {
-                            console.log(response)
-                            if (response.status == 'error') {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                }).then((result) => {
-                                    window.location.reload();
-                                })
-                            }
-                            else {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Meeting added to group calendar',
-                                }).then((result) => {
-                                    window.location.reload();
-                                })
-                            }
-                        },
-                        //TODO: can this error function be deleted? since it was handled above
-                        error: function (response) {
-                            console.log("something went wrong in group events ", response)
+                $.ajax({
+                    url: "/EventModels/Create", //TODO: change this to the meeting time accept method
+                    type: "POST",
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify(timeData), //TODO: will this need to change also?
+                    success: function (response) {
+                        console.log(response)
+                        if (response.status == 'error') {
                             Swal.fire({
                                 icon: 'error',
-                                title: "Meeting can't be added to group events",
+                                title: response.message,
                             }).then((result) => {
                                 window.location.reload();
                             })
                         }
-                    })
-                }
-                time.setAttribute('class', 'alignTime');
-                accept.setAttribute('class', 'alignTime');
-                accept.classList.add('btn-danger');
-                potentialTime.appendChild(time);
-                potentialTime.appendChild(accept);
-                var meetingTimesList = document.getElementById("meetingTimesList");
-                meetingTimesList.appendChild(potentialTime);
+                        else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Meeting added to group calendar',
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        }
+                    },
+                    //TODO: can this error function be deleted? since it was handled above
+                    error: function (response) {
+                        console.log("something went wrong in group events ", response)
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Meeting can't be added to group events",
+                        }).then((result) => {
+                            window.location.reload();
+                        })
+                    }
+                })
             }
+            time.setAttribute('class', 'alignTime');
+            accept.setAttribute('class', 'alignTime');
+            accept.classList.add('btn-danger');
+            potentialTime.appendChild(time);
+            potentialTime.appendChild(accept);
+            var meetingTimesList = document.getElementById("meetingTimesList");
+            meetingTimesList.appendChild(potentialTime);
         }
     }
 
@@ -413,11 +417,9 @@
     }
     
     function convertToHumanReadable(dateToConvert) {
-        console.log(dateToConvert)
         var dateObj = new Date(dateToConvert)
         var momentObj = moment(dateObj)
         var momentString = momentObj.format('MMMM Do YYYY, h:mm a')
-        console.log(momentString)
         return momentString
     }
 

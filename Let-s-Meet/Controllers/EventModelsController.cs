@@ -103,11 +103,11 @@ namespace Let_s_Meet.Controllers
             User user = await _um.GetUserAsync(User);
             
             DateTime start = DateTime.Now;
-            DateTime end = DateTime.Now.AddDays(withinDays);
+            DateTime end = DateTime.Now.AddDays(eventData.withinDays);
 
-            TimeSpan timeSpan = TimeSpan.Parse(duration);
+            TimeSpan timeSpan = TimeSpan.Parse(eventData.duration);
 
-            List<EventModel> suggested = await EventSuggestion.SuggestEventsAsync(_context, groupID, timeSpan, start, end, title, location);
+            List<EventModel> suggested = await EventSuggestion.SuggestEventsAsync(_context, eventData.groupID, timeSpan, start, end, eventData.title, eventData.location);
 
             
             return Ok(suggested);
