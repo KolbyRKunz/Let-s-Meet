@@ -187,7 +187,7 @@
             <input type="text" class="modalItem " id="meetingLocation" placeholder="Location" />
             <h4>How soon do you want to hold the meeting?</h4>
             <select id="meetingDaysOut">
-                <option value="1">Within 1 day from now</option>
+                <option value="1" selected="selected">Within 1 day from now</option>
                 <option value="2">Within 2 days from now</option>
                 <option value="3">Within 3 days from now</option>
                 <option value="4">Within 4 days from now</option>
@@ -198,7 +198,11 @@
             <!--TODO: this can be removed if we don't want the select, I can just note that it's only hour long meetings for now-->
             <h4>Length of the meeting</h4>
             <select id="meetingLength">
-                <option value="1">1 hour</option>
+                <option value="00:30:00">30 minutes</option>
+                <option value="00:45:00">45 minutes</option>
+                <option value="01:00:00" selected="selected">1 hour</option>
+                <option value="02:00:00">2 hour</option>
+                <option value="03:00:00">3 hour</option>
             </select>
         </div>
         <div class="modal-footer">
@@ -310,7 +314,7 @@
         });
 
         function getMeetingTimes(data) {
-            console.log(data);
+            //console.log(data);
             var potentialTime = document.createElement("div");
             potentialTime.setAttribute('class', 'potentialTime');
             var time = document.createElement('p');
