@@ -130,20 +130,32 @@
                 }).then((result) => {
                     if(result.isConfirmed)
                     {
-                        info.event.remove(); 
-                        var url = '/EventModels/Delete';
-
-                        var eventData = {
-                            id: parseInt(eventID)
+                        //Don't allow deleting group events from here
+                        if (info.event._def.groupId !== "-1") //IMPORTANT: Have to do a string compare
+                        {
+                            Swal.fire({
+                                title: 'Can\'t delete group event from here',
+                                icon: 'error',
+                            })
                         }
+                        //Deleting a single user's event
+                        else
+                        {
+                            info.event.remove();
+                            var url = '/EventModels/Delete';
 
-                        $.ajax({
-                            type: 'POST',
-                            url: url,
-                            dataType: 'json',
-                            contentType: 'application/json',
-                            data: JSON.stringify(eventData)
-                        })
+                            var eventData = {
+                                id: parseInt(eventID)
+                            }
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify(eventData)
+                            })
+                        }
                     }
                 })
             },
