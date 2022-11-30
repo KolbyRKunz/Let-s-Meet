@@ -256,7 +256,7 @@
                 inputTag.setAttribute('name', 'checkbox');
                 inputTag.setAttribute('value', data[i].name);
                 inputTag.setAttribute('class', 'checkbox');
-                //inputTag.setAttribute('checked', true);
+                inputTag.setAttribute('checked', true);
                 inputTag.onclick = (e) => {
                     calendar.refetchEvents();
                 }
@@ -269,6 +269,7 @@
                 div.appendChild(labelTag);
                 calendarFilter.appendChild(div);
             }
+            calendar.refetchEvents();
         }
 
     });
