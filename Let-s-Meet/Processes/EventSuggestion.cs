@@ -27,6 +27,11 @@ namespace Let_s_Meet.Processes
         /// <returns></returns>
         private static async Task<List<EventModel>> SuggestEvents(MeetContext context, int groupID, TimeSpan duration, DateTime start, DateTime end, string title, string location)
         {
+            // Get calendar for the group
+            var calendar = await context.Calendars
+                .Include(c => c.Group)
+                .FirstOrDefaultAsync(c => c.Group.GroupID == groupID);
+
             // Get all users in the group
             var users = await context
                 .Groups
@@ -70,11 +75,16 @@ namespace Let_s_Meet.Processes
             List<EventModel> availableEvents = new List<EventModel>();
             foreach (TimeRange t in availablePeriods)
             {
+                DateTime tStart = t.Start.AddMinutes(5 - (t.Start.Minute % 5)); // Round up to multiple of 5
+                DateTime tEnd = t.End.AddMinutes(-(t.Start.Minute % 5)); // Round down to multiple of 5
+
+                TimeRange roundedT = new TimeRange(tStart, tEnd);
+
                 // If the available time is shorter than the duration, skip it
-                if (t.Duration < duration) continue;
+                if (roundedT.Duration < duration) continue;
 
                 // Split the available time into multiple events
-                int numEvents = (int)(t.Duration.TotalMinutes / duration.TotalMinutes);
+                int numEvents = (int)(roundedT.Duration.TotalMinutes / duration.TotalMinutes);
                 for (int i = 0; i < numEvents; i++)
                 {
                     // Create event
@@ -82,8 +92,10 @@ namespace Let_s_Meet.Processes
                     {
                         Title = title,
                         Location = location,
-                        StartTime = t.Start.AddMinutes(i * duration.TotalMinutes),
-                        EndTime = t.Start.AddMinutes((i + 1) * duration.TotalMinutes)
+                        StartTime = roundedT.Start.AddMinutes(i * duration.TotalMinutes),
+                        EndTime = roundedT.Start.AddMinutes((i + 1) * duration.TotalMinutes),
+                        Calendar = new CalendarModel { CalendarID = calendar.CalendarID },
+                        Users = users.Select(u => new UserModel { UserID = u.UserID, FirstName = u.FirstName, LastName = u.LastName, Email = u.Email }).ToList()
                     };
 
                     // Add event to list
