@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>My Calendars</h1>
+<h1 class="description">My Calendars</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -38,9 +38,13 @@
                 <div style=@Html.Raw("height:20px;width:20px;background:"+item.Color)></div>
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CalendarID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CalendarID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CalendarID" id="@item.CalendarID">Delete</a> <!--Figure out better way than putting id here, but keeping it like this for now-->
+                <div>
+                    <a asp-action="Details" asp-route-id="@item.CalendarID" style="display: inline-block;">Details</a>
+                    <div id="@item.CalendarID" style="display: inline-block;"> <!--Figure out better way than putting id here, but keeping it like this for now-->
+                        | <a asp-action="Edit" asp-route-id="@item.CalendarID">Edit</a>
+                        | <a asp-action="Delete" asp-route-id="@item.CalendarID">Delete</a> 
+                    </div>
+                </div>
             </td>
         </tr>
 }
