@@ -13,6 +13,7 @@ using Let_s_Meet.Areas.Identity.Data;
 using System.Globalization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.AspNetCore.Http;
+using Let_s_Meet.Models.FromBodyDataModels;
 using Let_s_Meet.Processes;
 
 namespace Let_s_Meet.Controllers
@@ -97,16 +98,16 @@ namespace Let_s_Meet.Controllers
         }
 
         // GET: EventModels/SuggestEvent
-        public async Task<IActionResult> SuggestEvent(int groupID, string duration, int withinDays, string title, string location)
+        public async Task<IActionResult> SuggestEvent([FromBody] SuggestEventModel eventData)
         {
             User user = await _um.GetUserAsync(User);
             
             DateTime start = DateTime.Now;
-            DateTime end = DateTime.Now.AddDays(withinDays);
+            DateTime end = DateTime.Now.AddDays(eventData.withinDays);
 
-            TimeSpan timeSpan = TimeSpan.Parse(duration);
+            TimeSpan timeSpan = TimeSpan.Parse(eventData.duration);
 
-            List<EventModel> suggested = await EventSuggestion.SuggestEventsAsync(_context, groupID, timeSpan, start, end, title, location);
+            List<EventModel> suggested = await EventSuggestion.SuggestEventsAsync(_context, eventData.groupID, timeSpan, start, end, eventData.title, eventData.location);
 
             
             return Ok(suggested);
@@ -141,20 +142,20 @@ namespace Let_s_Meet.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create(string title, string location, string startTime, string endTime, int calendarID)
+        public async Task<IActionResult> Create([FromBody] CreateEventModel eventData)
         {
             var styles = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
             var culture = CultureInfo.InvariantCulture;
             const string dateFormatString = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
             EventModel eventModel = new EventModel {
-                Title = title,
-                Location = location,
-                StartTime = DateTime.ParseExact(startTime, dateFormatString, culture, styles),
-                EndTime = DateTime.ParseExact(endTime, dateFormatString, culture, styles)
+                Title = eventData.title,
+                Location = eventData.location,
+                StartTime = DateTime.ParseExact(eventData.startTime, dateFormatString, culture, styles),
+                EndTime = DateTime.ParseExact(eventData.endTime, dateFormatString, culture, styles)
             };
             User user = await _um.GetUserAsync(User);
             UserModel userModel = await _context.Users.FindAsync(user.UserID);
-            CalendarModel cal = await _context.Calendars.FindAsync(calendarID);
+            CalendarModel cal = await _context.Calendars.FindAsync(eventData.calendarID);
 
             List<UserModel> users = new List<UserModel> { userModel };
 
@@ -251,9 +252,9 @@ namespace Let_s_Meet.Controllers
 
         // POST: EventModels/Delete/5
         [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed([FromBody] IdModel id)
         {
-            var eventModel = await _context.Events.FindAsync(id);
+            var eventModel = await _context.Events.FindAsync(id.id);
             _context.Events.Remove(eventModel);
             await _context.SaveChangesAsync();
             return Ok();//RedirectToAction(nameof(Index));

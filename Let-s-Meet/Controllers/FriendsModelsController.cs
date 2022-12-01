@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Runtime.InteropServices;
 using Let_s_Meet.Migrations;
 using Let_s_Meet.Models.JWTModels;
+using Let_s_Meet.Models.FromBodyDataModels;
 
 namespace Let_s_Meet.Controllers
 {
@@ -245,9 +246,9 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AcceptRequest(int id)
+        public async Task<IActionResult> AcceptRequest([FromBody] IdModel id)
         {
-            FriendsModel fm = await _context.Friends.FindAsync(id);
+            FriendsModel fm = await _context.Friends.FindAsync(id.id);
             if (fm == null)
             {
                 return NotFound();
@@ -270,9 +271,9 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RejectRequest(int id)
+        public async Task<IActionResult> RejectRequest([FromBody] IdModel id)
         {
-            FriendsModel fm = await _context.Friends.FindAsync(id);
+            FriendsModel fm = await _context.Friends.FindAsync(id.id);
             if (fm == null)
             {
                 return NotFound();
@@ -295,10 +296,10 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateFriendRequestById(int friendId)
+        public async Task<IActionResult> CreateFriendRequestById([FromBody] IdModel friendId)
         {
             // Check if user exists with friend ID
-            UserModel friend = await _context.Users.FindAsync(friendId);
+            UserModel friend = await _context.Users.FindAsync(friendId.id);
 
             if (friend == null)
                 return Ok(new { status = "error", message = "User does not exist" });
