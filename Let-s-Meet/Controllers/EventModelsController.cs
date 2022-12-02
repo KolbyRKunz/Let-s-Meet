@@ -14,6 +14,7 @@ using System.Globalization;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.AspNetCore.Http;
 using Let_s_Meet.Models.FromBodyDataModels;
+using Let_s_Meet.Processes;
 
 namespace Let_s_Meet.Controllers
 {
@@ -99,7 +100,17 @@ namespace Let_s_Meet.Controllers
         // GET: EventModels/SuggestEvent
         public async Task<IActionResult> SuggestEvent([FromBody] SuggestEventModel eventData)
         {
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            User user = await _um.GetUserAsync(User);
+            
+            DateTime start = DateTime.UtcNow;
+            DateTime end = DateTime.UtcNow.AddDays(eventData.withinDays);
+
+            TimeSpan timeSpan = TimeSpan.Parse(eventData.duration);
+
+            List<EventModel> suggested = await EventSuggestion.SuggestEventsAsync(_context, eventData.groupID, timeSpan, start, end, eventData.title, eventData.location);
+
+            
+            return Ok(suggested);
         }
 
 
@@ -144,12 +155,20 @@ namespace Let_s_Meet.Controllers
             };
             User user = await _um.GetUserAsync(User);
             UserModel userModel = await _context.Users.FindAsync(user.UserID);
-            CalendarModel cal = await _context.Calendars.FindAsync(eventData.calendarID);
+            CalendarModel cal = await _context.Calendars
+                .Include("Group")
+                .Include("Group.Users")
+                .Where(c => c.CalendarID == eventData.calendarID)
+                .FirstOrDefaultAsync();
 
             List<UserModel> users = new List<UserModel> { userModel };
 
-            // TODO if calendar has group add group users to users
-            
+            // If calendar has group add group users to users
+            if (cal.Group != null)
+            {
+                users.AddRange(cal.Group.Users);
+            }
+
             eventModel.Users = users;
             eventModel.Calendar = cal;
 

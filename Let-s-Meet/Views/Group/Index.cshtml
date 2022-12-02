@@ -1,4 +1,6 @@
 ﻿<link rel="stylesheet" type="text/css" href="~/css/site.css" />
+<!--moment.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!--Sweet Alert 2-->
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--<script src="sweetalert2.all.min.js"></script>-->
@@ -23,8 +25,14 @@
 
                 height: "auto",
 
-                events: '/api/getGroupEvents', //TODO: will need to call correct api controller to get group event, this is a hard coded data call
+                events: `/EventModels/GetCalendarEvents?calendarIds=${"@ViewBag.GroupCalendarID"}`, //TODO: is this the correct call
                 
+                selectable:true,
+                nowIndicator: true,
+                navLinks: true,
+                nowIndicator: true,
+                timeZone:'local',
+
                 //IMPORTANT: this is doing the displaying of the location since it's not a default fullcalendar attribute
                 eventDidMount: function (info) {
                     //Need to make sure it's not month view because this won't work there
@@ -36,7 +44,103 @@
                     }
                 },
                 
-                nowIndicator: true
+                eventClick: function (info) {
+                    var eventID = info.event.id;
+                    Swal.fire({
+                        title: 'Are you sure you want to delete this event?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete event!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            info.event.remove();
+                            var url = '/EventModels/Delete';
+
+                            var eventData = {
+                                id: parseInt(eventID)
+                            }
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify(eventData)
+                            })
+                        }
+                    })
+                },
+
+                select: function (data) {
+                    console.log(data); //this is the data given by the select callback, fullcalendar
+                    var startDate = formatStartEndDate(data.start)//FIXED: Have to give it start/end and not startStr/endStr becuase it will leave out important data
+                    var endDate = formatStartEndDate(data.end) //TODO: convert to local time currently UTC
+
+                    addEvent(startDate, endDate).then((values) => { //JS promise?
+                        console.log(values);//this is a JSON/object of stuff from the promise of addEvent()
+                        var eventName = values.eventName
+                        var calendarID = "@ViewBag.GroupCalendarID"
+                        var location = values.location
+                        var startDate = $('#startDate').val()
+                        var endDate = $('#endDate').val()
+
+                        startDate = new Date(startDate)
+                        endDate = new Date(endDate)
+
+                        if (endDate.getTime() < startDate.getTime()) //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'The End Date can\'t be before Start Date',
+                            })
+                            return
+                        }
+                        if (eventName == "") //TODO: make it take care of this in the event creation popup so users don't have to reselect items and enter title
+                        {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Please enter Event Name',
+                            })
+                            return
+                        }
+
+                        /*Need to convert to ISOstring for database
+                            it has a similar idea to UTC, but different formatting
+                            but I found the C# played nicer with this than .toUTCString()*/
+                        startDate = startDate.toISOString()
+                        endDate = endDate.toISOString()
+
+                        //REMEMBER: Need dates/times to go to the backend in UTC format!
+                        var url = '/EventModels/Create';
+
+                        var eventData = {
+                            title: eventName,
+                            startTime: startDate,
+                            endTime: endDate,
+                            calendarID: calendarID,
+                            location: location
+                        }
+                        console.log(eventData)
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            contentType: 'application/json',
+                            data: JSON.stringify(eventData)
+                        })
+                        .done(function (result) {
+                            console.log(result)
+                            calendar.refetchEvents() //Instead of location.reload() this will refresh the calendar
+                        });
+
+                    })
+                    .catch(error => console.log(error));
+                },
+            
             });
             calendar.render();
         });
@@ -83,7 +187,7 @@
             <input type="text" class="modalItem " id="meetingLocation" placeholder="Location" />
             <h4>How soon do you want to hold the meeting?</h4>
             <select id="meetingDaysOut">
-                <option value="1">Within 1 day from now</option>
+                <option value="1" selected="selected">Within 1 day from now</option>
                 <option value="2">Within 2 days from now</option>
                 <option value="3">Within 3 days from now</option>
                 <option value="4">Within 4 days from now</option>
@@ -94,7 +198,11 @@
             <!--TODO: this can be removed if we don't want the select, I can just note that it's only hour long meetings for now-->
             <h4>Length of the meeting</h4>
             <select id="meetingLength">
-                <option value="1">1 hour</option>
+                <option value="00:30:00">30 minutes</option>
+                <option value="00:45:00">45 minutes</option>
+                <option value="01:00:00" selected="selected">1 hour</option>
+                <option value="02:00:00">2 hour</option>
+                <option value="03:00:00">3 hour</option>
             </select>
         </div>
         <div class="modal-footer">
@@ -116,15 +224,6 @@
                 <h5>If none of these work, hit cancel and start a new search with different days</h5>
             </div>
             <div id="meetingTimesList">
-                <!--TODO: Remove these later, it's hardcoded just for displaying an idea of what it looks like-->
-                <div class="potentialTime">
-                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
-                    <button class="alignTime btn-danger">Accept</button>
-                </div>
-                <div class="potentialTime">
-                    <p class="alignTime">Time Goes here, this is hard coded for design, delete later</p>
-                    <button class="alignTime btn-danger">Accept</button>
-                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -177,96 +276,114 @@
         var days = daysSelect.options[daysSelect.selectedIndex].value;
         var lengthSelect = document.getElementById('meetingLength');
         var length = lengthSelect.options[lengthSelect.selectedIndex].value;
-        console.log(reason);
-        console.log(location);
-        console.log(days);
-        console.log(length);
         
         /*TODO: this is where the API call for the finding meeting time will go
             I put the friends request one here for now since it does something similar-ish
             to what I think will happen here with meeting times, but let me know if it needs to change. */
-        var url = '/FriendsModels/GetReceivedRequests'; //TODO: this will be actual meeting creation api call
+        var url = '/EventModels/SuggestEvent'; //TODO: this will be actual meeting creation api call
+        
         var meetingData = {
+            groupID: @ViewBag.groupID,
+            duration: length,
+            withinDays: days,
             title: reason,
             location: location,
-            withinDays: days,
-            duration: length,
-            //calendarID: 1 //TODO: How to get calendarID here
         }
+        
         $.ajax({
-            type: 'POST',
+            type: 'POST', //TODO: Should this be get or post?
             url: url,
-            dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify(meetingData),
             //async: false //Is this needed to make sure ajax doesn't return early, but it should be solved by .done
+            success: function(data) {
+                //Put the loop outside the function so variables are assigned correctly because closures
+                //Also I should be using let more than var in the future
+                for(let i = 0; i < data.length; i++){
+                    console.log(data[i])
+                    getMeetingTimes(data[i]);
+                }
+                //Algorithm couldn't find times with given parameters
+                if(data.length === 0)
+                {
+                    var meetingTimesList = document.getElementById("meetingTimesList");
+                    var h3 = document.createElement("h3")
+                    h3.innerHTML = "Couldn'\t find any meeting times within the desired time range. Try searching with different inputs."
+                    meetingTimesList.appendChild(h3)
+                }
+            }
         })
         .done(function (data) {
             //TODO: error checking
-            console.log(data)
-            getMeetingTimes(data)
+            //Do in success function instead?
+            //getMeetingTimes(data)
         })
         .fail(function (error) {
             console.log(error);
         });
 
         function getMeetingTimes(data) {
-            console.log(data);
-            for (var i = 0; i < data.length; i++) {
-                var potentialTime = document.createElement("div");
-                potentialTime.setAttribute('class', 'potentialTime');
-                var time = document.createElement('p');
-                time.innerHTML = data[i].requestedBy.firstName; //TODO: change this to time from meeting api call
-                var accept = document.createElement("button");
-                accept.innerHTML = "Accept";
-                accept.setAttribute("id", data[i].friendsID); //TODO: Change this id
-                accept.onclick = (e) => {
-                    console.log(e.target.id);
-                    $.ajax({
-                        url: "/FriendsModels/AcceptRequest", //TODO: change this to the meeting time accept method
-                        type: "POST",
-                        data: JSON.stringify({ id: parseInt(e.target.id) }), //TODO: will this need to change also?
-                        contentType: 'application/json',
-                        dataType: "json",
-                        success: function (response) {
-                            console.log(response)
-                            if (response.status == 'error') {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                }).then((result) => {
-                                    window.location.reload();
-                                })
-                            }
-                            else {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Meeting added to group calendar',
-                                }).then((result) => {
-                                    window.location.reload();
-                                })
-                            }
-                        },
-                        //TODO: can this error function be deleted? since it was handled above
-                        error: function (response) {
-                            console.log("something went wrong in group events ", response)
+            //console.log(data);
+            var potentialTime = document.createElement("div");
+            potentialTime.setAttribute('class', 'potentialTime');
+            var time = document.createElement('p');
+            time.innerHTML = convertToHumanReadable(data.startTime) + " to " + convertToHumanReadable(data.endTime); //TODO: change this to time from meeting api call
+            var accept = document.createElement("button");
+            accept.innerHTML = "Accept";
+                
+            accept.onclick = (e) => {
+                let timeData = {
+                    title: data.title,
+                    location: data.location,
+                    startTime: new Date (data.startTime).toISOString(), //TODO: is this needed? .toISOString()
+                    endTime: new Date(data.endTime).toISOString(),  //TODO: is this needed? .toISOString()
+                    calendarID: @ViewBag.GroupCalendarID,
+                };
+
+                $.ajax({
+                    url: "/EventModels/Create", //TODO: change this to the meeting time accept method
+                    type: "POST",
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify(timeData), //TODO: will this need to change also?
+                    success: function (response) {
+                        console.log(response)
+                        if (response.status == 'error') {
                             Swal.fire({
                                 icon: 'error',
-                                title: "Meeting can't be added to group events",
+                                title: response.message,
                             }).then((result) => {
                                 window.location.reload();
                             })
                         }
-                    })
-                }
-                time.setAttribute('class', 'alignTime');
-                accept.setAttribute('class', 'alignTime');
-                accept.classList.add('btn-danger');
-                potentialTime.appendChild(time);
-                potentialTime.appendChild(accept);
-                var meetingTimesList = document.getElementById("meetingTimesList");
-                meetingTimesList.appendChild(potentialTime);
+                        else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Meeting added to group calendar',
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        }
+                    },
+                    //TODO: can this error function be deleted? since it was handled above
+                    error: function (response) {
+                        console.log("something went wrong in group events ", response)
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Meeting can't be added to group events",
+                        }).then((result) => {
+                            window.location.reload();
+                        })
+                    }
+                })
             }
+            time.setAttribute('class', 'alignTime');
+            accept.setAttribute('class', 'alignTime');
+            accept.classList.add('btn-danger');
+            potentialTime.appendChild(time);
+            potentialTime.appendChild(accept);
+            var meetingTimesList = document.getElementById("meetingTimesList");
+            meetingTimesList.appendChild(potentialTime);
         }
     }
 
@@ -311,6 +428,15 @@
             text: "Copy the link above to give to someone to join the group"
         })
     }
+    
+    function convertToHumanReadable(dateToConvert) {
+        var dateObj = new Date(dateToConvert)
+        console.log(dateObj)
+        var momentObj = moment(dateObj)
+        var momentString = momentObj.format('dddd MMMM Do YYYY, h:mm a')
+        console.log(momentString)
+        return momentString
+    }
 
     function leaveGroup() {
         /*Since it's a get, there is no body, only query string parameters
@@ -345,6 +471,52 @@
                 })
             }
         })
+    }
+
+    async function addEvent(startDate, endDate) {
+
+        const { value: formValues } = await Swal.fire({
+            title: 'Add an event that isn\'t created with the Let\'s Meet button',
+            html: //This does no input checking currently
+                //TODO: Figure out how to style in css not inline like this.
+                //Was struggling to get site.css to acess parts of the popup
+                '<div style="display:grid"><label>Event Name</label>' +
+                '<input type="text" id="eventName" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Event Location</label>' +
+                '<input type="text" id="location" class="swal2-input">' +
+                '<br/></div>' +
+                '<div style="display:grid"><label>Start Date</label>' +
+                `<input type="datetime-local" id="startDate" class="swal2-input" value="${startDate}">` + //IMPORTANT: take not of the ` back tick here for string interpolation
+                '<br/></div>' +
+                '<div style="display:grid"><label>End Date</label>' +
+                `<input type="datetime-local" id="endDate" class="swal2-input" value="${endDate}">` +
+                '<br/></div>',
+            focusConfirm: false,
+            position: 'top-end',
+            showCancelButton: true,
+            confirmButtonText: 'Create Event',
+            preConfirm: () => {
+                return {
+                    eventName: $('#eventName').val(),
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                    location: $('#location').val()
+                }
+            }
+        });
+        return formValues;
+    }
+
+    function formatStartEndDate(date) {
+        var formattedDate = new Date(date)
+        var d = String(formattedDate.getDate()).padStart(2, '0')
+        var m = String(formattedDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var y = formattedDate.getFullYear();
+        var h = String(formattedDate.getHours()).padStart(2, '0');
+        var mi = String(formattedDate.getMinutes()).padStart(2, '0')
+        formattedDate = y + "-" + m + "-" + d + "T" + h + ":" + mi
+        return formattedDate
     }
 
 </script>

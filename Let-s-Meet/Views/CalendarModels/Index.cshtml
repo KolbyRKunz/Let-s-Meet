@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>My Calendars</h1>
+<h1 class="description">My Calendars</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -26,23 +26,49 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <div style=@Html.Raw("height:20px;width:20px;background:"+item.Color)></div>
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CalendarID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CalendarID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CalendarID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <div style=@Html.Raw("height:20px;width:20px;background:"+item.Color)></div>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.CalendarID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.CalendarID">Details</a>
+
+                    @if (item.Group == null)
+                    {
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.CalendarID">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<script>
+    fetch('/CalendarModels/GetCalendars')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            for (var i = 0; i < data.length; i++) {
+                //Get the group calendars
+                //This work makes it so you can't delete group calendars
+                if (data[i].group !== null) {
+                    let id = document.getElementById(data[i].calendarID)
+                    id.style.visibility="hidden"
+                }
+            }
+        })
+        .catch(function (e) {
+            console.log("error in getting calendars: " + e);
+        })
+</script>

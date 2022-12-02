@@ -6,8 +6,8 @@ namespace Let_s_Meet.Models.FromBodyDataModels
     // Add profile data for application users by adding properties to the User class
     public class SuggestEventModel
     {
-        [Required(ErrorMessage = "calendarId is required")]
-        public int calendarID { get; set; }
+        [Required(ErrorMessage = "groupID is required")]
+        public int groupID { get; set; }
         [Required(ErrorMessage = "duration is required")]
         public string duration { get; set; }
         [Required(ErrorMessage = "withinDays is required")]
@@ -15,6 +15,6 @@ namespace Let_s_Meet.Models.FromBodyDataModels
         [Required(ErrorMessage = "title is required")]
         public string title { get; set; }
         [Required(ErrorMessage = "location is required")]
-        public int location { get; set; }
+        public string location { get; set; }
     }
 }

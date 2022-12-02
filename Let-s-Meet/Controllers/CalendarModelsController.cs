@@ -42,6 +42,7 @@ namespace Let_s_Meet.Controllers
             return View(await _context
                 .Calendars
                 .Include(c => c.Owner)
+                .Include(c => c.Group)
                 .Where(c => c.Owner.UserID == id || c.Group.Users.Any(m => m.UserID == id))
                 .ToListAsync()
                 );
@@ -124,6 +125,7 @@ namespace Let_s_Meet.Controllers
             }
 
             var calendarModel = await _context.Calendars
+                .Include(c => c.Group)
                 .FirstOrDefaultAsync(m => m.CalendarID == id);
             if (calendarModel == null)
             {
@@ -189,7 +191,9 @@ namespace Let_s_Meet.Controllers
                 return NotFound();
             }
 
-            var calendarModel = await _context.Calendars.FindAsync(id);
+            var calendarModel = await _context.Calendars
+                .Include(c => c.Group)
+                .FirstOrDefaultAsync(c => c.CalendarID == id);
             if (calendarModel == null)
             {
                 return NotFound();
@@ -213,6 +217,15 @@ namespace Let_s_Meet.Controllers
             {
                 try
                 {
+                    var old = await _context.Calendars.Where(c => c.CalendarID == id).Select(c => new { c.Name, c.Description }).FirstOrDefaultAsync();
+                    if (calendarModel.Name == null || calendarModel.Name == "")
+                    {
+                        calendarModel.Name = old.Name;
+                    }
+                    if (calendarModel.Description == null || calendarModel.Description == "")
+                    {
+                        calendarModel.Description = old.Description;
+                    }
                     _context.Update(calendarModel);
                     await _context.SaveChangesAsync();
                 }

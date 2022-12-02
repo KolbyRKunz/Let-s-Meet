@@ -130,20 +130,32 @@
                 }).then((result) => {
                     if(result.isConfirmed)
                     {
-                        info.event.remove(); 
-                        var url = '/EventModels/Delete';
-
-                        var eventData = {
-                            id: parseInt(eventID)
+                        //Don't allow deleting group events from here
+                        if (info.event._def.groupId !== "-1") //IMPORTANT: Have to do a string compare
+                        {
+                            Swal.fire({
+                                title: 'Can\'t delete group event from here',
+                                icon: 'error',
+                            })
                         }
+                        //Deleting a single user's event
+                        else
+                        {
+                            info.event.remove();
+                            var url = '/EventModels/Delete';
 
-                        $.ajax({
-                            type: 'POST',
-                            url: url,
-                            dataType: 'json',
-                            contentType: 'application/json',
-                            data: JSON.stringify(eventData)
-                        })
+                            var eventData = {
+                                id: parseInt(eventID)
+                            }
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify(eventData)
+                            })
+                        }
                     }
                 })
             },
@@ -200,7 +212,7 @@
                     endDate = endDate.toISOString()
 
                     //REMEMBER: Need dates/times to go to the backend in UTC format!
-                    var url = 'EventModels/Create';
+                    var url = '/EventModels/Create';
 
                     var eventData = {
                         title: eventName,
@@ -256,7 +268,7 @@
                 inputTag.setAttribute('name', 'checkbox');
                 inputTag.setAttribute('value', data[i].name);
                 inputTag.setAttribute('class', 'checkbox');
-                //inputTag.setAttribute('checked', true);
+                inputTag.setAttribute('checked', true);
                 inputTag.onclick = (e) => {
                     calendar.refetchEvents();
                 }
@@ -269,6 +281,7 @@
                 div.appendChild(labelTag);
                 calendarFilter.appendChild(div);
             }
+            calendar.refetchEvents();
         }
 
     });
@@ -292,9 +305,21 @@
 <script>
 
     async function addEvent(startDate, endDate){
+
+        //make it so only User calendars can be added to, not groups
+        let response = await fetch('/CalendarModels/GetCalendars')
+        let data = await response.json();
         
+        var calendars = [];
+        for(var i = 0; i < data.length; i++){
+            if(data[i].group === null){
+                calendars.push(data[i]);
+            }
+        }
+
         // Generate html string for calendar select input using calendars in ViewBag
-        var calendars = JSON.parse('@Html.Raw(@ViewBag.Calendars)');
+        //var calendars = JSON.parse('@Html.Raw(@ViewBag.Calendars)');
+
         var calendarInput = '<select class="swal2-input" name="calendars">';
         for (var i = 0; i < calendars.length; i++) {
             calendarInput += '<option value="' + calendars[i].calendarID + '">' + calendars[i].name + '</option>';
