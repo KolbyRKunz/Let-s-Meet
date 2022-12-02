@@ -45,7 +45,7 @@ namespace Let_s_Meet.Processes
             List<EventModel> events = await context.Events
                 .Include(e => e.Users)
                 .Where(e => e.Users.Any(u => users.Contains(u)))
-                .Where(e => e.StartTime >= start && e.EndTime <= end)
+                .Where(e => e.StartTime >= start || e.EndTime <= end) //TODO: Handle events that have started but haven't ended
                 .ToListAsync();
 
             // Add all events to a list of time periods
@@ -53,7 +53,7 @@ namespace Let_s_Meet.Processes
             foreach (EventModel e in events) {
 
                 // Create TimeRange
-                TimeRange timeRange = new TimeRange(e.StartTime, e.EndTime);
+                TimeRange timeRange = new TimeRange(DateTime.SpecifyKind(e.StartTime, DateTimeKind.Utc), DateTime.SpecifyKind(e.EndTime, DateTimeKind.Utc));
 
                 // Add TimeRange to event collection
                 eventPeriods.Add(timeRange);

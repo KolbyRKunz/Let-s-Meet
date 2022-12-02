@@ -300,7 +300,16 @@
                 //Put the loop outside the function so variables are assigned correctly because closures
                 //Also I should be using let more than var in the future
                 for(let i = 0; i < data.length; i++){
+                    console.log(data[i])
                     getMeetingTimes(data[i]);
+                }
+                //Algorithm couldn't find times with given parameters
+                if(data.length === 0)
+                {
+                    var meetingTimesList = document.getElementById("meetingTimesList");
+                    var h3 = document.createElement("h3")
+                    h3.innerHTML = "Couldn'\t find any meeting times within the desired time range. Try searching with different inputs."
+                    meetingTimesList.appendChild(h3)
                 }
             }
         })
@@ -422,8 +431,10 @@
     
     function convertToHumanReadable(dateToConvert) {
         var dateObj = new Date(dateToConvert)
+        console.log(dateObj)
         var momentObj = moment(dateObj)
-        var momentString = momentObj.format('MMMM Do YYYY, h:mm a')
+        var momentString = momentObj.format('dddd MMMM Do YYYY, h:mm a')
+        console.log(momentString)
         return momentString
     }
 

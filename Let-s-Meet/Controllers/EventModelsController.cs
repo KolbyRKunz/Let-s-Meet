@@ -102,8 +102,8 @@ namespace Let_s_Meet.Controllers
         {
             User user = await _um.GetUserAsync(User);
             
-            DateTime start = DateTime.Now;
-            DateTime end = DateTime.Now.AddDays(eventData.withinDays);
+            DateTime start = DateTime.UtcNow;
+            DateTime end = DateTime.UtcNow.AddDays(eventData.withinDays);
 
             TimeSpan timeSpan = TimeSpan.Parse(eventData.duration);
 
