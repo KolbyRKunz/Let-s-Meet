@@ -266,7 +266,7 @@ namespace Let_s_Meet.Controllers
 
             return Ok(new { status = "ok", message = "Group created" });
         }
-        public async Task<IActionResult> JoinGroupRedirect(JoinCodeModel code)
+        public async Task<IActionResult> JoinGroupRedirect([FromBody] JoinCodeModel code)
         {
             var result = await JoinGroup(code);
             if (result is OkObjectResult ok)
@@ -280,7 +280,7 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> JoinGroup(JoinCodeModel code)
+        public async Task<IActionResult> JoinGroup([FromBody] JoinCodeModel code)
         {
             User user = await _um.GetUserAsync(User);
             int userId = user.UserID;

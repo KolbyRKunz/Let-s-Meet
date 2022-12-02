@@ -161,7 +161,7 @@ namespace Let_s_Meet.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCalendar(CalendarModel calendarModel)
+        public async Task<IActionResult> CreateCalendar([FromBody] CalendarModel calendarModel)
         {
             // get current user and set it as owner
             User user = await _um.GetUserAsync(User);
