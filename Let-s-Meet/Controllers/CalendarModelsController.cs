@@ -214,6 +214,15 @@ namespace Let_s_Meet.Controllers
             {
                 try
                 {
+                    var old = await _context.Calendars.Where(c => c.CalendarID == id).Select(c => new { c.Name, c.Description }).FirstOrDefaultAsync();
+                    if (calendarModel.Name == null || calendarModel.Name == "")
+                    {
+                        calendarModel.Name = old.Name;
+                    }
+                    if (calendarModel.Description == null || calendarModel.Description == "")
+                    {
+                        calendarModel.Description = old.Description;
+                    }
                     _context.Update(calendarModel);
                     await _context.SaveChangesAsync();
                 }

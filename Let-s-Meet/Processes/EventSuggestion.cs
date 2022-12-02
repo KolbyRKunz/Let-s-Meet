@@ -4,6 +4,7 @@ using Let_s_Meet.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -87,13 +88,24 @@ namespace Let_s_Meet.Processes
                 int numEvents = (int)(roundedT.Duration.TotalMinutes / duration.TotalMinutes);
                 for (int i = 0; i < numEvents; i++)
                 {
+                    // Timezone settings
+                    var styles = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
+                    var culture = CultureInfo.InvariantCulture;
+                    const string dateFormatString = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
+
+                    // Adjust times
+                    DateTime startUTC = roundedT.Start.AddMinutes(i * duration.TotalMinutes).ToUniversalTime();
+                    DateTime endUTC = roundedT.Start.AddMinutes((i + 1) * duration.TotalMinutes).ToUniversalTime();
+
                     // Create event
                     EventModel e = new EventModel()
                     {
                         Title = title,
                         Location = location,
-                        StartTime = roundedT.Start.AddMinutes(i * duration.TotalMinutes),
-                        EndTime = roundedT.Start.AddMinutes((i + 1) * duration.TotalMinutes),
+                        StartTime = startUTC,
+                        EndTime = endUTC,
+                        //StartTime = roundedT.Start.AddMinutes(i * duration.TotalMinutes),
+                        //EndTime = roundedT.Start.AddMinutes((i + 1) * duration.TotalMinutes),
                         Calendar = new CalendarModel { CalendarID = calendar.CalendarID },
                         Users = users.Select(u => new UserModel { UserID = u.UserID, FirstName = u.FirstName, LastName = u.LastName, Email = u.Email }).ToList()
                     };

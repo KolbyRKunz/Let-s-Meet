@@ -155,7 +155,11 @@ namespace Let_s_Meet.Controllers
             };
             User user = await _um.GetUserAsync(User);
             UserModel userModel = await _context.Users.FindAsync(user.UserID);
-            CalendarModel cal = await _context.Calendars.FindAsync(eventData.calendarID);
+            CalendarModel cal = await _context.Calendars
+                .Include("Group")
+                .Include("Group.Users")
+                .Where(c => c.CalendarID == eventData.calendarID)
+                .FirstOrDefaultAsync();
 
             List<UserModel> users = new List<UserModel> { userModel };
 
