@@ -10,6 +10,7 @@ using Let_s_Meet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Let_s_Meet.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
+using Let_s_Meet.Models.FromBodyDataModels;
 
 namespace Let_s_Meet.Controllers
 {
@@ -160,21 +161,23 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCalendar([FromBody] CalendarModel calendarModel)
+        public async Task<IActionResult> CreateCalendar([FromBody] CreateCalendarModel CreateCalendarModel)
         {
             // get current user and set it as owner
             User user = await _um.GetUserAsync(User);
             UserModel userModel = _context.Users.Find(user.UserID);
+            var calendarModel = new CalendarModel();
+            calendarModel.Name = CreateCalendarModel.Name;
+            calendarModel.Description = CreateCalendarModel.Description;
+            calendarModel.Color = CreateCalendarModel.Color;
             calendarModel.Owner = userModel;
 
             if (ModelState.IsValid)
             {
                 _context.Add(calendarModel);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-            return Ok(calendarModel);
+            return Ok(new {status = "success", message = "Calendar has been created" });
         }
 
 
