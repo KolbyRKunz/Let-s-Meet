@@ -266,8 +266,11 @@ namespace Let_s_Meet.Controllers
 
             return Ok(new { status = "ok", message = "Group created" });
         }
-        public async Task<IActionResult> JoinGroupRedirect([FromBody] JoinCodeModel code)
+        public async Task<IActionResult> JoinGroupRedirect(string joinCode)
+
         {
+            var code = new JoinCodeModel();
+            code.joinCode = joinCode;
             var result = await JoinGroup(code);
             if (result is OkObjectResult ok)
             {
