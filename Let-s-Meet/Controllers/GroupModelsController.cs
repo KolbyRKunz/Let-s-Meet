@@ -266,9 +266,9 @@ namespace Let_s_Meet.Controllers
 
             return Ok(new { status = "ok", message = "Group created" });
         }
-        public async Task<IActionResult> JoinGroupRedirect(string joinCode)
+        public async Task<IActionResult> JoinGroupRedirect(JoinCodeModel code)
         {
-            var result = await JoinGroup(joinCode);
+            var result = await JoinGroup(code);
             if (result is OkObjectResult ok)
             {
                 return RedirectToAction("Groups", "Home");
@@ -280,13 +280,13 @@ namespace Let_s_Meet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> JoinGroup(string joinCode)
+        public async Task<IActionResult> JoinGroup(JoinCodeModel code)
         {
             User user = await _um.GetUserAsync(User);
             int userId = user.UserID;
 
             // Get group from join code
-            string[] split = joinCode.Split('-');
+            string[] split = code.joinCode.Split('-');
             if (split.Length != 2)
             {
                 return BadRequest("Invalid join code");
@@ -296,7 +296,7 @@ namespace Let_s_Meet.Controllers
             GroupModel group = await _context
                 .Groups
                 .Include(g => g.Users)
-                .Where(g => g.GroupID == groupId && g.JoinCode == joinCode)
+                .Where(g => g.GroupID == groupId && g.JoinCode == code.joinCode)
                 .FirstOrDefaultAsync();
             if (group == null)
             {

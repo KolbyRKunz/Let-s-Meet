@@ -143,7 +143,7 @@ namespace Let_s_Meet.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CalendarID,Name,Description,Color,Owner")] CalendarModel calendarModel)
+        public async Task<IActionResult> Create(CalendarModel calendarModel)
         {
             // get current user and set it as owner
             User user = await _um.GetUserAsync(User);
@@ -161,7 +161,7 @@ namespace Let_s_Meet.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCalendar([Bind("CalendarID,Name,Description,Color,Owner")] CalendarModel calendarModel)
+        public async Task<IActionResult> CreateCalendar(CalendarModel calendarModel)
         {
             // get current user and set it as owner
             User user = await _um.GetUserAsync(User);

@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Let_s_Meet.Models
 {
+    [BindProperties]
     [JsonObject(MemberSerialization.OptIn)]
     public class CalendarModel
     {
